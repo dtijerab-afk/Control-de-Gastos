@@ -296,8 +296,8 @@ export function TransactionModal({
                 onClick={() => setQuincena(1)}
                 className={`px-3 py-2.5 text-left rounded-lg border transition-colors ${
                   quincena === 1
-                    ? 'border-[#0F5132] bg-emerald-950/[0.04] text-slate-900'
-                    : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                    ? 'border-[#12663F] bg-emerald-50/70 text-[#0B3B24]'
+                    : 'border-slate-200 text-slate-600 hover:border-emerald-900/25'
                 }`}
               >
                 <span className="block text-xs font-semibold">1ª Quincena</span>
@@ -310,8 +310,8 @@ export function TransactionModal({
                 onClick={() => setQuincena(2)}
                 className={`px-3 py-2.5 text-left rounded-lg border transition-colors ${
                   quincena === 2
-                    ? 'border-[#0F5132] bg-emerald-950/[0.04] text-slate-900'
-                    : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                    ? 'border-[#12663F] bg-emerald-50/70 text-[#0B3B24]'
+                    : 'border-slate-200 text-slate-600 hover:border-emerald-900/25'
                 }`}
               >
                 <span className="block text-xs font-semibold">2ª Quincena</span>
@@ -348,7 +348,7 @@ export function TransactionModal({
               <button
                 type="button"
                 onClick={() => setCreatingCategory((prev) => !prev)}
-                className="inline-flex items-center gap-1 text-xs font-medium text-[#0F5132] hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-medium text-[#12663F] hover:underline"
               >
                 <Plus className="w-3.5 h-3.5" />
                 {creatingCategory ? 'Cancelar nueva' : 'Nueva categoría'}
@@ -356,7 +356,7 @@ export function TransactionModal({
             </div>
 
             {creatingCategory ? (
-              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg space-y-3">
+              <div className="p-3.5 bg-[#F4F8F5] border border-emerald-950/12 rounded-lg space-y-3">
                 <input
                   type="text"
                   maxLength={VALIDATION_LIMITS.CATEGORY_NAME_MAX}
@@ -469,7 +469,7 @@ export function TransactionModal({
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 text-sm font-semibold text-white bg-[#0F5132] hover:bg-[#0B3D26] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
+              className="px-5 py-2 text-sm font-semibold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
             >
               {saving
                 ? 'Guardando...'

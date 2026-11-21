@@ -5,13 +5,13 @@ export function AuthScreen() {
   const { signInWithGoogle, signingIn, authError } = useFinance();
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="min-h-screen bg-[#F3F7F4] flex flex-col">
+      <header className="border-b border-emerald-950/10 bg-[#0B3B24] text-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-8">
-          <span className="text-lg font-bold tracking-tight text-slate-900 font-display whitespace-nowrap shrink-0">
+          <span className="text-lg font-bold tracking-tight text-white font-display whitespace-nowrap shrink-0">
             Quincena
           </span>
-          <div className="hidden md:flex items-center gap-6 text-sm text-slate-600">
+          <div className="hidden md:flex items-center gap-6 text-sm text-emerald-100/85">
             <span className="whitespace-nowrap shrink-0">Control quincenal</span>
             <span className="whitespace-nowrap shrink-0">Categorías propias</span>
             <span className="whitespace-nowrap shrink-0">Gráficas mensuales</span>
@@ -20,7 +20,7 @@ export function AuthScreen() {
             type="button"
             onClick={signInWithGoogle}
             disabled={signingIn}
-            className="px-4 py-2 text-sm font-medium text-white bg-[#0F5132] hover:bg-[#0B3D26] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap shrink-0"
+            className="px-4 py-2 text-sm font-semibold text-[#0B3B24] bg-emerald-300 hover:bg-emerald-200 disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap shrink-0"
           >
             {signingIn ? 'Conectando...' : 'Iniciar sesión'}
           </button>
@@ -30,7 +30,7 @@ export function AuthScreen() {
       <main className="flex-1 flex items-center">
         <div className="max-w-6xl w-full mx-auto px-6 py-14 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
           <div className="lg:col-span-6 flex flex-col justify-center">
-            <p className="text-sm font-medium text-[#0F5132] mb-3">
+            <p className="text-sm font-semibold text-[#12663F] mb-3">
               Finanzas personales diseñadas alrededor de cada quincena
             </p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-tight [text-wrap:balance] mb-5">
@@ -46,7 +46,7 @@ export function AuthScreen() {
                 type="button"
                 onClick={signInWithGoogle}
                 disabled={signingIn}
-                className="inline-flex items-center justify-center gap-3 px-6 py-3 text-sm font-semibold text-white bg-[#0F5132] hover:bg-[#0B3D26] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
+                className="inline-flex items-center justify-center gap-3 px-6 py-3 text-sm font-semibold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
               >
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -57,7 +57,7 @@ export function AuthScreen() {
                 {signingIn ? 'Iniciando sesión...' : 'Continuar con Google'}
                 <ArrowRight className="w-4 h-4 shrink-0" />
               </button>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-600">
                 Tus registros se guardan de forma privada en tu cuenta.
               </span>
             </div>
@@ -71,23 +71,23 @@ export function AuthScreen() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-slate-200">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-emerald-950/10">
               <div>
-                <CalendarRange className="w-4 h-4 text-[#0F5132] mb-2" />
+                <CalendarRange className="w-4 h-4 text-[#12663F] mb-2" />
                 <h2 className="text-sm font-semibold text-slate-900 mb-1">Ciclo quincenal</h2>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Separa automáticamente 1ª quincena (1–15) y 2ª quincena (16–fin).
                 </p>
               </div>
               <div>
-                <FolderKanban className="w-4 h-4 text-[#0F5132] mb-2" />
+                <FolderKanban className="w-4 h-4 text-[#12663F] mb-2" />
                 <h2 className="text-sm font-semibold text-slate-900 mb-1">Categorías propias</h2>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Define tus categorías de ingreso y gasto con límites mensuales.
                 </p>
               </div>
               <div>
-                <BarChart3 className="w-4 h-4 text-[#0F5132] mb-2" />
+                <BarChart3 className="w-4 h-4 text-[#12663F] mb-2" />
                 <h2 className="text-sm font-semibold text-slate-900 mb-1">Gráficas mensuales</h2>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Visualiza ingresos vs. gastos mes a mes y distribución por categoría.
@@ -97,19 +97,19 @@ export function AuthScreen() {
           </div>
 
           <div className="lg:col-span-6 flex">
-            <div className="w-full bg-white border border-slate-200 rounded-xl p-6 sm:p-8 flex flex-col justify-between">
+            <div className="w-full bg-white border border-emerald-950/10 rounded-xl p-6 sm:p-8 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                <div className="flex items-center justify-between pb-4 border-b border-emerald-950/10">
                   <div>
-                    <p className="text-xs text-slate-500">Vista previa del libro mensual</p>
+                    <p className="text-xs text-emerald-800/75">Vista previa del libro mensual</p>
                     <p className="text-base font-semibold text-slate-900 mt-0.5">
                       Estructura por quincenas
                     </p>
                   </div>
-                  <span className="text-xs font-mono text-slate-500 tabular-nums">Q1 · Q2</span>
+                  <span className="text-xs font-mono text-emerald-800/80 tabular-nums">Q1 · Q2</span>
                 </div>
 
-                <div className="grid grid-cols-2 divide-x divide-slate-200 border-b border-slate-200 py-5">
+                <div className="grid grid-cols-2 divide-x divide-emerald-950/10 border-b border-emerald-950/10 py-5">
                   <div className="pr-5">
                     <p className="text-xs text-slate-500">1ª Quincena · días 1–15</p>
                     <p className="text-xl font-mono font-semibold text-emerald-700 tabular-nums mt-1">
@@ -147,11 +147,11 @@ export function AuthScreen() {
                       <div key={bar.m} className="flex flex-col items-center gap-2 h-full justify-end">
                         <div className="w-full flex items-end justify-center gap-1 h-24">
                           <div
-                            className="w-2.5 bg-[#0F5132] rounded-t-sm"
+                            className="w-2.5 bg-[#12663F] rounded-t-sm"
                             style={{ height: `${bar.inc}%` }}
                           />
                           <div
-                            className="w-2.5 bg-slate-300 rounded-t-sm"
+                            className="w-2.5 bg-emerald-200 rounded-t-sm"
                             style={{ height: `${bar.exp}%` }}
                           />
                         </div>

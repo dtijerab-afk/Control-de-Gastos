@@ -146,14 +146,14 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
             Evolución histórica terminando en {formatMonthLabel(selectedMonth)}
           </p>
         </div>
-        <div className="inline-flex items-center gap-1 p-1 bg-slate-200/70 rounded-lg w-fit">
+        <div className="inline-flex items-center gap-1 p-1 bg-emerald-950/[0.06] rounded-lg w-fit">
           <button
             type="button"
             onClick={() => setMonthsSpan(6)}
             className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
               monthsSpan === 6
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#0B3B24] shadow-xs'
+                : 'text-slate-600 hover:text-[#0B3B24]'
             }`}
           >
             Últimos 6 meses
@@ -163,8 +163,8 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
             onClick={() => setMonthsSpan(12)}
             className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
               monthsSpan === 12
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#0B3B24] shadow-xs'
+                : 'text-slate-600 hover:text-[#0B3B24]'
             }`}
           >
             Últimos 12 meses
@@ -173,7 +173,7 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
       </div>
 
       {/* Chart 1: Monthly Income vs Expense Bar Chart */}
-      <section className="bg-white border border-slate-200 rounded-xl p-6">
+      <section className="bg-white border border-emerald-950/10 rounded-xl p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
           <div>
             <h3 className="text-base font-semibold text-slate-900">Ingresos vs. Gastos por mes</h3>
@@ -183,7 +183,7 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
           </div>
           <div className="flex items-center gap-4 text-xs text-slate-600">
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-xs bg-[#0F5132]" aria-hidden="true" />
+              <span className="w-2.5 h-2.5 rounded-xs bg-[#15803D]" aria-hidden="true" />
               Ingresos
             </span>
             <span className="inline-flex items-center gap-1.5">
@@ -204,7 +204,7 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                 if (key) onSelectMonth(key);
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2ECE5" />
               <XAxis
                 dataKey="label"
                 axisLine={false}
@@ -219,12 +219,12 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                 tickFormatter={(v) => formatCompactCurrency(Number(v), currency)}
               />
               <Tooltip
-                cursor={{ fill: '#F1F5F9' }}
+                cursor={{ fill: '#F3F7F4' }}
                 content={({ active, payload, label }) => {
                   if (!active || !payload || payload.length === 0) return null;
                   const row = payload[0].payload as (typeof monthlySeries)[number];
                   return (
-                    <div className="bg-white border border-slate-200 rounded-lg px-3.5 py-2.5 shadow-sm text-xs space-y-1">
+                    <div className="bg-white border border-emerald-950/15 rounded-lg px-3.5 py-2.5 shadow-sm text-xs space-y-1">
                       <p className="font-semibold text-slate-900">{label}</p>
                       <p className="font-mono tabular-nums text-emerald-700">
                         Ingresos: +{formatCurrency(row.ingresos, currency)}
@@ -240,7 +240,7 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                   );
                 }}
               />
-              <Bar dataKey="ingresos" fill="#0F5132" radius={[4, 4, 0, 0]} maxBarSize={28} />
+              <Bar dataKey="ingresos" fill="#15803D" radius={[4, 4, 0, 0]} maxBarSize={28} />
               <Bar dataKey="gastos" fill="#E11D48" radius={[4, 4, 0, 0]} maxBarSize={28} />
             </BarChart>
           </ResponsiveContainer>
@@ -249,7 +249,7 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
 
       {/* Charts 2 & 3: Net Savings Area Chart + Category Donut */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <section className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-6 flex flex-col">
+        <section className="lg:col-span-7 bg-white border border-emerald-950/10 rounded-xl p-6 flex flex-col">
           <div className="mb-5">
             <h3 className="text-base font-semibold text-slate-900">Balance neto mensual</h3>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -261,11 +261,11 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
               <AreaChart data={monthlySeries} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="netBalanceFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0F5132" stopOpacity={0.22} />
-                    <stop offset="95%" stopColor="#0F5132" stopOpacity={0.01} />
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2ECE5" />
                 <XAxis
                   dataKey="label"
                   axisLine={false}
@@ -302,8 +302,8 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                 <Area
                   type="monotone"
                   dataKey="balance"
-                  stroke="#0F5132"
-                  strokeWidth={2}
+                  stroke="#12663F"
+                  strokeWidth={2.25}
                   fill="url(#netBalanceFill)"
                 />
               </AreaChart>
@@ -311,7 +311,7 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
           </div>
         </section>
 
-        <section className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-6 flex flex-col">
+        <section className="lg:col-span-5 bg-white border border-emerald-950/10 rounded-xl p-6 flex flex-col">
           <div className="mb-4">
             <h3 className="text-base font-semibold text-slate-900">Gastos por categoría</h3>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -394,7 +394,7 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
       </div>
 
       {/* Category Budget Progress (if any budgets configured) */}
-      <section className="bg-white border border-slate-200 rounded-xl p-6">
+      <section className="bg-white border border-emerald-950/10 rounded-xl p-6">
         <div className="mb-4">
           <h3 className="text-base font-semibold text-slate-900">
             Seguimiento de presupuestos mensuales
@@ -439,14 +439,14 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                       / {formatCurrency(row.budget, currency)} ({Math.round(row.pct)}%)
                     </div>
                   </div>
-                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-emerald-950/[0.07] rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
                         overBudget
                           ? 'bg-rose-600'
                           : warning
                             ? 'bg-amber-600'
-                            : 'bg-[#0F5132]'
+                            : 'bg-[#12663F]'
                       }`}
                       style={{ width: `${Math.min(100, row.pct)}%` }}
                     />

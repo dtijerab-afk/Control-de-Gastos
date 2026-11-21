@@ -141,14 +141,14 @@ export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
     <div className="space-y-6">
       {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="inline-flex items-center gap-1 p-1 bg-slate-200/70 rounded-lg w-fit">
+        <div className="inline-flex items-center gap-1 p-1 bg-emerald-950/[0.06] rounded-lg w-fit">
           <button
             type="button"
             onClick={() => setActiveType('gasto')}
             className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
               activeType === 'gasto'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#0B3B24] shadow-xs'
+                : 'text-slate-600 hover:text-[#0B3B24]'
             }`}
           >
             Categorías de gasto ({categories.filter((c) => c.type === 'gasto').length})
@@ -158,8 +158,8 @@ export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
             onClick={() => setActiveType('ingreso')}
             className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
               activeType === 'ingreso'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#0B3B24] shadow-xs'
+                : 'text-slate-600 hover:text-[#0B3B24]'
             }`}
           >
             Categorías de ingreso ({categories.filter((c) => c.type === 'ingreso').length})
@@ -169,7 +169,7 @@ export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
         <button
           type="button"
           onClick={openCreateForm}
-          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#0F5132] hover:bg-[#0B3D26] rounded-lg transition-colors whitespace-nowrap shrink-0 w-fit"
+          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#12663F] hover:bg-[#0D4F30] rounded-lg transition-colors whitespace-nowrap shrink-0 w-fit"
         >
           <Plus className="w-3.5 h-3.5" />
           Nueva categoría
@@ -178,7 +178,7 @@ export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
 
       {/* Category Create / Edit Form Panel */}
       {formOpen && (
-        <section className="bg-white border border-slate-200 rounded-xl p-6">
+        <section className="bg-white border border-emerald-950/10 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-slate-900">
               {editingCat ? 'Editar categoría' : 'Crear categoría personalizada'}
@@ -293,7 +293,7 @@ export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 text-xs font-semibold text-white bg-[#0F5132] hover:bg-[#0B3D26] disabled:opacity-60 rounded-lg whitespace-nowrap"
+                className="px-4 py-2 text-xs font-semibold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-lg whitespace-nowrap"
               >
                 {saving ? 'Guardando...' : editingCat ? 'Guardar cambios' : 'Crear categoría'}
               </button>
@@ -303,8 +303,8 @@ export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
       )}
 
       {/* Categories List */}
-      <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+      <section className="bg-white border border-emerald-950/10 rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-emerald-950/10 flex items-center justify-between">
           <div>
             <h2 className="text-base font-semibold text-slate-900">
               {activeType === 'gasto' ? 'Categorías de gasto' : 'Categorías de ingreso'}
@@ -421,7 +421,7 @@ export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
       </section>
 
       {/* Workspace Currency Preferences */}
-      <section className="bg-white border border-slate-200 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <section className="bg-white border border-emerald-950/10 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-900">Moneda de visualización</h3>
           <p className="text-xs text-slate-500 mt-0.5">

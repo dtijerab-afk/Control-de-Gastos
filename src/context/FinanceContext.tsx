@@ -178,6 +178,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         setAuthError('Se cerró la ventana de inicio de sesión antes de completar el acceso.');
       } else if (code === 'auth/popup-blocked') {
         setAuthError('Tu navegador bloqueó la ventana emergente. Permite ventanas emergentes e intenta de nuevo.');
+      } else if (code === 'auth/unauthorized-domain') {
+        setAuthError(
+          `El dominio "${window.location.hostname}" no está autorizado en Firebase Authentication. Agrégalo en Firebase Console → Authentication → Settings → Authorized domains.`
+        );
       } else {
         setAuthError('No fue posible iniciar sesión con Google. Intenta nuevamente.');
       }
