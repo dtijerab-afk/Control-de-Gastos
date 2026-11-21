@@ -1,0 +1,210 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Preferences and workspace state for an authenticated personal finance user. No PII stored.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID matching the document ID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name shown inside the workspace.",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "currency": {
+          "type": "string",
+          "description": "Preferred ISO 4217 currency code.",
+          "enum": ["MXN", "USD", "EUR", "COP", "ARS", "PEN", "CLP"],
+          "maxLength": 10
+        },
+        "seededDefaults": {
+          "type": "boolean",
+          "description": "Whether initial default categories have been seeded."
+        },
+        "monthlyBudget": {
+          "type": "number",
+          "description": "Optional global monthly expense budget target (0 means unset)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of profile creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last profile update."
+        }
+      },
+      "required": ["uid", "displayName", "currency", "seededDefaults", "createdAt", "updatedAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Custom income or expense category owned by a user.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the custom category.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "type": {
+          "type": "string",
+          "description": "Whether the category is for income or expenses.",
+          "enum": ["ingreso", "gasto"],
+          "maxLength": 10
+        },
+        "color": {
+          "type": "string",
+          "description": "Hex color swatch for charts and visual organization.",
+          "minLength": 7,
+          "maxLength": 7,
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "monthlyBudget": {
+          "type": "number",
+          "description": "Optional monthly budget target (0 means no budget set)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update."
+        }
+      },
+      "required": ["ownerId", "name", "type", "color", "monthlyBudget", "createdAt", "updatedAt"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Biweekly income or expense ledger entry belonging to a user.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "type": {
+          "type": "string",
+          "description": "Transaction type (income or expense).",
+          "enum": ["ingreso", "gasto"],
+          "maxLength": 10
+        },
+        "amount": {
+          "type": "number",
+          "description": "Positive monetary amount."
+        },
+        "description": {
+          "type": "string",
+          "description": "Short description or concept of the transaction.",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Referenced Category document ID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "categoryName": {
+          "type": "string",
+          "description": "Snapshot of category name at write time.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "date": {
+          "type": "string",
+          "description": "Transaction date in YYYY-MM-DD format.",
+          "minLength": 10,
+          "maxLength": 10,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "monthKey": {
+          "type": "string",
+          "description": "Year-month grouping key in YYYY-MM format.",
+          "minLength": 7,
+          "maxLength": 7,
+          "pattern": "^[0-9]{4}-[0-9]{2}$"
+        },
+        "quincena": {
+          "type": "number",
+          "description": "Biweekly period within the month (1 for days 1-15, 2 for days 16-end).",
+          "enum": [1, 2]
+        },
+        "paymentMethod": {
+          "type": "string",
+          "description": "Payment method used for this entry.",
+          "enum": ["transferencia", "debito", "credito", "efectivo", "otro"],
+          "maxLength": 20
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional additional note.",
+          "minLength": 0,
+          "maxLength": 300
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update."
+        }
+      },
+      "required": [
+        "ownerId",
+        "type",
+        "amount",
+        "description",
+        "categoryId",
+        "categoryName",
+        "date",
+        "monthKey",
+        "quincena",
+        "paymentMethod",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Per-user workspace preferences and master ownership document."
+    },
+    "/users/{userId}/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Custom income and expense categories for the user."
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "Biweekly income and expense entries for the user."
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Quincena — Finanzas Personales",
+  "description": "Aplicación de control de finanzas personales para registrar ingresos y gastos quincenales con categorías personalizadas y gráficas mensuales.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
