@@ -10,6 +10,7 @@ import {
   ListOrdered,
   LogOut,
   Menu,
+  PiggyBank,
   Plus,
   X,
 } from 'lucide-react';
@@ -19,6 +20,7 @@ import { BrandLogo } from './components/BrandLogo';
 import { BudgetAlertBanner } from './components/BudgetAlertBanner';
 import { CategoriesView } from './components/CategoriesView';
 import { OverviewView } from './components/OverviewView';
+import { SavingsPlanView } from './components/SavingsPlanView';
 import { TransactionModal } from './components/TransactionModal';
 import { TransactionsView } from './components/TransactionsView';
 import { useFinance } from './context/FinanceContext';
@@ -39,6 +41,7 @@ import type { NavSection, QuincenaFilter, Transaction } from './types/finance';
 const NAV_ITEMS: { id: NavSection; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'resumen', label: 'Resumen', icon: LayoutDashboard },
   { id: 'movimientos', label: 'Movimientos', icon: ListOrdered },
+  { id: 'ahorro', label: 'Plan de ahorro', icon: PiggyBank },
   { id: 'graficas', label: 'Gráficas', icon: BarChart3 },
   { id: 'categorias', label: 'Categorías', icon: FolderKanban },
 ];
@@ -347,6 +350,10 @@ export default function App() {
               onOpenNewTransaction={handleOpenNew}
               onEditTransaction={handleEditTx}
             />
+          )}
+
+          {activeNav === 'ahorro' && (
+            <SavingsPlanView selectedMonth={selectedMonth} />
           )}
 
           {activeNav === 'graficas' && (

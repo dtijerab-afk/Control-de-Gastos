@@ -11,6 +11,7 @@ import {
   type UserProfile,
 } from '../types/finance';
 import { getMonthKeyFromDate, getTodayDateStr } from './financeUtils';
+import { sanitizeSavingsPlanState, type SavingsPlanState } from './savingsPlan';
 
 export const BACKUP_SCHEMA_VERSION = 1 as const;
 export const MAX_BACKUP_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -57,6 +58,7 @@ export interface QuincenaBackupFile {
   profile: BackupProfileEntry;
   categories: BackupCategoryEntry[];
   transactions: BackupTransactionEntry[];
+  savingsPlan?: SavingsPlanState;
 }
 
 export interface BackupImportReport {
@@ -104,9 +106,17 @@ export function buildQuincenaBackup(params: {
   categories: Category[];
   transactions: Transaction[];
   sourceProjectId: string;
+  savingsPlan?: SavingsPlanState;
 }): QuincenaBackupFile {
-  const { profile, fallbackDisplayName, currency, categories, transactions, sourceProjectId } =
-    params;
+  const {
+    profile,
+    fallbackDisplayName,
+    currency,
+    categories,
+    transactions,
+    sourceProjectId,
+    savingsPlan,
+  } = params;
 
   const cleanCategories: BackupCategoryEntry[] = categories.map((cat) => ({
     sourceId: cat.id,
@@ -163,6 +173,7 @@ export function buildQuincenaBackup(params: {
     },
     categories: cleanCategories,
     transactions: cleanTransactions,
+    ...(savingsPlan ? { savingsPlan: sanitizeSavingsPlanState(savingsPlan) } : {}),
   };
 }
 
@@ -382,6 +393,7 @@ export function parseAndValidateQuincenaBackup(
       },
       categories,
       transactions,
+      ...(root.savingsPlan ? { savingsPlan: sanitizeSavingsPlanState(root.savingsPlan) } : {}),
     },
   };
 }

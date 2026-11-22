@@ -11,6 +11,7 @@ import {
 } from '../lib/backupUtils';
 import { db } from '../lib/firebase';
 import { formatCurrency, formatMonthLabel } from '../lib/financeUtils';
+import { loadSavingsPlan, saveSavingsPlan } from '../lib/savingsPlan';
 import {
   createCategory,
   deleteCategory,
@@ -163,6 +164,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
     if (!user) return;
     setImportError(null);
     const sourceProjectId = String(db.app.options.projectId ?? '');
+    const savingsPlan = loadSavingsPlan(user.uid);
     const backup = buildQuincenaBackup({
       profile,
       fallbackDisplayName: user.displayName || user.email?.split('@')[0] || 'Usuario',
@@ -170,6 +172,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
       categories,
       transactions,
       sourceProjectId,
+      savingsPlan,
     });
     const filename = downloadQuincenaBackup(backup);
     setExportSummary(
@@ -216,6 +219,9 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
         categories,
         transactions
       );
+      if (pendingImport.backup.savingsPlan) {
+        saveSavingsPlan(user.uid, pendingImport.backup.savingsPlan);
+      }
       setImportReport(report);
       setPendingImport(null);
     } catch (err) {
