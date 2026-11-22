@@ -294,7 +294,7 @@ export default function App() {
         </header>
 
         {/* Main Content Viewport */}
-        <main className="flex-1 w-full max-w-[1280px] mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-5 lg:py-6">
+        <main className="flex-1 w-full max-w-[1280px] mx-auto px-2.5 sm:px-6 lg:px-8 py-2.5 sm:py-5 lg:py-6">
           <BudgetAlertBanner
             alerts={visibleBudgetAlerts}
             selectedMonth={selectedMonth}

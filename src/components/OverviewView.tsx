@@ -803,12 +803,12 @@ export function OverviewView({
 
       {/* Recent Ledger Section (Ultra-compact mobile list + high-density desktop table) */}
       <section className="bg-white border border-emerald-950/10 rounded-xl overflow-hidden">
-        <div className="px-3.5 py-2.5 sm:px-5 sm:py-3 border-b border-emerald-950/10 flex items-center justify-between gap-3">
+        <div className="px-2.5 py-2 sm:px-4 sm:py-2.5 border-b border-emerald-950/10 flex items-center justify-between gap-2.5">
           <div>
-            <h2 className="text-base font-bold sm:font-semibold text-slate-900">
+            <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
               Movimientos recientes
             </h2>
-            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
+            <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 leading-tight mt-0.5">
               {selectedQuincena === 'all'
                 ? formatMonthLabel(selectedMonth)
                 : `${selectedQuincena === 1 ? '1ª' : '2ª'} Quincena · ${formatMonthLabel(selectedMonth)}`}
@@ -827,18 +827,18 @@ export function OverviewView({
         {loadingData ? (
           <div className="divide-y divide-slate-100">
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="px-4 py-2.5 flex items-center justify-between">
-                <div className="h-4 w-48 bg-emerald-950/[0.06] rounded animate-pulse" />
-                <div className="h-4 w-20 bg-emerald-950/[0.06] rounded animate-pulse" />
+              <div key={n} className="px-3 sm:px-4 py-2 flex items-center justify-between">
+                <div className="h-3.5 w-44 bg-emerald-950/[0.06] rounded animate-pulse" />
+                <div className="h-3.5 w-20 bg-emerald-950/[0.06] rounded animate-pulse" />
               </div>
             ))}
           </div>
         ) : recentTransactions.length === 0 ? (
-          <div className="px-4 py-8 text-center">
+          <div className="px-4 py-7 text-center">
             <p className="text-base sm:text-sm font-bold text-slate-900">
               Aún no hay movimientos en este periodo
             </p>
-            <p className="text-sm sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-1 mb-4 max-w-md mx-auto">
+            <p className="text-sm sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-1 mb-3.5 max-w-md mx-auto">
               Registra tu primer ingreso quincenal o gasto para ver el balance en tiempo real.
             </p>
             <button
@@ -858,14 +858,14 @@ export function OverviewView({
                 <li
                   key={tx.id}
                   onClick={() => onEditTransaction(tx)}
-                  className="px-3.5 py-2 active:bg-slate-50 cursor-pointer transition-colors"
+                  className="px-2.5 py-1.5 active:bg-slate-50 cursor-pointer transition-colors"
                 >
                   <div className="flex items-baseline justify-between gap-2">
-                    <p className="text-[15px] font-bold text-slate-900 truncate leading-snug">
+                    <p className="text-[15px] font-bold text-slate-900 truncate leading-tight">
                       {tx.description}
                     </p>
                     <span
-                      className={`text-[15px] font-mono font-bold tabular-nums whitespace-nowrap shrink-0 ${
+                      className={`text-[15px] font-mono font-bold tabular-nums whitespace-nowrap shrink-0 leading-tight ${
                         tx.type === 'ingreso' ? 'text-emerald-700' : 'text-rose-700'
                       }`}
                     >
@@ -873,7 +873,7 @@ export function OverviewView({
                       {formatCurrency(tx.amount, currency)}
                     </span>
                   </div>
-                  <p className="text-[13px] font-semibold text-slate-600 truncate leading-tight mt-0.5">
+                  <p className="text-[12.5px] font-semibold text-slate-600 truncate leading-tight mt-0.5">
                     {formatShortDate(tx.date)} · {tx.categoryName} · {tx.quincena === 1 ? '1ª Q' : '2ª Q'}
                   </p>
                 </li>
@@ -885,11 +885,11 @@ export function OverviewView({
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-emerald-950/10 bg-[#F4F8F5] text-xs font-semibold text-emerald-950/70">
-                    <th className="py-2 pl-5 pr-2.5">Fecha</th>
-                    <th className="py-2 px-2.5">Concepto</th>
-                    <th className="py-2 px-2.5">Categoría</th>
-                    <th className="py-2 px-2.5">Periodo</th>
-                    <th className="py-2 pl-2.5 pr-5 text-right">Monto</th>
+                    <th className="py-1.5 pl-4 pr-2">Fecha</th>
+                    <th className="py-1.5 px-2">Concepto</th>
+                    <th className="py-1.5 px-2">Categoría</th>
+                    <th className="py-1.5 px-2">Periodo</th>
+                    <th className="py-1.5 pl-2 pr-4 text-right">Monto</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -899,26 +899,26 @@ export function OverviewView({
                       onClick={() => onEditTransaction(tx)}
                       className="hover:bg-slate-50 cursor-pointer transition-colors"
                     >
-                      <td className="py-2 pl-5 pr-2.5 text-xs font-mono tabular-nums text-slate-600 whitespace-nowrap">
+                      <td className="py-1.5 pl-4 pr-2 text-xs font-mono tabular-nums text-slate-600 whitespace-nowrap">
                         {formatShortDate(tx.date)}
                       </td>
-                      <td className="py-2 px-2.5">
+                      <td className="py-1.5 px-2">
                         <p className="font-semibold text-slate-900 truncate max-w-xs leading-tight">
                           {tx.description}
                         </p>
-                        <p className="text-xs text-slate-500 leading-tight mt-0.5">
+                        <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                           {getPaymentMethodLabel(tx.paymentMethod)}
                           {tx.notes ? ` · ${tx.notes}` : ''}
                         </p>
                       </td>
-                      <td className="py-2 px-2.5 text-xs font-medium text-slate-700 whitespace-nowrap">
+                      <td className="py-1.5 px-2 text-xs font-medium text-slate-700 whitespace-nowrap">
                         {tx.categoryName}
                       </td>
-                      <td className="py-2 px-2.5 text-xs text-slate-500 whitespace-nowrap">
+                      <td className="py-1.5 px-2 text-xs text-slate-500 whitespace-nowrap">
                         {tx.quincena === 1 ? '1ª Quincena' : '2ª Quincena'}
                       </td>
                       <td
-                        className={`py-2 pl-2.5 pr-5 text-right font-mono font-semibold tabular-nums whitespace-nowrap ${
+                        className={`py-1.5 pl-2 pr-4 text-right font-mono font-semibold tabular-nums whitespace-nowrap ${
                           tx.type === 'ingreso' ? 'text-emerald-700' : 'text-rose-700'
                         }`}
                       >
