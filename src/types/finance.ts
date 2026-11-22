@@ -5,7 +5,7 @@ export type TransactionType = 'ingreso' | 'gasto';
 export type QuincenaNumber = 1 | 2;
 export type QuincenaFilter = 'all' | 1 | 2;
 export type PaymentMethod = 'transferencia' | 'debito' | 'credito' | 'efectivo' | 'otro';
-export type NavSection = 'resumen' | 'movimientos' | 'ahorro' | 'graficas' | 'categorias';
+export type NavSection = 'resumen' | 'movimientos' | 'deudas' | 'ahorro' | 'graficas' | 'categorias';
 
 export interface UserProfile {
   uid: string;

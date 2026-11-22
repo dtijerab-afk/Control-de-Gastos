@@ -5,6 +5,7 @@ import {
   BarChart3,
   ChevronLeft,
   ChevronRight,
+  CreditCard,
   FolderKanban,
   LayoutDashboard,
   ListOrdered,
@@ -21,6 +22,7 @@ import { AuthScreen } from './components/AuthScreen';
 import { BrandLogo } from './components/BrandLogo';
 import { BudgetAlertBanner } from './components/BudgetAlertBanner';
 import { CategoriesView } from './components/CategoriesView';
+import { DebtsView } from './components/DebtsView';
 import { OverviewView } from './components/OverviewView';
 import { SavingsPlanView } from './components/SavingsPlanView';
 import { TransactionModal } from './components/TransactionModal';
@@ -45,6 +47,7 @@ import type { NavSection, QuincenaFilter, Transaction } from './types/finance';
 const NAV_ITEMS: { id: NavSection; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'resumen', label: 'Resumen', icon: LayoutDashboard },
   { id: 'movimientos', label: 'Movimientos', icon: ListOrdered },
+  { id: 'deudas', label: 'Deudas y extractos', icon: CreditCard },
   { id: 'ahorro', label: 'Plan de ahorro', icon: PiggyBank },
   { id: 'graficas', label: 'Gráficas', icon: BarChart3 },
   { id: 'categorias', label: 'Categorías', icon: FolderKanban },
@@ -429,6 +432,8 @@ export default function App() {
               onEditTransaction={handleEditTx}
             />
           )}
+
+          {activeNav === 'deudas' && <DebtsView selectedMonth={selectedMonth} />}
 
           {activeNav === 'ahorro' && (
             <SavingsPlanView selectedMonth={selectedMonth} />

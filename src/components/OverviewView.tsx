@@ -8,6 +8,7 @@ import {
   BarChart3,
   CalendarRange,
   Copy,
+  CreditCard,
   Gauge,
   Pencil,
   Percent,
@@ -26,6 +27,7 @@ import {
 } from 'recharts';
 import { useFinance } from '../context/FinanceContext';
 import { useTheme } from '../context/ThemeContext';
+import { computeDebtStatus, loadDebtsState } from '../lib/debtsStore';
 import {
   formatCompactCurrency,
   formatCurrency,
@@ -172,6 +174,18 @@ export function OverviewView({
     }
     return map;
   }, [categories]);
+
+  const debtOverview = useMemo(() => {
+    if (!user) return { activeDebts: [], totalRemaining: 0, totalMonthly: 0 };
+    const state = loadDebtsState(user.uid);
+    const active = state.debts
+      .filter((d) => d.remainingAmount > 0)
+      .map((debt) => ({ debt, schedule: computeDebtStatus(debt, selectedMonth) }))
+      .sort((a, b) => a.schedule.dueDateForMonth.localeCompare(b.schedule.dueDateForMonth));
+    const totalRemaining = active.reduce((acc, item) => acc + item.debt.remainingAmount, 0);
+    const totalMonthly = active.reduce((acc, item) => acc + item.debt.monthlyPayment, 0);
+    return { activeDebts: active, totalRemaining, totalMonthly };
+  }, [user, selectedMonth, transactions.length]);
 
   const handleCopyPreviousQuincena = async () => {
     if (!user || !previousQuincenaInfo || selectedQuincena === 'all') return;
@@ -1103,6 +1117,96 @@ export function OverviewView({
               </table>
             </div>
           </>
+        )}
+      </section>
+
+      {/* Debts & Bank Statements Quick Block */}
+      <section className="mf-card overflow-hidden">
+        <div className="px-4 sm:px-5 py-3.5 border-b border-emerald-950/[0.08] dark:border-emerald-400/12 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-500/15 border border-rose-200/80 dark:border-rose-400/25 text-rose-700 dark:text-rose-300 flex items-center justify-center shrink-0">
+              <CreditCard className="w-4 h-4" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 font-display leading-tight">
+                Deudas, fechas de pago y extractos
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                {debtOverview.activeDebts.length > 0
+                  ? `${debtOverview.activeDebts.length} ${debtOverview.activeDebts.length === 1 ? 'deuda activa' : 'deudas activas'} · Saldo ${formatCurrency(debtOverview.totalRemaining, currency)}`
+                  : 'Registra tus tarjetas, préstamos, fechas límite y extractos PDF o fotos.'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate('deudas')}
+            className="inline-flex items-center gap-1 text-xs font-bold text-[#12663F] dark:text-emerald-400 hover:underline whitespace-nowrap shrink-0"
+          >
+            <span>{debtOverview.activeDebts.length > 0 ? 'Gestionar' : 'Abrir módulo'}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {debtOverview.activeDebts.length === 0 ? (
+          <div className="px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <p className="text-xs text-slate-600 dark:text-slate-300">
+              Lleva el control de tus cuotas quincenales y guarda tus extractos bancarios en PDF o
+              fotografías.
+            </p>
+            <button
+              type="button"
+              onClick={() => onNavigate('deudas')}
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-bold text-[#0B3B24] dark:text-emerald-200 bg-[#F2F7F4] dark:bg-[#0F261B] hover:bg-emerald-100/80 dark:hover:bg-emerald-500/15 border border-emerald-900/15 dark:border-emerald-400/20 rounded-xl transition-colors whitespace-nowrap shrink-0"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Agregar deuda o extracto
+            </button>
+          </div>
+        ) : (
+          <div className="divide-y divide-emerald-950/[0.06] dark:divide-emerald-400/10">
+            {debtOverview.activeDebts.slice(0, 3).map(({ debt, schedule }) => (
+              <div
+                key={debt.id}
+                onClick={() => onNavigate('deudas')}
+                className="px-4 sm:px-5 py-3 flex items-center justify-between gap-3 hover:bg-[#F5FAF7] dark:hover:bg-emerald-400/[0.06] cursor-pointer transition-colors"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ backgroundColor: debt.color }}
+                    aria-hidden="true"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                      {debt.name}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                      {debt.institution ? `${debt.institution} · ` : ''}
+                      Pago {formatShortDate(schedule.dueDateForMonth)}
+                      {schedule.status === 'overdue'
+                        ? ` · Vencida (${Math.abs(schedule.daysUntilDue)} d)`
+                        : schedule.status === 'due_soon'
+                          ? ` · Vence en ${schedule.daysUntilDue} d`
+                          : schedule.status === 'paid_month'
+                            ? ' · Al día'
+                            : ''}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100">
+                    {formatCurrency(debt.remainingAmount, currency)}
+                  </p>
+                  {debt.monthlyPayment > 0 && (
+                    <p className="text-[11px] font-mono tabular-nums text-slate-500 dark:text-slate-400">
+                      Cuota {formatCurrency(debt.monthlyPayment, currency)}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </section>
     </div>
