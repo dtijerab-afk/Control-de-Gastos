@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { AnalyticsView } from './components/AnalyticsView';
 import { AuthScreen } from './components/AuthScreen';
+import { BrandLogo } from './components/BrandLogo';
 import { BudgetAlertBanner } from './components/BudgetAlertBanner';
 import { CategoriesView } from './components/CategoriesView';
 import { OverviewView } from './components/OverviewView';
@@ -110,9 +111,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-[#F3F7F4] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <span className="text-xl font-bold tracking-tight text-[#0B3B24] font-display">
-            Quincena
-          </span>
+          <BrandLogo size="md" tone="dark" />
           <p className="text-sm font-semibold text-slate-600">Cargando tu espacio financiero...</p>
         </div>
       </div>
@@ -143,13 +142,13 @@ export default function App() {
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#0B3B24] text-emerald-50 border-r border-emerald-950/80">
-      <div className="h-14 sm:h-16 px-5 sm:px-6 flex items-center justify-between border-b border-white/10 shrink-0">
+      <div className="h-14 sm:h-16 px-4 sm:px-5 flex items-center justify-between border-b border-white/10 shrink-0">
         <button
           type="button"
           onClick={() => handleSelectNav('resumen')}
-          className="text-xl sm:text-lg font-bold tracking-tight text-white font-display whitespace-nowrap shrink-0"
+          className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/60 rounded-lg"
         >
-          Quincena
+          <BrandLogo size="sm" tone="light" />
         </button>
         <button
           type="button"
@@ -230,18 +229,26 @@ export default function App() {
               type="button"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Abrir menú de navegación"
-              className="lg:hidden p-2 -ml-1.5 text-slate-800 hover:text-[#0B3B24] rounded-lg hover:bg-emerald-50"
+              className="lg:hidden p-1.5 -ml-1 text-slate-800 hover:text-[#0B3B24] rounded-lg hover:bg-emerald-50 shrink-0"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="hidden sm:inline text-sm text-emerald-800/70 whitespace-nowrap shrink-0">
-                Quincena
+            <button
+              type="button"
+              onClick={() => handleSelectNav('resumen')}
+              aria-label="Ir al inicio de MoneyFlow"
+              className="lg:hidden inline-flex items-center shrink-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700/30"
+            >
+              <BrandLogo size="xs" tone="dark" showWordmark={false} />
+            </button>
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <span className="hidden sm:inline text-sm font-bold text-[#0B3B24] font-display whitespace-nowrap shrink-0">
+                MoneyFlow
               </span>
               <span className="hidden sm:inline text-sm text-emerald-900/25" aria-hidden="true">
                 /
               </span>
-              <h1 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-900 truncate">
+              <h1 className="text-[15px] sm:text-sm font-bold sm:font-semibold text-slate-900 truncate">
                 {activeNavItem.label}
               </h1>
             </div>

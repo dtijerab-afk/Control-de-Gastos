@@ -1,5 +1,6 @@
 import { ArrowRight, BarChart3, CalendarRange, FolderKanban } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
+import { BrandLogo } from './BrandLogo';
 
 export function AuthScreen() {
   const { signInWithGoogle, signingIn, authError } = useFinance();
@@ -8,9 +9,7 @@ export function AuthScreen() {
     <div className="min-h-screen bg-[#F3F7F4] flex flex-col">
       <header className="border-b border-emerald-950/10 bg-[#0B3B24] text-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-8">
-          <span className="text-lg font-bold tracking-tight text-white font-display whitespace-nowrap shrink-0">
-            Quincena
-          </span>
+          <BrandLogo size="sm" tone="light" />
           <div className="hidden md:flex items-center gap-6 text-sm text-emerald-100/85">
             <span className="whitespace-nowrap shrink-0">Control quincenal</span>
             <span className="whitespace-nowrap shrink-0">Categorías propias</span>
