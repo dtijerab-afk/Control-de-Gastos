@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  CalendarClock,
   CheckCircle2,
+  Coins,
+  Compass,
   Pencil,
   PiggyBank,
   Plus,
@@ -448,7 +451,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
     <div className="space-y-3 sm:space-y-5">
       {/* Feedback banner */}
       {feedback && (
-        <div className="px-3 py-2 text-[13px] sm:text-xs font-semibold text-emerald-900 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between gap-3">
+        <div className="px-3.5 py-2 text-[13px] sm:text-xs font-semibold text-emerald-900 bg-emerald-50 border border-emerald-200/80 rounded-xl shadow-xs flex items-center justify-between gap-3">
           <span>{feedback}</span>
           <button
             type="button"
@@ -463,16 +466,21 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
       {/* 4-Column Unified Savings KPI Strip */}
       <section
         aria-label="Resumen del plan de ahorro"
-        className="bg-white border border-emerald-950/10 rounded-xl grid grid-cols-2 lg:grid-cols-4 overflow-hidden"
+        className="mf-card grid grid-cols-2 lg:grid-cols-4 overflow-hidden"
       >
-        <div className="p-3 sm:p-4 lg:p-5 border-b border-r border-emerald-950/10 lg:border-b-0">
-          <p className="text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-500">
-            Meta mensual
-          </p>
+        <div className="p-3 sm:p-4 lg:p-5 border-b border-r border-emerald-950/[0.08] lg:border-b-0 bg-gradient-to-b from-emerald-50/40 to-transparent">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500">
+              Meta mensual
+            </p>
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+              <Target className="w-4 h-4" />
+            </span>
+          </div>
           {loadingData ? (
-            <div className="h-6 sm:h-7 w-24 bg-slate-100 rounded mt-1.5 animate-pulse" />
+            <div className="h-6 sm:h-7 w-24 bg-slate-100 rounded mt-2 animate-pulse" />
           ) : (
-            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-[#0B3B24] tabular-nums mt-0.5 sm:mt-1 truncate">
+            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-[#0B3B24] tabular-nums mt-1 sm:mt-1.5 truncate">
               {formatCurrency(summary.monthlyTargetAmount, currency)}
             </p>
           )}
@@ -483,14 +491,19 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
           </p>
         </div>
 
-        <div className="p-3 sm:p-4 lg:p-5 border-b lg:border-b-0 lg:border-r border-emerald-950/10">
-          <p className="text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-500">
-            Por quincena
-          </p>
+        <div className="p-3 sm:p-4 lg:p-5 border-b lg:border-b-0 lg:border-r border-emerald-950/[0.08] bg-gradient-to-b from-teal-50/30 to-transparent">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500">
+              Por quincena
+            </p>
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-teal-50 border border-teal-200/70 text-teal-700 flex items-center justify-center shrink-0">
+              <CalendarClock className="w-4 h-4" />
+            </span>
+          </div>
           {loadingData ? (
-            <div className="h-6 sm:h-7 w-24 bg-slate-100 rounded mt-1.5 animate-pulse" />
+            <div className="h-6 sm:h-7 w-24 bg-slate-100 rounded mt-2 animate-pulse" />
           ) : (
-            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-emerald-700 tabular-nums mt-0.5 sm:mt-1 truncate">
+            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-emerald-700 tabular-nums mt-1 sm:mt-1.5 truncate">
               {formatCurrency(summary.quincenaTargetAmount, currency)}
             </p>
           )}
@@ -499,15 +512,20 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
           </p>
         </div>
 
-        <div className="p-3 sm:p-4 lg:p-5 border-r border-emerald-950/10">
-          <p className="text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-500">
-            Ahorro del mes
-          </p>
+        <div className="p-3 sm:p-4 lg:p-5 border-r border-emerald-950/[0.08]">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500">
+              Ahorro del mes
+            </p>
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-100/80 border border-emerald-200/70 text-emerald-700 flex items-center justify-center shrink-0">
+              <PiggyBank className="w-4 h-4" />
+            </span>
+          </div>
           {loadingData ? (
-            <div className="h-6 sm:h-7 w-24 bg-slate-100 rounded mt-1.5 animate-pulse" />
+            <div className="h-6 sm:h-7 w-24 bg-slate-100 rounded mt-2 animate-pulse" />
           ) : (
             <p
-              className={`text-lg sm:text-2xl font-mono font-bold sm:font-semibold tabular-nums mt-0.5 sm:mt-1 truncate ${
+              className={`text-lg sm:text-2xl font-mono font-bold sm:font-semibold tabular-nums mt-1 sm:mt-1.5 truncate ${
                 summary.targetReached ? 'text-emerald-700' : 'text-slate-900'
               }`}
             >
@@ -522,10 +540,15 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
         </div>
 
         <div className="p-3 sm:p-4 lg:p-5">
-          <p className="text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-500">
-            Total en metas
-          </p>
-          <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-slate-900 tabular-nums mt-0.5 sm:mt-1 truncate">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500">
+              Total en metas
+            </p>
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-50 border border-amber-200/70 text-amber-700 flex items-center justify-center shrink-0">
+              <Coins className="w-4 h-4" />
+            </span>
+          </div>
+          <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-slate-900 tabular-nums mt-1 sm:mt-1.5 truncate">
             {formatCurrency(goalsTotals.totalSaved, currency)}
           </p>
           <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 sm:mt-1 truncate">
@@ -537,21 +560,26 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
       </section>
 
       {/* Monthly & Biweekly Plan Configuration Card */}
-      <section className="bg-white border border-emerald-950/10 rounded-xl p-3 sm:p-5 space-y-3">
+      <section className="mf-card p-3.5 sm:p-5 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div className="min-w-0">
-            <h2 className="text-base font-bold sm:font-semibold text-slate-900">
-              Regla de ahorro · {formatMonthLabel(selectedMonth)}
-            </h2>
-            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
-              Define cuánto apartar cada mes (se divide automáticamente en 1ª y 2ª quincena).
-            </p>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+              <SlidersHorizontal className="w-4 h-4" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+                Regla de ahorro · {formatMonthLabel(selectedMonth)}
+              </h2>
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+                Define cuánto apartar cada mes (se divide automáticamente en 1ª y 2ª quincena).
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5 shrink-0">
             {!editingRule && (
               <>
-                <div className="inline-flex items-center gap-0.5 p-0.5 bg-emerald-950/[0.06] rounded-lg">
+                <div className="inline-flex items-center gap-0.5 p-1 bg-[#EFF5F1] border border-emerald-950/[0.08] rounded-xl">
                   {PCT_PRESETS.map((pct) => {
                     const active =
                       plan.monthlyRule.mode === 'percentage' &&
@@ -561,10 +589,10 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                         key={pct}
                         type="button"
                         onClick={() => handleQuickPctSelect(pct)}
-                        className={`px-2 py-1 text-xs font-bold rounded-md transition-colors whitespace-nowrap ${
+                        className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
                           active
-                            ? 'bg-white text-[#0B3B24] shadow-xs'
-                            : 'text-slate-700 hover:text-[#0B3B24]'
+                            ? 'bg-[#0B3B24] text-white shadow-xs'
+                            : 'text-slate-700 hover:text-[#0B3B24] hover:bg-white/60'
                         }`}
                       >
                         {pct}%
@@ -575,7 +603,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                 <button
                   type="button"
                   onClick={openRuleEditor}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] sm:text-xs font-bold text-[#0B3B24] bg-[#F3F7F4] border border-emerald-900/15 hover:bg-emerald-50 rounded-lg transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold text-[#0B3B24] bg-[#F3F8F5] border border-emerald-900/15 hover:bg-emerald-50 hover:border-emerald-800/30 rounded-xl transition-all whitespace-nowrap"
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5 text-[#12663F]" />
                   Personalizar
@@ -590,13 +618,13 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
             onSubmit={handleSaveRule}
             className="pt-3 border-t border-emerald-950/10 space-y-3"
           >
-            <div className="inline-flex items-center gap-1 p-1 bg-emerald-950/[0.06] rounded-lg">
+            <div className="inline-flex items-center gap-1 p-1 bg-[#EFF5F1] border border-emerald-950/[0.08] rounded-xl">
               <button
                 type="button"
                 onClick={() => setRuleMode('percentage')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors whitespace-nowrap ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
                   ruleMode === 'percentage'
-                    ? 'bg-white text-[#0B3B24] shadow-xs'
+                    ? 'bg-white text-[#0B3B24] shadow-xs ring-1 ring-emerald-950/10'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -702,7 +730,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
           </div>
 
           <div
-            className="h-2.5 w-full bg-emerald-950/[0.08] rounded-full overflow-hidden"
+            className="h-3 w-full bg-emerald-950/[0.07] ring-1 ring-inset ring-emerald-950/[0.05] rounded-full overflow-hidden"
             role="progressbar"
             aria-valuenow={Math.round(summary.progressPct)}
             aria-valuemin={0}
@@ -711,7 +739,9 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
           >
             <div
               className={`h-full rounded-full transition-all ${
-                summary.targetReached ? 'bg-emerald-600' : 'bg-[#12663F]'
+                summary.targetReached
+                  ? 'bg-gradient-to-r from-[#0F5A36] to-emerald-400'
+                  : 'bg-gradient-to-r from-[#0B4A2B] to-[#10B981]'
               }`}
               style={{ width: `${Math.min(100, summary.progressPct)}%` }}
             />
@@ -719,14 +749,20 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
 
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs font-semibold sm:font-normal text-slate-600">
             <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 font-mono tabular-nums">
-              <span>1ª Q: {formatCurrency(summary.q1Saved, currency)}</span>
-              <span aria-hidden="true" className="text-slate-300">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#0F5A36]" aria-hidden="true" />
+                1ª Q: {formatCurrency(summary.q1Saved, currency)}
+              </span>
+              <span aria-hidden="true" className="text-emerald-900/25">
                 ·
               </span>
-              <span>2ª Q: {formatCurrency(summary.q2Saved, currency)}</span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true" />
+                2ª Q: {formatCurrency(summary.q2Saved, currency)}
+              </span>
               {summary.explicitSavingsLogged > 0 && (
                 <>
-                  <span aria-hidden="true" className="text-slate-300">
+                  <span aria-hidden="true" className="text-emerald-900/25">
                     ·
                   </span>
                   <span className="text-emerald-700 font-semibold">
@@ -743,22 +779,27 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
       </section>
 
       {/* Savings Goals Section */}
-      <section className="bg-white border border-emerald-950/10 rounded-xl overflow-hidden">
-        <div className="px-3 sm:px-5 py-3 border-b border-emerald-950/10 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="text-base font-bold sm:font-semibold text-slate-900">
-              Metas de ahorro ({plan.goals.length})
-            </h2>
-            <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
-              {goalsTotals.activeCount > 0
-                ? `Aporte combinado sugerido: ${formatCurrency(goalsTotals.totalReqPerQuincena, currency)} / quincena`
-                : 'Crea objetivos concretos con fecha límite y cuota quincenal'}
-            </p>
+      <section className="mf-card overflow-hidden">
+        <div className="px-3.5 sm:px-5 py-3 border-b border-emerald-950/[0.08] bg-gradient-to-r from-[#F6FAF7] to-white flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center shrink-0">
+              <Target className="w-4 h-4" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+                Metas de ahorro ({plan.goals.length})
+              </h2>
+              <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 truncate">
+                {goalsTotals.activeCount > 0
+                  ? `Aporte combinado sugerido: ${formatCurrency(goalsTotals.totalReqPerQuincena, currency)} / quincena`
+                  : 'Crea objetivos concretos con fecha límite y cuota quincenal'}
+              </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={() => openNewGoalForm()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 text-[13px] sm:text-xs font-bold text-white bg-[#12663F] hover:bg-[#0D4F30] rounded-lg transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-[13px] sm:text-xs font-bold text-white bg-gradient-to-b from-[#167A4B] to-[#0E5534] hover:from-[#12663F] hover:to-[#0A4127] shadow-xs shadow-emerald-950/20 rounded-xl transition-all whitespace-nowrap shrink-0"
           >
             <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
             Nueva meta
@@ -992,18 +1033,18 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
             </div>
           </div>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-emerald-950/[0.06]">
             {goalsWithSchedule.map(({ goal, schedule }) => {
               const isContributing = contributingGoalId === goal.id;
               const isDeleting = confirmDeleteId === goal.id;
 
               return (
-                <li key={goal.id} className="px-3 sm:px-5 py-2.5 sm:py-3.5 space-y-2">
+                <li key={goal.id} className="px-3.5 sm:px-5 py-3 sm:py-3.5 space-y-2 hover:bg-[#F7FBF8]/70 transition-colors">
                   <div className="flex items-start justify-between gap-2.5">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
                         <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0"
+                          className="w-3 h-3 rounded-full ring-2 ring-white shadow-xs shrink-0"
                           style={{ backgroundColor: goal.color }}
                         />
                         <h3 className="text-[15px] sm:text-sm font-bold text-slate-900 truncate leading-tight">
@@ -1040,7 +1081,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   </div>
 
                   {/* Compact progress bar */}
-                  <div className="h-2 w-full bg-emerald-950/[0.07] rounded-full overflow-hidden">
+                  <div className="h-2.5 w-full bg-emerald-950/[0.07] ring-1 ring-inset ring-emerald-950/[0.04] rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all"
                       style={{
@@ -1219,23 +1260,28 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
 
       {/* Analytical Split: 12-Month Savings Projection Chart + 50/30/20 Guide */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
-        <section className="lg:col-span-7 bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5 flex flex-col">
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <div>
-              <h2 className="text-base font-bold sm:font-semibold text-slate-900">
-                Proyección de ahorro (12 meses)
-              </h2>
-              <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
-                Saldo acumulado partiendo de tus metas actuales
-              </p>
+        <section className="lg:col-span-7 mf-card p-3.5 sm:p-5 flex flex-col">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+                <TrendingUp className="w-4 h-4" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+                  Proyección de ahorro (12 meses)
+                </h2>
+                <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+                  Saldo acumulado partiendo de tus metas actuales
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-3 text-xs font-bold sm:font-normal text-slate-700 shrink-0">
+            <div className="flex items-center gap-3 text-xs font-bold sm:font-medium text-slate-700 shrink-0">
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-xs bg-[#12663F]" aria-hidden="true" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#12663F] ring-2 ring-emerald-100" aria-hidden="true" />
                 Plan objetivo
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-xs bg-[#0D9488]" aria-hidden="true" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#0D9488] ring-2 ring-teal-100" aria-hidden="true" />
                 Ritmo actual
               </span>
             </div>
@@ -1276,7 +1322,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                       ritmoActualAcumulado: number;
                     };
                     return (
-                      <div className="bg-white border border-emerald-950/15 rounded-lg px-3 py-2 shadow-sm text-xs space-y-1">
+                      <div className="bg-white border border-emerald-950/15 rounded-xl px-3 py-2 shadow-md text-xs space-y-1">
                         <p className="font-bold text-slate-900">{label}</p>
                         <p className="font-mono font-semibold tabular-nums text-[#12663F]">
                           Plan objetivo: {formatCurrency(row.planAcumulado, currency)}
@@ -1310,46 +1356,57 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
           </div>
         </section>
 
-        <section className="lg:col-span-5 bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5 flex flex-col justify-between gap-4">
+        <section className="lg:col-span-5 mf-card p-3.5 sm:p-5 flex flex-col justify-between gap-4">
           <div className="space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <h2 className="text-base font-bold sm:font-semibold text-slate-900">
+            <div className="flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+                <Compass className="w-4 h-4" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
                   Guía 50 / 30 / 20
                 </h2>
-                <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
+                <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
                   Referencia sobre tus ingresos de {formatMonthLabel(selectedMonth)}
                 </p>
               </div>
-              <TrendingUp className="w-4 h-4 text-[#12663F] shrink-0" />
             </div>
 
             {summary.monthIncome > 0 ? (
-              <div className="divide-y divide-slate-100">
-                <div className="py-2 flex items-center justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-bold text-slate-900">Necesidades (50%)</p>
-                    <p className="text-xs text-slate-500">Vivienda, despensa, servicios, transporte</p>
+              <div className="divide-y divide-emerald-950/[0.08]">
+                <div className="py-2.5 flex items-center justify-between gap-2">
+                  <div className="flex items-start gap-2 min-w-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-500 mt-1.5 shrink-0" aria-hidden="true" />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">Necesidades (50%)</p>
+                      <p className="text-xs text-slate-500">Vivienda, despensa, servicios, transporte</p>
+                    </div>
                   </div>
                   <span className="text-sm font-mono font-bold text-slate-900 tabular-nums shrink-0">
                     {formatCurrency(rule503020.needs, currency)}
                   </span>
                 </div>
-                <div className="py-2 flex items-center justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-bold text-slate-900">Estilo de vida (30%)</p>
-                    <p className="text-xs text-slate-500">Restaurantes, ocio, compras personales</p>
+                <div className="py-2.5 flex items-center justify-between gap-2">
+                  <div className="flex items-start gap-2 min-w-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 mt-1.5 shrink-0" aria-hidden="true" />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">Estilo de vida (30%)</p>
+                      <p className="text-xs text-slate-500">Restaurantes, ocio, compras personales</p>
+                    </div>
                   </div>
                   <span className="text-sm font-mono font-bold text-slate-900 tabular-nums shrink-0">
                     {formatCurrency(rule503020.wants, currency)}
                   </span>
                 </div>
-                <div className="py-2 flex items-center justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-bold text-[#0B3B24]">Ahorro e inversión (20%)</p>
-                    <p className="text-xs text-slate-500">
-                      {formatCurrency(rule503020.savings / 2, currency)} cada quincena
-                    </p>
+                <div className="py-2.5 flex items-center justify-between gap-2">
+                  <div className="flex items-start gap-2 min-w-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#12663F] mt-1.5 shrink-0" aria-hidden="true" />
+                    <div>
+                      <p className="text-sm font-bold text-[#0B3B24]">Ahorro e inversión (20%)</p>
+                      <p className="text-xs text-slate-500">
+                        {formatCurrency(rule503020.savings / 2, currency)} cada quincena
+                      </p>
+                    </div>
                   </div>
                   <span className="text-sm font-mono font-bold text-emerald-700 tabular-nums shrink-0">
                     {formatCurrency(rule503020.savings, currency)}

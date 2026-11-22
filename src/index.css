@@ -10,12 +10,30 @@
   html {
     font-family: var(--font-sans);
     color: #0f172a;
-    background-color: #f3f7f4;
+    background-color: #eef5f0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: #eef5f0;
+    background-image:
+      radial-gradient(circle at 12% 0%, rgba(16, 185, 129, 0.07) 0%, transparent 42%),
+      radial-gradient(circle at 92% 10%, rgba(11, 59, 36, 0.04) 0%, transparent 38%);
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
   }
+}
+
+.mf-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(11, 59, 36, 0.1);
+  border-radius: 1rem;
+  box-shadow:
+    0 1px 2px rgba(11, 59, 36, 0.04),
+    0 6px 18px -6px rgba(11, 59, 36, 0.05);
 }
 
 .tabular-nums {

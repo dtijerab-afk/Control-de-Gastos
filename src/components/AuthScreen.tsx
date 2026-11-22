@@ -1,4 +1,11 @@
-import { ArrowRight, BarChart3, CalendarRange, FolderKanban } from 'lucide-react';
+import {
+  ArrowDownRight,
+  ArrowRight,
+  ArrowUpRight,
+  BarChart3,
+  CalendarRange,
+  FolderKanban,
+} from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { BrandLogo } from './BrandLogo';
 
@@ -6,20 +13,20 @@ export function AuthScreen() {
   const { signInWithGoogle, signingIn, authError } = useFinance();
 
   return (
-    <div className="min-h-screen bg-[#F3F7F4] flex flex-col">
-      <header className="border-b border-emerald-950/10 bg-[#0B3B24] text-white">
+    <div className="min-h-screen flex flex-col">
+      <header className="border-b border-emerald-950/15 bg-gradient-to-r from-[#072B1A] via-[#0B3B24] to-[#082D1C] text-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-8">
           <BrandLogo size="sm" tone="light" />
           <div className="hidden md:flex items-center gap-6 text-sm text-emerald-100/85">
             <span className="whitespace-nowrap shrink-0">Control quincenal</span>
-            <span className="whitespace-nowrap shrink-0">Categorías propias</span>
+            <span className="whitespace-nowrap shrink-0">Plan de ahorro</span>
             <span className="whitespace-nowrap shrink-0">Gráficas mensuales</span>
           </div>
           <button
             type="button"
             onClick={signInWithGoogle}
             disabled={signingIn}
-            className="px-4 py-2 text-sm font-semibold text-[#0B3B24] bg-emerald-300 hover:bg-emerald-200 disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap shrink-0"
+            className="px-4 py-2 text-sm font-bold text-[#072B1A] bg-emerald-300 hover:bg-emerald-200 disabled:opacity-60 rounded-xl shadow-xs transition-all whitespace-nowrap shrink-0"
           >
             {signingIn ? 'Conectando...' : 'Iniciar sesión'}
           </button>
@@ -45,7 +52,7 @@ export function AuthScreen() {
                 type="button"
                 onClick={signInWithGoogle}
                 disabled={signingIn}
-                className="inline-flex items-center justify-center gap-3 px-6 py-3 text-sm font-semibold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
+                className="inline-flex items-center justify-center gap-3 px-6 py-3 text-sm font-bold text-white bg-gradient-to-b from-[#167A4B] to-[#0E5534] hover:from-[#12663F] hover:to-[#0A4127] shadow-md shadow-emerald-950/20 disabled:opacity-60 rounded-xl transition-all whitespace-nowrap"
               >
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -64,7 +71,7 @@ export function AuthScreen() {
             {authError && (
               <div
                 role="alert"
-                className="mb-8 px-4 py-3 text-sm text-rose-800 bg-rose-50 border border-rose-200 rounded-lg max-w-xl"
+                className="mb-8 px-4 py-3 text-sm text-rose-800 bg-rose-50 border border-rose-200 rounded-xl max-w-xl"
               >
                 {authError}
               </div>
@@ -72,22 +79,28 @@ export function AuthScreen() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-emerald-950/10">
               <div>
-                <CalendarRange className="w-4 h-4 text-[#12663F] mb-2" />
-                <h2 className="text-sm font-semibold text-slate-900 mb-1">Ciclo quincenal</h2>
+                <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center mb-2.5">
+                  <CalendarRange className="w-4 h-4" />
+                </span>
+                <h2 className="text-sm font-bold text-slate-900 mb-1">Ciclo quincenal</h2>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Separa automáticamente 1ª quincena (1–15) y 2ª quincena (16–fin).
                 </p>
               </div>
               <div>
-                <FolderKanban className="w-4 h-4 text-[#12663F] mb-2" />
-                <h2 className="text-sm font-semibold text-slate-900 mb-1">Categorías propias</h2>
+                <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center mb-2.5">
+                  <FolderKanban className="w-4 h-4" />
+                </span>
+                <h2 className="text-sm font-bold text-slate-900 mb-1">Categorías propias</h2>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Define tus categorías de ingreso y gasto con límites mensuales.
                 </p>
               </div>
               <div>
-                <BarChart3 className="w-4 h-4 text-[#12663F] mb-2" />
-                <h2 className="text-sm font-semibold text-slate-900 mb-1">Gráficas mensuales</h2>
+                <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center mb-2.5">
+                  <BarChart3 className="w-4 h-4" />
+                </span>
+                <h2 className="text-sm font-bold text-slate-900 mb-1">Gráficas mensuales</h2>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Visualiza ingresos vs. gastos mes a mes y distribución por categoría.
                 </p>
@@ -96,7 +109,7 @@ export function AuthScreen() {
           </div>
 
           <div className="lg:col-span-6 flex">
-            <div className="w-full bg-white border border-emerald-950/10 rounded-xl p-6 sm:p-8 flex flex-col justify-between">
+            <div className="w-full mf-card p-6 sm:p-8 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between pb-4 border-b border-emerald-950/10">
                   <div>
@@ -161,22 +174,37 @@ export function AuthScreen() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-200 space-y-2.5">
+              <div className="pt-4 border-t border-emerald-950/[0.08] space-y-2.5">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-700">Nómina 1ª quincena · 1ª Q</span>
-                  <span className="font-mono font-medium text-emerald-700 tabular-nums">
+                  <span className="inline-flex items-center gap-2 text-slate-800 font-medium">
+                    <span className="w-6 h-6 rounded-lg bg-emerald-50 border border-emerald-200/70 text-emerald-700 flex items-center justify-center shrink-0">
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </span>
+                    Nómina 1ª quincena · 1ª Q
+                  </span>
+                  <span className="font-mono font-semibold text-emerald-700 tabular-nums">
                     +$18,500.00
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-700">Vivienda y renta · 1ª Q</span>
-                  <span className="font-mono font-medium text-rose-700 tabular-nums">
+                  <span className="inline-flex items-center gap-2 text-slate-800 font-medium">
+                    <span className="w-6 h-6 rounded-lg bg-rose-50 border border-rose-200/70 text-rose-700 flex items-center justify-center shrink-0">
+                      <ArrowDownRight className="w-3.5 h-3.5" />
+                    </span>
+                    Vivienda y renta · 1ª Q
+                  </span>
+                  <span className="font-mono font-semibold text-rose-700 tabular-nums">
                     −$7,500.00
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-700">Supermercado y despensa · 2ª Q</span>
-                  <span className="font-mono font-medium text-rose-700 tabular-nums">
+                  <span className="inline-flex items-center gap-2 text-slate-800 font-medium">
+                    <span className="w-6 h-6 rounded-lg bg-rose-50 border border-rose-200/70 text-rose-700 flex items-center justify-center shrink-0">
+                      <ArrowDownRight className="w-3.5 h-3.5" />
+                    </span>
+                    Supermercado y despensa · 2ª Q
+                  </span>
+                  <span className="font-mono font-semibold text-rose-700 tabular-nums">
                     −$2,340.00
                   </span>
                 </div>

@@ -1,5 +1,12 @@
 import { useMemo, useState } from 'react';
-import { AlertCircle, AlertTriangle } from 'lucide-react';
+import {
+  AlertCircle,
+  AlertTriangle,
+  BarChart3,
+  Gauge,
+  PieChart as PieChartIcon,
+  TrendingUp,
+} from 'lucide-react';
 import {
   Area,
   AreaChart,
@@ -152,14 +159,14 @@ export function AnalyticsView({
             Evolución histórica terminando en {formatMonthLabel(selectedMonth)}
           </p>
         </div>
-        <div className="inline-flex items-center gap-1 p-1 bg-emerald-950/[0.06] rounded-lg w-full sm:w-fit">
+        <div className="inline-flex items-center gap-1 p-1 bg-white/80 border border-emerald-950/10 shadow-xs rounded-xl w-full sm:w-fit">
           <button
             type="button"
             onClick={() => setMonthsSpan(6)}
-            className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
+            className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
               monthsSpan === 6
-                ? 'bg-white text-[#0B3B24] shadow-xs'
-                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24]'
+                ? 'bg-[#0B3B24] text-white shadow-xs'
+                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24] hover:bg-emerald-950/[0.04]'
             }`}
           >
             Últimos 6 meses
@@ -167,10 +174,10 @@ export function AnalyticsView({
           <button
             type="button"
             onClick={() => setMonthsSpan(12)}
-            className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
+            className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
               monthsSpan === 12
-                ? 'bg-white text-[#0B3B24] shadow-xs'
-                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24]'
+                ? 'bg-[#0B3B24] text-white shadow-xs'
+                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24] hover:bg-emerald-950/[0.04]'
             }`}
           >
             Últimos 12 meses
@@ -179,23 +186,28 @@ export function AnalyticsView({
       </div>
 
       {/* Chart 1: Monthly Income vs Expense Bar Chart */}
-      <section className="bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5">
+      <section className="mf-card p-3.5 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5 sm:mb-4">
-          <div>
-            <h3 className="text-base font-bold sm:font-semibold text-slate-900">
-              Ingresos vs. Gastos por mes
-            </h3>
-            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
-              Toca cualquier mes para inspeccionar su desglose
-            </p>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+              <BarChart3 className="w-4 h-4" />
+            </span>
+            <div className="min-w-0">
+              <h3 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+                Ingresos vs. Gastos por mes
+              </h3>
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+                Toca cualquier mes para inspeccionar su desglose
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-3.5 text-[13px] sm:text-xs font-bold sm:font-normal text-slate-700 sm:text-slate-600">
+          <div className="flex items-center gap-3.5 text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600">
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-xs bg-[#15803D]" aria-hidden="true" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#15803D] ring-2 ring-emerald-100" aria-hidden="true" />
               Ingresos
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-xs bg-rose-600" aria-hidden="true" />
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-600 ring-2 ring-rose-100" aria-hidden="true" />
               Gastos
             </span>
           </div>
@@ -257,14 +269,19 @@ export function AnalyticsView({
 
       {/* Charts 2 & 3: Net Savings Area Chart + Category Donut */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
-        <section className="lg:col-span-7 bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5 flex flex-col">
-          <div className="mb-3.5 sm:mb-4">
-            <h3 className="text-base font-bold sm:font-semibold text-slate-900">
-              Balance neto mensual
-            </h3>
-            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
-              Diferencia entre ingresos y gastos por mes
-            </p>
+        <section className="lg:col-span-7 mf-card p-3.5 sm:p-5 flex flex-col">
+          <div className="flex items-center gap-2.5 mb-3.5 sm:mb-4">
+            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+              <TrendingUp className="w-4 h-4" />
+            </span>
+            <div className="min-w-0">
+              <h3 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+                Balance neto mensual
+              </h3>
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+                Diferencia entre ingresos y gastos por mes
+              </p>
+            </div>
           </div>
           <div className="h-56 sm:h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -321,17 +338,22 @@ export function AnalyticsView({
           </div>
         </section>
 
-        <section className="lg:col-span-5 bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5 flex flex-col">
-          <div className="mb-3">
-            <h3 className="text-base font-bold sm:font-semibold text-slate-900">
-              Gastos por categoría
-            </h3>
-            <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500">
-              {formatMonthLabel(selectedMonth)} · Total{' '}
-              <span className="font-mono font-bold tabular-nums text-slate-900">
-                {formatCurrency(expenseBreakdown.total, currency)}
-              </span>
-            </p>
+        <section className="lg:col-span-5 mf-card p-3.5 sm:p-5 flex flex-col">
+          <div className="flex items-center gap-2.5 mb-3">
+            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+              <PieChartIcon className="w-4 h-4" />
+            </span>
+            <div className="min-w-0">
+              <h3 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+                Gastos por categoría
+              </h3>
+              <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+                {formatMonthLabel(selectedMonth)} · Total{' '}
+                <span className="font-mono font-bold tabular-nums text-slate-900">
+                  {formatCurrency(expenseBreakdown.total, currency)}
+                </span>
+              </p>
+            </div>
           </div>
 
           {expenseBreakdown.items.length === 0 ? (
@@ -377,7 +399,7 @@ export function AnalyticsView({
                 </ResponsiveContainer>
               </div>
 
-              <div className="divide-y divide-slate-100 max-h-52 overflow-y-auto">
+              <div className="divide-y divide-emerald-950/[0.06] max-h-52 overflow-y-auto">
                 {expenseBreakdown.items.map((item) => (
                   <div
                     key={item.id}
@@ -385,7 +407,7 @@ export function AnalyticsView({
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <span
-                        className="w-2.5 h-2.5 rounded-xs shrink-0"
+                        className="w-3 h-3 rounded-full ring-2 ring-white shadow-xs shrink-0"
                         style={{ backgroundColor: item.color }}
                         aria-hidden="true"
                       />
@@ -410,14 +432,19 @@ export function AnalyticsView({
       </div>
 
       {/* Category Budget Progress (if any budgets configured) */}
-      <section className="bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5">
-        <div className="mb-3">
-          <h3 className="text-base font-bold sm:font-semibold text-slate-900">
-            Seguimiento de presupuestos mensuales
-          </h3>
-          <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
-            Gasto acumulado en {formatMonthLabel(selectedMonth)} frente a límites por categoría
-          </p>
+      <section className="mf-card p-3.5 sm:p-5">
+        <div className="flex items-center gap-2.5 mb-3.5">
+          <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+            <Gauge className="w-4 h-4" />
+          </span>
+          <div className="min-w-0">
+            <h3 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+              Seguimiento de presupuestos mensuales
+            </h3>
+            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+              Gasto acumulado en {formatMonthLabel(selectedMonth)} frente a límites por categoría
+            </p>
+          </div>
         </div>
 
         {budgetRows.length === 0 ? (
@@ -426,7 +453,7 @@ export function AnalyticsView({
             desde la sección de Categorías.
           </p>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-emerald-950/[0.06]">
             {budgetRows.map((row) => {
               const overBudget = row.remaining < 0;
               const warning = !overBudget && row.pct >= alertThresholdPct;
@@ -437,11 +464,11 @@ export function AnalyticsView({
                   : `Disponible ${formatCurrency(row.remaining, currency)}`;
 
               return (
-                <div key={row.id} className="py-2 sm:py-2.5 first:pt-0.5 last:pb-0.5 space-y-1.5">
+                <div key={row.id} className="py-2.5 first:pt-0.5 last:pb-0.5 space-y-1.5">
                   <div className="flex flex-wrap items-center justify-between gap-1.5">
                     <div className="flex items-center gap-2 min-w-0">
                       <span
-                        className="w-2.5 h-2.5 rounded-xs shrink-0"
+                        className="w-3 h-3 rounded-full ring-2 ring-white shadow-xs shrink-0"
                         style={{ backgroundColor: row.color }}
                         aria-hidden="true"
                       />
@@ -456,14 +483,14 @@ export function AnalyticsView({
                       / {formatCurrency(row.budget, currency)} ({Math.round(row.pct)}%)
                     </div>
                   </div>
-                  <div className="h-2 w-full bg-emerald-950/[0.07] rounded-full overflow-hidden">
+                  <div className="h-2.5 w-full bg-emerald-950/[0.07] ring-1 ring-inset ring-emerald-950/[0.04] rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
                         overBudget
-                          ? 'bg-rose-600'
+                          ? 'bg-gradient-to-r from-rose-600 to-rose-500'
                           : warning
-                            ? 'bg-amber-600'
-                            : 'bg-[#12663F]'
+                            ? 'bg-gradient-to-r from-amber-600 to-amber-400'
+                            : 'bg-gradient-to-r from-[#0F5A36] to-[#10B981]'
                       }`}
                       style={{ width: `${Math.min(100, row.pct)}%` }}
                     />

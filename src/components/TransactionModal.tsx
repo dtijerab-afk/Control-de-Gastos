@@ -1,5 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, AlertTriangle, Plus, X } from 'lucide-react';
+import {
+  AlertCircle,
+  AlertTriangle,
+  ArrowDownRight,
+  ArrowUpRight,
+  Plus,
+  ReceiptText,
+  X,
+} from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import {
   computeProjectedExpenseImpact,
@@ -236,7 +244,7 @@ export function TransactionModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-3 sm:p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#061D12]/55 backdrop-blur-xs p-3 sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="tx-modal-title"
@@ -244,16 +252,21 @@ export function TransactionModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-white border border-slate-200 rounded-xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200">
-          <h2 id="tx-modal-title" className="text-base font-bold text-slate-900">
-            {editingTransaction ? 'Editar movimiento' : 'Registrar movimiento'}
-          </h2>
+      <div className="bg-white border border-emerald-950/15 rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-emerald-950/[0.08] bg-gradient-to-r from-[#F6FAF7] to-white">
+          <div className="flex items-center gap-2.5">
+            <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center shrink-0">
+              <ReceiptText className="w-4 h-4" />
+            </span>
+            <h2 id="tx-modal-title" className="text-base font-bold text-slate-900">
+              {editingTransaction ? 'Editar movimiento' : 'Registrar movimiento'}
+            </h2>
+          </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Cerrar ventana"
-            className="p-2 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-2 text-slate-500 hover:text-slate-900 rounded-xl hover:bg-emerald-950/[0.05] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -265,28 +278,30 @@ export function TransactionModal({
             <label className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1.5">
               Tipo de movimiento
             </label>
-            <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-lg">
+            <div className="grid grid-cols-2 gap-1 p-1 bg-[#EFF5F1] border border-emerald-950/[0.08] rounded-xl">
               <button
                 type="button"
                 onClick={() => setType('gasto')}
-                className={`py-2 px-3 text-sm font-bold rounded-md transition-colors whitespace-nowrap ${
+                className={`py-2 px-3 text-sm font-bold rounded-lg transition-all whitespace-nowrap inline-flex items-center justify-center gap-1.5 ${
                   type === 'gasto'
-                    ? 'bg-white text-rose-700 shadow-xs'
+                    ? 'bg-white text-rose-700 shadow-xs ring-1 ring-rose-200/80'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Gasto (−)
+                <ArrowDownRight className="w-4 h-4" />
+                Gasto
               </button>
               <button
                 type="button"
                 onClick={() => setType('ingreso')}
-                className={`py-2 px-3 text-sm font-bold rounded-md transition-colors whitespace-nowrap ${
+                className={`py-2 px-3 text-sm font-bold rounded-lg transition-all whitespace-nowrap inline-flex items-center justify-center gap-1.5 ${
                   type === 'ingreso'
-                    ? 'bg-white text-emerald-700 shadow-xs'
+                    ? 'bg-white text-emerald-700 shadow-xs ring-1 ring-emerald-200/80'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Ingreso (+)
+                <ArrowUpRight className="w-4 h-4" />
+                Ingreso
               </button>
             </div>
           </div>
@@ -336,10 +351,10 @@ export function TransactionModal({
               <button
                 type="button"
                 onClick={() => setQuincena(1)}
-                className={`px-3 py-2 text-left rounded-lg border transition-colors ${
+                className={`px-3.5 py-2.5 text-left rounded-xl border transition-all ${
                   quincena === 1
-                    ? 'border-[#12663F] bg-emerald-50/70 text-[#0B3B24]'
-                    : 'border-slate-200 text-slate-600 hover:border-emerald-900/25'
+                    ? 'border-[#12663F] bg-emerald-50/70 text-[#0B3B24] shadow-2xs ring-1 ring-[#12663F]/20'
+                    : 'border-emerald-950/12 text-slate-600 hover:border-emerald-900/25 hover:bg-slate-50/60'
                 }`}
               >
                 <span className="block text-sm sm:text-xs font-bold">1ª Quincena</span>
@@ -350,10 +365,10 @@ export function TransactionModal({
               <button
                 type="button"
                 onClick={() => setQuincena(2)}
-                className={`px-3 py-2 text-left rounded-lg border transition-colors ${
+                className={`px-3.5 py-2.5 text-left rounded-xl border transition-all ${
                   quincena === 2
-                    ? 'border-[#12663F] bg-emerald-50/70 text-[#0B3B24]'
-                    : 'border-slate-200 text-slate-600 hover:border-emerald-900/25'
+                    ? 'border-[#12663F] bg-emerald-50/70 text-[#0B3B24] shadow-2xs ring-1 ring-[#12663F]/20'
+                    : 'border-emerald-950/12 text-slate-600 hover:border-emerald-900/25 hover:bg-slate-50/60'
                 }`}
               >
                 <span className="block text-sm sm:text-xs font-bold">2ª Quincena</span>
@@ -536,18 +551,18 @@ export function TransactionModal({
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-200">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-emerald-950/[0.08]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-bold sm:font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors whitespace-nowrap"
+              className="px-4 py-2 text-sm font-bold sm:font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors whitespace-nowrap"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 text-sm font-bold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
+              className="px-5 py-2 text-sm font-bold text-white bg-gradient-to-b from-[#167A4B] to-[#0E5534] hover:from-[#12663F] hover:to-[#0A4127] shadow-xs shadow-emerald-950/20 disabled:opacity-60 rounded-xl transition-all whitespace-nowrap"
             >
               {saving
                 ? 'Guardando...'

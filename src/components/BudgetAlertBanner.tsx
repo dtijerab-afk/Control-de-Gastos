@@ -64,15 +64,23 @@ export function BudgetAlertBanner({
       role="status"
       aria-live="polite"
       aria-label={`Alertas de presupuesto de ${formatMonthLabel(selectedMonth)}`}
-      className={`mb-3.5 sm:mb-5 rounded-xl border px-3.5 py-2.5 sm:px-4 sm:py-3 ${containerTone}`}
+      className={`mb-3 sm:mb-4 rounded-2xl border px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-xs ${containerTone}`}
     >
       <div className="flex items-start justify-between gap-2.5">
         <div className="flex items-start gap-2.5 min-w-0">
-          {hasExceeded ? (
-            <AlertCircle className={`w-5 h-5 sm:w-4 sm:h-4 shrink-0 mt-0.5 ${iconTone}`} />
-          ) : (
-            <AlertTriangle className={`w-5 h-5 sm:w-4 sm:h-4 shrink-0 mt-0.5 ${iconTone}`} />
-          )}
+          <span
+            className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${
+              hasExceeded
+                ? 'bg-rose-100/90 border-rose-200 text-rose-700'
+                : 'bg-amber-100/90 border-amber-200 text-amber-700'
+            }`}
+          >
+            {hasExceeded ? (
+              <AlertCircle className={`w-4 h-4 shrink-0 ${iconTone}`} />
+            ) : (
+              <AlertTriangle className={`w-4 h-4 shrink-0 ${iconTone}`} />
+            )}
+          </span>
           <div className="min-w-0">
             <p className="text-[15px] sm:text-sm font-bold leading-snug">{primaryTitle}</p>
             <p className={`text-[13px] sm:text-xs font-semibold sm:font-medium font-mono tabular-nums mt-0.5 ${subTextTone}`}>
@@ -86,7 +94,7 @@ export function BudgetAlertBanner({
           onClick={onDismissAll}
           aria-label="Ocultar aviso de presupuesto"
           title="Ocultar aviso"
-          className={`p-1.5 -mr-1 -mt-0.5 rounded-md transition-colors shrink-0 ${actionTone}`}
+          className={`p-1.5 -mr-1 -mt-0.5 rounded-lg hover:bg-black/5 transition-colors shrink-0 ${actionTone}`}
         >
           <X className="w-4 h-4" />
         </button>

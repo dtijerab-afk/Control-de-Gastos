@@ -1,5 +1,17 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { AlertCircle, AlertTriangle, Download, Pencil, Plus, Trash2, Upload, X } from 'lucide-react';
+import {
+  AlertCircle,
+  AlertTriangle,
+  Download,
+  Globe,
+  HardDriveDownload,
+  Pencil,
+  Plus,
+  Tags,
+  Trash2,
+  Upload,
+  X,
+} from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import {
   buildQuincenaBackup,
@@ -237,14 +249,14 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
     <div className="space-y-3.5 sm:space-y-5">
       {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
-        <div className="inline-flex items-center gap-1 p-1 bg-emerald-950/[0.06] rounded-lg w-full sm:w-fit">
+        <div className="inline-flex items-center gap-1 p-1 bg-white/80 border border-emerald-950/10 shadow-xs rounded-xl w-full sm:w-fit">
           <button
             type="button"
             onClick={() => setActiveType('gasto')}
-            className={`flex-1 sm:flex-none px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
+            className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
               activeType === 'gasto'
-                ? 'bg-white text-[#0B3B24] shadow-xs'
-                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24]'
+                ? 'bg-[#0B3B24] text-white shadow-xs'
+                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24] hover:bg-emerald-950/[0.04]'
             }`}
           >
             Gastos ({categories.filter((c) => c.type === 'gasto').length})
@@ -252,10 +264,10 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
           <button
             type="button"
             onClick={() => setActiveType('ingreso')}
-            className={`flex-1 sm:flex-none px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
+            className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
               activeType === 'ingreso'
-                ? 'bg-white text-[#0B3B24] shadow-xs'
-                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24]'
+                ? 'bg-[#0B3B24] text-white shadow-xs'
+                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24] hover:bg-emerald-950/[0.04]'
             }`}
           >
             Ingresos ({categories.filter((c) => c.type === 'ingreso').length})
@@ -265,7 +277,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
         <button
           type="button"
           onClick={openCreateForm}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm sm:text-xs font-bold text-white bg-[#12663F] hover:bg-[#0D4F30] rounded-lg transition-colors whitespace-nowrap shrink-0 w-full sm:w-fit"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm sm:text-xs font-bold text-white bg-gradient-to-b from-[#167A4B] to-[#0E5534] hover:from-[#12663F] hover:to-[#0A4127] shadow-xs shadow-emerald-950/20 rounded-xl transition-all whitespace-nowrap shrink-0 w-full sm:w-fit"
         >
           <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           Nueva categoría
@@ -274,7 +286,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
 
       {/* Category Create / Edit Form Panel */}
       {formOpen && (
-        <section className="bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5">
+        <section className="mf-card p-3.5 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-bold text-slate-900">
               {editingCat ? 'Editar categoría' : 'Crear categoría personalizada'}
@@ -283,7 +295,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
               type="button"
               onClick={() => setFormOpen(false)}
               aria-label="Cerrar formulario"
-              className="p-1.5 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100"
+              className="p-1.5 text-slate-500 hover:text-slate-900 rounded-xl hover:bg-emerald-950/[0.05] transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -399,15 +411,20 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
       )}
 
       {/* Categories List (Ultra-compact single-row alignment on mobile & desktop) */}
-      <section className="bg-white border border-emerald-950/10 rounded-xl overflow-hidden">
-        <div className="px-3.5 py-2.5 sm:px-5 sm:py-3 border-b border-emerald-950/10 flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold sm:font-semibold text-slate-900">
-              {activeType === 'gasto' ? 'Categorías de gasto' : 'Categorías de ingreso'}
-            </h2>
-            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
-              Acumulado en {formatMonthLabel(selectedMonth)}
-            </p>
+      <section className="mf-card overflow-hidden">
+        <div className="px-3.5 py-2.5 sm:px-5 sm:py-3 border-b border-emerald-950/[0.08] bg-gradient-to-r from-[#F6FAF7] to-white flex items-center justify-between">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center shrink-0">
+              <Tags className="w-4 h-4" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+                {activeType === 'gasto' ? 'Categorías de gasto' : 'Categorías de ingreso'}
+              </h2>
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+                Acumulado en {formatMonthLabel(selectedMonth)}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -422,14 +439,14 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
             <button
               type="button"
               onClick={openCreateForm}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm sm:text-xs font-bold text-white bg-[#0F5132] hover:bg-[#0B3D26] rounded-lg"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm sm:text-xs font-bold text-white bg-gradient-to-b from-[#167A4B] to-[#0E5534] hover:from-[#12663F] hover:to-[#0A4127] shadow-xs shadow-emerald-950/20 rounded-xl"
             >
               <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               Nueva categoría
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-emerald-950/[0.06]">
             {visibleCategories.map((cat) => {
               const stats = statsByCategory.get(cat.id) ?? { monthTotal: 0, totalCount: 0 };
               const isConfirming = confirmDeleteId === cat.id;
@@ -442,11 +459,11 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
               return (
                 <div
                   key={cat.id}
-                  className="px-3.5 py-2 sm:px-5 sm:py-2.5 flex items-center justify-between gap-2.5 hover:bg-slate-50/70 transition-colors"
+                  className="px-3.5 py-2.5 sm:px-5 sm:py-3 flex items-center justify-between gap-2.5 hover:bg-[#F5FAF7] transition-colors"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span
-                      className="w-3 h-3 rounded-xs shrink-0"
+                      className="w-3.5 h-3.5 rounded-full ring-2 ring-white shadow-xs shrink-0"
                       style={{ backgroundColor: cat.color }}
                       aria-hidden="true"
                     />
@@ -546,21 +563,26 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
       </section>
 
       {/* Workspace Currency Preferences */}
-      <section className="bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-900">
-            Moneda de visualización
-          </h3>
-          <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
-            Define la divisa con la que se muestran tus montos y gráficas mensuales.
-          </p>
+      <section className="mf-card p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+            <Globe className="w-4 h-4" />
+          </span>
+          <div className="min-w-0">
+            <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-900 leading-tight">
+              Moneda de visualización
+            </h3>
+            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+              Define la divisa con la que se muestran tus montos y gráficas mensuales.
+            </p>
+          </div>
         </div>
         <select
           aria-label="Moneda de visualización"
           value={currency}
           disabled={savingCurrency}
           onChange={(e) => handleCurrencyChange(e.target.value as CurrencyCode)}
-          className="px-3.5 py-2 text-base sm:text-sm font-semibold sm:font-normal text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132] w-full sm:w-64"
+          className="px-3.5 py-2 text-base sm:text-sm font-semibold sm:font-medium text-slate-900 bg-[#F5F9F6] border border-emerald-950/15 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132] w-full sm:w-64 transition-colors"
         >
           {CURRENCIES.map((c) => (
             <option key={c.code} value={c.code}>
@@ -573,30 +595,35 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
       {/* Backup & Migration Section (JSON Export / Validated Import with UID & Category Remapping) */}
       <section
         aria-label="Respaldo y migración de datos"
-        className="bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5 space-y-3"
+        className="mf-card p-3.5 sm:p-5 space-y-3"
       >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          <div>
-            <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-900">
-              Respaldo completo (JSON)
-            </h3>
-            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
-              Exporta tu perfil, moneda, presupuesto mensual global, categorías personalizadas y
-              todos tus movimientos, o importa un respaldo previo sin sobrescribir ni duplicar
-              registros.
-            </p>
-            <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-700 sm:text-slate-600 mt-1.5 font-mono tabular-nums">
-              {categories.length} {categories.length === 1 ? 'categoría' : 'categorías'} ·{' '}
-              {transactions.length} {transactions.length === 1 ? 'movimiento' : 'movimientos'} ·
-              Meta {formatCurrency(profile?.monthlyBudget ?? 0, currency)}
-            </p>
+          <div className="flex items-start gap-2.5 min-w-0">
+            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0 mt-0.5">
+              <HardDriveDownload className="w-4 h-4" />
+            </span>
+            <div className="min-w-0">
+              <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-900 leading-tight">
+                Respaldo completo (JSON)
+              </h3>
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+                Exporta tu perfil, moneda, presupuesto mensual global, categorías personalizadas y
+                todos tus movimientos, o importa un respaldo previo sin sobrescribir ni duplicar
+                registros.
+              </p>
+              <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-700 sm:text-slate-600 mt-1.5 font-mono tabular-nums">
+                {categories.length} {categories.length === 1 ? 'categoría' : 'categorías'} ·{' '}
+                {transactions.length} {transactions.length === 1 ? 'movimiento' : 'movimientos'} ·
+                Meta {formatCurrency(profile?.monthlyBudget ?? 0, currency)}
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={handleExportBackup}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-sm sm:text-xs font-bold text-white bg-[#12663F] hover:bg-[#0D4F30] rounded-lg transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-sm sm:text-xs font-bold text-white bg-gradient-to-b from-[#167A4B] to-[#0E5534] hover:from-[#12663F] hover:to-[#0A4127] shadow-xs shadow-emerald-950/20 rounded-xl transition-all whitespace-nowrap"
             >
               <Download className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               Exportar respaldo JSON
@@ -613,7 +640,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
               type="button"
               disabled={importing}
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-sm sm:text-xs font-bold sm:font-medium text-[#0B3B24] bg-[#F3F7F4] border border-emerald-900/15 hover:bg-emerald-50 disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-sm sm:text-xs font-bold sm:font-semibold text-[#0B3B24] bg-[#F3F8F5] border border-emerald-900/15 hover:bg-emerald-50 hover:border-emerald-800/30 disabled:opacity-60 rounded-xl transition-all whitespace-nowrap"
             >
               <Upload className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#12663F]" />
               Importar respaldo JSON
