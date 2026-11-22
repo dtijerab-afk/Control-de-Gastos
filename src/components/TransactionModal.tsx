@@ -1,7 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Plus, X } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import {
+  computeProjectedExpenseImpact,
+  type BudgetAlertItem,
+} from '../lib/budgetAlerts';
+import {
+  formatCurrency,
   getDefaultDateForPeriod,
   getQuincenaFromDate,
   getQuincenaRangeLabel,
@@ -25,6 +30,8 @@ interface TransactionModalProps {
   editingTransaction: Transaction | null;
   defaultMonthKey: string;
   defaultQuincena: QuincenaFilter;
+  alertThresholdPct: number;
+  onBudgetAlertTriggered?: (alerts: BudgetAlertItem[]) => void;
 }
 
 export function TransactionModal({
@@ -33,8 +40,10 @@ export function TransactionModal({
   editingTransaction,
   defaultMonthKey,
   defaultQuincena,
+  alertThresholdPct,
+  onBudgetAlertTriggered,
 }: TransactionModalProps) {
-  const { user, categories, currency } = useFinance();
+  const { user, profile, categories, transactions, currency } = useFinance();
 
   const [type, setType] = useState<TransactionType>('gasto');
   const [amount, setAmount] = useState('');
@@ -111,9 +120,36 @@ export function TransactionModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [open, onClose]);
 
-  if (!open || !user) return null;
-
   const activeMonthKey = date.length >= 7 ? getMonthKeyFromDate(date) : defaultMonthKey;
+
+  const projectedAlerts = useMemo(() => {
+    if (!open || type !== 'gasto') return [];
+    const parsedAmount = Number(amount.replace(',', '.'));
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) return [];
+    return computeProjectedExpenseImpact({
+      monthKey: activeMonthKey,
+      transactions,
+      categories,
+      globalBudget: profile?.monthlyBudget ?? 0,
+      thresholdPct: alertThresholdPct,
+      draftAmount: parsedAmount,
+      draftCategoryId: categoryId,
+      editingTransactionId: editingTransaction?.id ?? null,
+    });
+  }, [
+    open,
+    type,
+    amount,
+    activeMonthKey,
+    transactions,
+    categories,
+    profile?.monthlyBudget,
+    alertThresholdPct,
+    categoryId,
+    editingTransaction?.id,
+  ]);
+
+  if (!open || !user) return null;
 
   const handleDateChange = (nextDate: string) => {
     setDate(nextDate);
@@ -184,6 +220,10 @@ export function TransactionModal({
       } else {
         await createTransaction(user.uid, payload);
       }
+
+      if (type === 'gasto' && projectedAlerts.length > 0) {
+        onBudgetAlertTriggered?.(projectedAlerts);
+      }
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo guardar el movimiento.');
@@ -192,9 +232,11 @@ export function TransactionModal({
     }
   };
 
+  const hasProjectedExceeded = projectedAlerts.some((a) => a.severity === 'exceeded');
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-3 sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="tx-modal-title"
@@ -203,8 +245,8 @@ export function TransactionModal({
       }}
     >
       <div className="bg-white border border-slate-200 rounded-xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-          <h2 id="tx-modal-title" className="text-base font-semibold text-slate-900">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200">
+          <h2 id="tx-modal-title" className="text-base font-bold text-slate-900">
             {editingTransaction ? 'Editar movimiento' : 'Registrar movimiento'}
           </h2>
           <button
@@ -217,17 +259,17 @@ export function TransactionModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4">
           {/* Type Segmented Control */}
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1.5">
+            <label className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1.5">
               Tipo de movimiento
             </label>
             <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-lg">
               <button
                 type="button"
                 onClick={() => setType('gasto')}
-                className={`py-2 px-3 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
+                className={`py-2 px-3 text-sm font-bold rounded-md transition-colors whitespace-nowrap ${
                   type === 'gasto'
                     ? 'bg-white text-rose-700 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -238,7 +280,7 @@ export function TransactionModal({
               <button
                 type="button"
                 onClick={() => setType('ingreso')}
-                className={`py-2 px-3 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
+                className={`py-2 px-3 text-sm font-bold rounded-md transition-colors whitespace-nowrap ${
                   type === 'ingreso'
                     ? 'bg-white text-emerald-700 shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -250,9 +292,9 @@ export function TransactionModal({
           </div>
 
           {/* Amount & Date */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label htmlFor="tx-amount" className="block text-xs font-medium text-slate-600 mb-1.5">
+              <label htmlFor="tx-amount" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
                 Monto ({currency})
               </label>
               <input
@@ -266,12 +308,12 @@ export function TransactionModal({
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-base font-mono tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                className="w-full px-3.5 py-2.5 text-base font-mono font-bold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
               />
             </div>
 
             <div>
-              <label htmlFor="tx-date" className="block text-xs font-medium text-slate-600 mb-1.5">
+              <label htmlFor="tx-date" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
                 Fecha
               </label>
               <input
@@ -280,42 +322,42 @@ export function TransactionModal({
                 required
                 value={date}
                 onChange={(e) => handleDateChange(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm font-mono tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-mono font-semibold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
               />
             </div>
           </div>
 
           {/* Quincena Selector */}
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1.5">
+            <label className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
               Quincena asignada
             </label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setQuincena(1)}
-                className={`px-3 py-2.5 text-left rounded-lg border transition-colors ${
+                className={`px-3 py-2 text-left rounded-lg border transition-colors ${
                   quincena === 1
                     ? 'border-[#12663F] bg-emerald-50/70 text-[#0B3B24]'
                     : 'border-slate-200 text-slate-600 hover:border-emerald-900/25'
                 }`}
               >
-                <span className="block text-xs font-semibold">1ª Quincena</span>
-                <span className="block text-xs text-slate-500 mt-0.5">
+                <span className="block text-sm sm:text-xs font-bold">1ª Quincena</span>
+                <span className="block text-xs font-semibold sm:font-normal text-slate-500 mt-0.5">
                   {getQuincenaRangeLabel(activeMonthKey, 1)}
                 </span>
               </button>
               <button
                 type="button"
                 onClick={() => setQuincena(2)}
-                className={`px-3 py-2.5 text-left rounded-lg border transition-colors ${
+                className={`px-3 py-2 text-left rounded-lg border transition-colors ${
                   quincena === 2
                     ? 'border-[#12663F] bg-emerald-50/70 text-[#0B3B24]'
                     : 'border-slate-200 text-slate-600 hover:border-emerald-900/25'
                 }`}
               >
-                <span className="block text-xs font-semibold">2ª Quincena</span>
-                <span className="block text-xs text-slate-500 mt-0.5">
+                <span className="block text-sm sm:text-xs font-bold">2ª Quincena</span>
+                <span className="block text-xs font-semibold sm:font-normal text-slate-500 mt-0.5">
                   {getQuincenaRangeLabel(activeMonthKey, 2)}
                 </span>
               </button>
@@ -324,7 +366,7 @@ export function TransactionModal({
 
           {/* Description */}
           <div>
-            <label htmlFor="tx-desc" className="block text-xs font-medium text-slate-600 mb-1.5">
+            <label htmlFor="tx-desc" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
               Concepto o descripción
             </label>
             <input
@@ -335,20 +377,20 @@ export function TransactionModal({
               placeholder={type === 'ingreso' ? 'Ej. Pago de nómina quincenal' : 'Ej. Despensa semanal'}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+              className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
             />
           </div>
 
           {/* Category + Inline Quick Create */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="tx-category" className="block text-xs font-medium text-slate-600">
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="tx-category" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600">
                 Categoría
               </label>
               <button
                 type="button"
                 onClick={() => setCreatingCategory((prev) => !prev)}
-                className="inline-flex items-center gap-1 text-xs font-medium text-[#12663F] hover:underline"
+                className="inline-flex items-center gap-1 text-sm sm:text-xs font-bold sm:font-medium text-[#12663F] hover:underline"
               >
                 <Plus className="w-3.5 h-3.5" />
                 {creatingCategory ? 'Cancelar nueva' : 'Nueva categoría'}
@@ -356,14 +398,14 @@ export function TransactionModal({
             </div>
 
             {creatingCategory ? (
-              <div className="p-3.5 bg-[#F4F8F5] border border-emerald-950/12 rounded-lg space-y-3">
+              <div className="p-3 bg-[#F4F8F5] border border-emerald-950/12 rounded-lg space-y-3">
                 <input
                   type="text"
                   maxLength={VALIDATION_LIMITS.CATEGORY_NAME_MAX}
                   placeholder={`Nombre de categoría de ${type}`}
                   value={newCatName}
                   onChange={(e) => setNewCatName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#0F5132]"
+                  className="w-full px-3 py-2 text-base sm:text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#0F5132]"
                 />
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -386,7 +428,7 @@ export function TransactionModal({
                     type="button"
                     disabled={savingCategory}
                     onClick={handleQuickCreateCategory}
-                    className="px-3 py-1.5 text-xs font-medium text-white bg-[#0F5132] hover:bg-[#0B3D26] disabled:opacity-60 rounded-md whitespace-nowrap shrink-0"
+                    className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F5132] hover:bg-[#0B3D26] disabled:opacity-60 rounded-md whitespace-nowrap shrink-0"
                   >
                     {savingCategory ? 'Creando...' : 'Crear y elegir'}
                   </button>
@@ -398,7 +440,7 @@ export function TransactionModal({
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 required
-                className="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
               >
                 {filteredCategories.length === 0 ? (
                   <option value="">Sin categorías disponibles — crea una nueva</option>
@@ -414,16 +456,16 @@ export function TransactionModal({
           </div>
 
           {/* Payment Method & Optional Notes */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label htmlFor="tx-method" className="block text-xs font-medium text-slate-600 mb-1.5">
+              <label htmlFor="tx-method" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
                 Método de pago
               </label>
               <select
                 id="tx-method"
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-                className="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
               >
                 {PAYMENT_METHODS.map((pm) => (
                   <option key={pm.value} value={pm.value}>
@@ -434,7 +476,7 @@ export function TransactionModal({
             </div>
 
             <div>
-              <label htmlFor="tx-notes" className="block text-xs font-medium text-slate-600 mb-1.5">
+              <label htmlFor="tx-notes" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
                 Nota breve (opcional)
               </label>
               <input
@@ -444,15 +486,51 @@ export function TransactionModal({
                 placeholder="Referencia o detalle"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
               />
             </div>
           </div>
 
+          {/* Live Projected Budget Alert Preview */}
+          {projectedAlerts.length > 0 && (
+            <div
+              role="status"
+              className={`px-3.5 py-2.5 rounded-lg border space-y-1 ${
+                hasProjectedExceeded
+                  ? 'bg-rose-50 border-rose-200 text-rose-950'
+                  : 'bg-amber-50 border-amber-200 text-amber-950'
+              }`}
+            >
+              {projectedAlerts.map((item) => {
+                const over = item.severity === 'exceeded';
+                return (
+                  <div key={item.id} className="flex items-start gap-2">
+                    {over ? (
+                      <AlertCircle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                    )}
+                    <p className="text-[13px] sm:text-xs font-bold leading-snug">
+                      Con este gasto, {item.label.toLowerCase()} llegará al{' '}
+                      <span className="font-mono tabular-nums">{Math.round(item.pct)}%</span> (
+                      <span className="font-mono tabular-nums">
+                        {formatCurrency(item.spent, currency)} / {formatCurrency(item.budget, currency)}
+                      </span>
+                      ){' '}
+                      {over
+                        ? `· Excedido por ${formatCurrency(Math.abs(item.remaining), currency)}`
+                        : `· Restan ${formatCurrency(item.remaining, currency)}`}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {error && (
             <div
               role="alert"
-              className="px-3.5 py-2.5 text-sm text-rose-800 bg-rose-50 border border-rose-200 rounded-lg"
+              className="px-3.5 py-2.5 text-sm font-semibold text-rose-800 bg-rose-50 border border-rose-200 rounded-lg"
             >
               {error}
             </div>
@@ -462,14 +540,14 @@ export function TransactionModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors whitespace-nowrap"
+              className="px-4 py-2 text-sm font-bold sm:font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors whitespace-nowrap"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 text-sm font-semibold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
+              className="px-5 py-2 text-sm font-bold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
             >
               {saving
                 ? 'Guardando...'

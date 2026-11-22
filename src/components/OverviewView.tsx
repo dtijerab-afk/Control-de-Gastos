@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowRight, Copy, Pencil, Plus } from 'lucide-react';
+import { AlertCircle, AlertTriangle, ArrowRight, Copy, Pencil, Plus } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -36,6 +36,7 @@ import {
 interface OverviewViewProps {
   selectedMonth: string;
   selectedQuincena: QuincenaFilter;
+  alertThresholdPct: number;
   onChangeQuincena: (q: QuincenaFilter) => void;
   onSelectMonth: (monthKey: string) => void;
   onNavigate: (section: NavSection) => void;
@@ -46,6 +47,7 @@ interface OverviewViewProps {
 export function OverviewView({
   selectedMonth,
   selectedQuincena,
+  alertThresholdPct,
   onChangeQuincena,
   onSelectMonth,
   onNavigate,
@@ -178,7 +180,7 @@ export function OverviewView({
   const budgetUsedPct = globalBudget > 0 ? (monthExpenseTotal / globalBudget) * 100 : 0;
   const budgetRemaining = globalBudget - monthExpenseTotal;
   const budgetOver = globalBudget > 0 && budgetRemaining < 0;
-  const budgetWarning = globalBudget > 0 && !budgetOver && budgetUsedPct >= 85;
+  const budgetWarning = globalBudget > 0 && !budgetOver && budgetUsedPct >= alertThresholdPct;
   const q1BudgetSharePct =
     globalBudget > 0 ? Math.min(100, (quincenaSummary.q1.expense / globalBudget) * 100) : 0;
   const q2BudgetSharePct =
@@ -229,10 +231,10 @@ export function OverviewView({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3.5 sm:space-y-5">
       {/* Period Selector Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="inline-flex items-center gap-1 p-1 bg-emerald-950/[0.06] rounded-lg w-fit">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+        <div className="inline-flex items-center gap-1 p-1 bg-emerald-950/[0.06] rounded-lg w-full sm:w-fit overflow-x-auto">
           <button
             type="button"
             onClick={() => {
@@ -240,10 +242,10 @@ export function OverviewView({
               setConfirmingCopy(false);
               setCopyFeedback(null);
             }}
-            className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
+            className={`flex-1 sm:flex-none px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
               selectedQuincena === 'all'
                 ? 'bg-white text-[#0B3B24] shadow-xs'
-                : 'text-slate-600 hover:text-[#0B3B24]'
+                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24]'
             }`}
           >
             Todo el mes
@@ -255,13 +257,16 @@ export function OverviewView({
               setConfirmingCopy(false);
               setCopyFeedback(null);
             }}
-            className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
+            className={`flex-1 sm:flex-none px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
               selectedQuincena === 1
                 ? 'bg-white text-[#0B3B24] shadow-xs'
-                : 'text-slate-600 hover:text-[#0B3B24]'
+                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24]'
             }`}
           >
-            1ª Quincena ({getQuincenaRangeLabel(selectedMonth, 1)})
+            <span className="sm:hidden">1ª Q ({getQuincenaRangeLabel(selectedMonth, 1)})</span>
+            <span className="hidden sm:inline">
+              1ª Quincena ({getQuincenaRangeLabel(selectedMonth, 1)})
+            </span>
           </button>
           <button
             type="button"
@@ -270,35 +275,38 @@ export function OverviewView({
               setConfirmingCopy(false);
               setCopyFeedback(null);
             }}
-            className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
+            className={`flex-1 sm:flex-none px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
               selectedQuincena === 2
                 ? 'bg-white text-[#0B3B24] shadow-xs'
-                : 'text-slate-600 hover:text-[#0B3B24]'
+                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24]'
             }`}
           >
-            2ª Quincena ({getQuincenaRangeLabel(selectedMonth, 2)})
+            <span className="sm:hidden">2ª Q ({getQuincenaRangeLabel(selectedMonth, 2)})</span>
+            <span className="hidden sm:inline">
+              2ª Quincena ({getQuincenaRangeLabel(selectedMonth, 2)})
+            </span>
           </button>
         </div>
 
         {previousQuincenaInfo && previousQuincenaInfo.sourceTxs.length > 0 && (
           <div className="flex items-center gap-2">
             {confirmingCopy ? (
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-slate-600">
+              <div className="flex flex-wrap items-center gap-2 text-[13px] sm:text-xs">
+                <span className="font-semibold text-slate-700">
                   ¿Copiar {previousQuincenaInfo.sourceTxs.length} mov. de {previousQuincenaInfo.label}?
                 </span>
                 <button
                   type="button"
                   disabled={copying}
                   onClick={handleCopyPreviousQuincena}
-                  className="px-3 py-1.5 font-medium text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-md whitespace-nowrap"
+                  className="px-3 py-1.5 font-bold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-md whitespace-nowrap"
                 >
                   {copying ? 'Copiando...' : 'Confirmar'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmingCopy(false)}
-                  className="px-2.5 py-1.5 font-medium text-slate-600 hover:text-slate-900 whitespace-nowrap"
+                  className="px-2.5 py-1.5 font-bold sm:font-medium text-slate-600 hover:text-slate-900 whitespace-nowrap"
                 >
                   Cancelar
                 </button>
@@ -307,7 +315,7 @@ export function OverviewView({
               <button
                 type="button"
                 onClick={() => setConfirmingCopy(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#0B3B24] bg-white border border-emerald-900/15 hover:border-emerald-900/30 rounded-lg transition-colors whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium text-[#0B3B24] bg-white border border-emerald-900/15 hover:border-emerald-900/30 rounded-lg transition-colors whitespace-nowrap shrink-0"
               >
                 <Copy className="w-3.5 h-3.5 text-emerald-700" />
                 Copiar {previousQuincenaInfo.label}
@@ -318,58 +326,64 @@ export function OverviewView({
       </div>
 
       {copyFeedback && (
-        <div className="px-4 py-2.5 text-xs text-emerald-900 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
+        <div className="px-3.5 py-2 text-[13px] sm:text-xs font-semibold text-emerald-900 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
           <span>{copyFeedback}</span>
           <button
             type="button"
             onClick={() => setCopyFeedback(null)}
-            className="font-medium hover:underline ml-4"
+            className="font-bold hover:underline ml-4"
           >
             Cerrar
           </button>
         </div>
       )}
 
-      {/* 4-Column Unified KPI Strip (Single elevation, hairline dividers, zero nested cards) */}
+      {/* 4-Column Unified KPI Strip (2x2 compact grid on mobile, 4-col on lg) */}
       <section
         aria-label="Resumen financiero del periodo"
-        className="bg-white border border-emerald-950/10 rounded-xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-emerald-950/10"
+        className="bg-white border border-emerald-950/10 rounded-xl grid grid-cols-2 lg:grid-cols-4 overflow-hidden"
       >
-        <div className="p-5">
-          <p className="text-xs font-medium text-slate-500">Ingresos</p>
+        <div className="p-3 sm:p-4 lg:p-5 border-b border-r border-emerald-950/10 lg:border-b-0">
+          <p className="text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-500">
+            Ingresos
+          </p>
           {loadingData ? (
-            <div className="h-7 w-32 bg-slate-100 rounded mt-2 animate-pulse" />
+            <div className="h-6 sm:h-7 w-28 bg-slate-100 rounded mt-1.5 animate-pulse" />
           ) : (
-            <p className="text-2xl font-mono font-semibold text-emerald-700 tabular-nums mt-1.5">
+            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-emerald-700 tabular-nums mt-0.5 sm:mt-1 truncate">
               +{formatCurrency(kpis.income, currency)}
             </p>
           )}
-          <p className="text-xs text-slate-500 mt-1.5">
+          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 sm:mt-1">
             {kpis.incomeCount} {kpis.incomeCount === 1 ? 'registro' : 'registros'}
           </p>
         </div>
 
-        <div className="p-5">
-          <p className="text-xs font-medium text-slate-500">Gastos</p>
+        <div className="p-3 sm:p-4 lg:p-5 border-b lg:border-b-0 lg:border-r border-emerald-950/10">
+          <p className="text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-500">
+            Gastos
+          </p>
           {loadingData ? (
-            <div className="h-7 w-32 bg-slate-100 rounded mt-2 animate-pulse" />
+            <div className="h-6 sm:h-7 w-28 bg-slate-100 rounded mt-1.5 animate-pulse" />
           ) : (
-            <p className="text-2xl font-mono font-semibold text-rose-700 tabular-nums mt-1.5">
+            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-rose-700 tabular-nums mt-0.5 sm:mt-1 truncate">
               −{formatCurrency(kpis.expense, currency)}
             </p>
           )}
-          <p className="text-xs text-slate-500 mt-1.5">
+          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 sm:mt-1">
             {kpis.expenseCount} {kpis.expenseCount === 1 ? 'registro' : 'registros'}
           </p>
         </div>
 
-        <div className="p-5">
-          <p className="text-xs font-medium text-slate-500">Balance neto</p>
+        <div className="p-3 sm:p-4 lg:p-5 border-r border-emerald-950/10">
+          <p className="text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-500">
+            Balance neto
+          </p>
           {loadingData ? (
-            <div className="h-7 w-32 bg-slate-100 rounded mt-2 animate-pulse" />
+            <div className="h-6 sm:h-7 w-28 bg-slate-100 rounded mt-1.5 animate-pulse" />
           ) : (
             <p
-              className={`text-2xl font-mono font-semibold tabular-nums mt-1.5 ${
+              className={`text-lg sm:text-2xl font-mono font-bold sm:font-semibold tabular-nums mt-0.5 sm:mt-1 truncate ${
                 kpis.net > 0
                   ? 'text-slate-900'
                   : kpis.net < 0
@@ -381,18 +395,20 @@ export function OverviewView({
               {formatCurrency(Math.abs(kpis.net), currency)}
             </p>
           )}
-          <p className="text-xs text-slate-500 mt-1.5">
-            {netStatusLabel} · {formatMonthLabel(selectedMonth)}
+          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 sm:mt-1 truncate">
+            {netStatusLabel} · {formatShortMonthLabel(selectedMonth)}
           </p>
         </div>
 
-        <div className="p-5">
-          <p className="text-xs font-medium text-slate-500">Tasa de ahorro</p>
+        <div className="p-3 sm:p-4 lg:p-5">
+          <p className="text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-500">
+            Tasa de ahorro
+          </p>
           {loadingData ? (
-            <div className="h-7 w-20 bg-slate-100 rounded mt-2 animate-pulse" />
+            <div className="h-6 sm:h-7 w-16 bg-slate-100 rounded mt-1.5 animate-pulse" />
           ) : (
             <p
-              className={`text-2xl font-mono font-semibold tabular-nums mt-1.5 ${
+              className={`text-lg sm:text-2xl font-mono font-bold sm:font-semibold tabular-nums mt-0.5 sm:mt-1 ${
                 kpis.savingsRate >= 20
                   ? 'text-emerald-700'
                   : kpis.savingsRate < 0
@@ -403,8 +419,8 @@ export function OverviewView({
               {kpis.income > 0 ? `${kpis.savingsRate.toFixed(1)}%` : '0.0%'}
             </p>
           )}
-          <p className="text-xs text-slate-500 mt-1.5">
-            {kpis.income > 0 ? 'Sobre ingresos del periodo' : 'Sin ingresos registrados'}
+          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 sm:mt-1 truncate">
+            {kpis.income > 0 ? 'Sobre ingresos' : 'Sin ingresos'}
           </p>
         </div>
       </section>
@@ -412,14 +428,15 @@ export function OverviewView({
       {/* Global Monthly Budget Section */}
       <section
         aria-label="Presupuesto mensual global"
-        className="bg-white border border-emerald-950/10 rounded-xl p-6"
+        className="bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5"
       >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-base font-semibold text-slate-900">Presupuesto mensual global</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Seguimiento de gastos acumulados en {formatMonthLabel(selectedMonth)} respecto a tu
-              meta mensual
+        <div className="flex items-center justify-between gap-2.5">
+          <div className="min-w-0">
+            <h2 className="text-base font-bold sm:font-semibold text-slate-900">
+              Presupuesto mensual global
+            </h2>
+            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+              Gastos acumulados en {formatMonthLabel(selectedMonth)}
             </p>
           </div>
 
@@ -427,21 +444,21 @@ export function OverviewView({
             <button
               type="button"
               onClick={openBudgetEditor}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#0B3B24] bg-[#F3F7F4] border border-emerald-900/15 hover:bg-emerald-50 rounded-lg transition-colors whitespace-nowrap shrink-0 w-fit"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium text-[#0B3B24] bg-[#F3F7F4] border border-emerald-900/15 hover:bg-emerald-50 rounded-lg transition-colors whitespace-nowrap shrink-0"
             >
               <Pencil className="w-3.5 h-3.5 text-[#12663F]" />
-              {globalBudget > 0 ? 'Editar meta' : 'Definir meta mensual'}
+              {globalBudget > 0 ? 'Editar meta' : 'Definir meta'}
             </button>
           )}
         </div>
 
         {editingBudget ? (
-          <form onSubmit={handleSaveGlobalBudget} className="mt-5 pt-5 border-t border-emerald-950/10 space-y-3">
+          <form onSubmit={handleSaveGlobalBudget} className="mt-3.5 pt-3.5 border-t border-emerald-950/10 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-end gap-3">
               <div className="flex-1 max-w-xs">
                 <label
                   htmlFor="global-monthly-budget"
-                  className="block text-xs font-medium text-slate-600 mb-1.5"
+                  className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1"
                 >
                   Meta mensual de gastos ({currency})
                 </label>
@@ -455,14 +472,14 @@ export function OverviewView({
                   placeholder="Ej. 20000.00"
                   value={budgetInput}
                   onChange={(e) => setBudgetInput(e.target.value)}
-                  className="w-full px-3.5 py-2 text-sm font-mono tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                  className="w-full px-3.5 py-2 text-base sm:text-sm font-mono font-bold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
                 />
               </div>
               <div className="flex items-center gap-2">
                 <button
                   type="submit"
                   disabled={savingBudget}
-                  className="px-4 py-2 text-xs font-semibold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
+                  className="px-4 py-2 text-sm sm:text-xs font-bold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
                 >
                   {savingBudget ? 'Guardando...' : 'Guardar meta'}
                 </button>
@@ -471,7 +488,7 @@ export function OverviewView({
                     type="button"
                     disabled={savingBudget}
                     onClick={handleClearGlobalBudget}
-                    className="px-3 py-2 text-xs font-medium text-rose-700 hover:bg-rose-50 rounded-lg transition-colors whitespace-nowrap"
+                    className="px-3 py-2 text-sm sm:text-xs font-bold sm:font-medium text-rose-700 hover:bg-rose-50 rounded-lg transition-colors whitespace-nowrap"
                   >
                     Quitar meta
                   </button>
@@ -479,69 +496,77 @@ export function OverviewView({
                 <button
                   type="button"
                   onClick={() => setEditingBudget(false)}
-                  className="px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors whitespace-nowrap"
+                  className="px-3 py-2 text-sm sm:text-xs font-bold sm:font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors whitespace-nowrap"
                 >
                   Cancelar
                 </button>
               </div>
             </div>
             {budgetError && (
-              <p role="alert" className="text-xs text-rose-700">
+              <p role="alert" className="text-xs font-semibold text-rose-700">
                 {budgetError}
               </p>
             )}
           </form>
         ) : globalBudget > 0 ? (
-          <div className="mt-5 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-4 border-t border-slate-100">
+          <div className="mt-3.5 space-y-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5 pt-3 border-t border-slate-100">
               <div>
-                <p className="text-xs text-slate-500">Gastado en el mes</p>
-                <p className="text-lg font-mono font-semibold text-slate-900 tabular-nums mt-0.5">
+                <p className="text-[13px] sm:text-xs font-bold sm:font-normal text-slate-700 sm:text-slate-500">
+                  Gastado
+                </p>
+                <p className="text-base sm:text-lg font-mono font-bold sm:font-semibold text-slate-900 tabular-nums mt-0.5">
                   {formatCurrency(monthExpenseTotal, currency)}
                 </p>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {budgetUsedPct.toFixed(1)}% de la meta utilizada
+                <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500">
+                  {budgetUsedPct.toFixed(1)}% usado
                 </p>
               </div>
               <div>
-                <p className="text-xs text-slate-500">Meta mensual</p>
-                <p className="text-lg font-mono font-semibold text-slate-900 tabular-nums mt-0.5">
+                <p className="text-[13px] sm:text-xs font-bold sm:font-normal text-slate-700 sm:text-slate-500">
+                  Meta mensual
+                </p>
+                <p className="text-base sm:text-lg font-mono font-bold sm:font-semibold text-slate-900 tabular-nums mt-0.5">
                   {formatCurrency(globalBudget, currency)}
                 </p>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Referencia quincenal: {formatCurrency(globalBudget / 2, currency)}
+                <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500">
+                  Ref. Q: {formatCurrency(globalBudget / 2, currency)}
                 </p>
               </div>
-              <div>
-                <p className="text-xs text-slate-500">
-                  {budgetOver ? 'Excedido por' : 'Disponible'}
-                </p>
+              <div className="col-span-2 sm:col-span-1 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 flex sm:block items-center justify-between">
+                <div>
+                  <p className="text-[13px] sm:text-xs font-bold sm:font-normal text-slate-700 sm:text-slate-500">
+                    {budgetOver ? 'Excedido por' : 'Disponible'}
+                  </p>
+                  <p
+                    className={`text-base sm:text-lg font-mono font-bold sm:font-semibold tabular-nums mt-0.5 ${
+                      budgetOver
+                        ? 'text-rose-700'
+                        : budgetWarning
+                          ? 'text-amber-700'
+                          : 'text-emerald-700'
+                    }`}
+                  >
+                    {budgetOver ? '−' : ''}
+                    {formatCurrency(Math.abs(budgetRemaining), currency)}
+                  </p>
+                </div>
                 <p
-                  className={`text-lg font-mono font-semibold tabular-nums mt-0.5 ${
+                  className={`inline-flex items-center gap-1 text-xs font-bold sm:mt-0.5 ${
                     budgetOver
                       ? 'text-rose-700'
                       : budgetWarning
                         ? 'text-amber-700'
-                        : 'text-emerald-700'
+                        : 'text-slate-600 sm:text-slate-500 sm:font-normal'
                   }`}
                 >
-                  {budgetOver ? '−' : ''}
-                  {formatCurrency(Math.abs(budgetRemaining), currency)}
-                </p>
-                <p
-                  className={`text-xs mt-0.5 ${
-                    budgetOver
-                      ? 'text-rose-700 font-medium'
-                      : budgetWarning
-                        ? 'text-amber-700'
-                        : 'text-slate-500'
-                  }`}
-                >
+                  {budgetOver && <AlertCircle className="w-3.5 h-3.5 shrink-0" />}
+                  {budgetWarning && <AlertTriangle className="w-3.5 h-3.5 shrink-0" />}
                   {budgetOver
-                    ? 'Presupuesto mensual superado'
+                    ? 'Superado'
                     : budgetWarning
-                      ? 'Cerca del límite mensual'
-                      : 'Dentro del presupuesto'}
+                      ? `Cerca del límite (≥${alertThresholdPct}%)`
+                      : 'Dentro de meta'}
                 </p>
               </div>
             </div>
@@ -575,26 +600,26 @@ export function OverviewView({
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2 mt-2 text-xs text-slate-500">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono tabular-nums">
+              <div className="flex flex-wrap items-center justify-between gap-2 mt-1.5 text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500">
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 font-mono tabular-nums">
                   <span>1ª Q: {formatCurrency(quincenaSummary.q1.expense, currency)}</span>
                   <span aria-hidden="true" className="text-emerald-900/25">
                     ·
                   </span>
                   <span>2ª Q: {formatCurrency(quincenaSummary.q2.expense, currency)}</span>
                 </div>
-                <span className="font-mono tabular-nums text-slate-700">
+                <span className="font-mono font-bold tabular-nums text-slate-800">
                   {Math.round(budgetUsedPct)}% usado
                 </span>
               </div>
             </div>
           </div>
         ) : (
-          <div className="mt-4 pt-4 border-t border-emerald-950/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-600">
+          <div className="mt-3 pt-3 border-t border-emerald-950/10 text-[13px] sm:text-xs font-medium sm:font-normal text-slate-700 sm:text-slate-600">
             <p>
               Aún no has configurado una meta global de gastos mensuales. En{' '}
               {formatMonthLabel(selectedMonth)} llevas{' '}
-              <span className="font-mono font-semibold text-slate-900 tabular-nums">
+              <span className="font-mono font-bold text-slate-900 tabular-nums">
                 {formatCurrency(monthExpenseTotal, currency)}
               </span>{' '}
               en gastos registrados.
@@ -604,16 +629,16 @@ export function OverviewView({
       </section>
 
       {/* Main Analytical Split: 6-Month Bar Chart + Q1 vs Q2 Comparison */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <section className="lg:col-span-7 bg-white border border-emerald-950/10 rounded-xl p-6 flex flex-col">
-          <div className="flex items-center justify-between gap-4 mb-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
+        <section className="lg:col-span-7 bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5 flex flex-col">
+          <div className="flex items-center justify-between gap-3 mb-3.5 sm:mb-4">
             <div>
-              <h2 className="text-base font-semibold text-slate-900">Flujo mensual</h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Ingresos frente a gastos en los últimos 6 meses
+              <h2 className="text-base font-bold sm:font-semibold text-slate-900">Flujo mensual</h2>
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
+                Ingresos vs. gastos (6 meses)
               </p>
             </div>
-            <div className="flex items-center gap-4 text-xs text-slate-600 shrink-0">
+            <div className="flex items-center gap-3 text-[13px] sm:text-xs font-bold sm:font-normal text-slate-700 sm:text-slate-600 shrink-0">
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-xs bg-[#15803D]" aria-hidden="true" />
                 Ingresos
@@ -625,11 +650,11 @@ export function OverviewView({
             </div>
           </div>
 
-          <div className="h-64 w-full">
+          <div className="h-56 sm:h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={sixMonthData}
-                margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                margin={{ top: 6, right: 6, left: 0, bottom: 0 }}
                 onClick={(state) => {
                   const clickedKey = (state as { activePayload?: { payload?: { monthKey?: string } }[] })
                     ?.activePayload?.[0]?.payload?.monthKey;
@@ -641,13 +666,13 @@ export function OverviewView({
                   dataKey="label"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#64748B', fontSize: 12 }}
+                  tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  width={68}
-                  tick={{ fill: '#64748B', fontSize: 11, fontFamily: 'IBM Plex Mono' }}
+                  width={64}
+                  tick={{ fill: '#475569', fontSize: 11, fontFamily: 'IBM Plex Mono', fontWeight: 600 }}
                   tickFormatter={(v) => formatCompactCurrency(Number(v), currency)}
                 />
                 <Tooltip
@@ -660,15 +685,15 @@ export function OverviewView({
                       balance: number;
                     };
                     return (
-                      <div className="bg-white border border-emerald-950/15 rounded-lg px-3.5 py-2.5 shadow-sm text-xs space-y-1">
-                        <p className="font-semibold text-slate-900">{label}</p>
-                        <p className="font-mono tabular-nums text-emerald-700">
+                      <div className="bg-white border border-emerald-950/15 rounded-lg px-3 py-2 shadow-sm text-xs space-y-1">
+                        <p className="font-bold text-slate-900">{label}</p>
+                        <p className="font-mono font-semibold tabular-nums text-emerald-700">
                           Ingresos: +{formatCurrency(row.ingresos, currency)}
                         </p>
-                        <p className="font-mono tabular-nums text-rose-700">
+                        <p className="font-mono font-semibold tabular-nums text-rose-700">
                           Gastos: −{formatCurrency(row.gastos, currency)}
                         </p>
-                        <p className="font-mono tabular-nums text-slate-900 pt-1 border-t border-slate-100">
+                        <p className="font-mono font-bold tabular-nums text-slate-900 pt-1 border-t border-slate-100">
                           Neto: {row.balance >= 0 ? '+' : '−'}
                           {formatCurrency(Math.abs(row.balance), currency)}
                         </p>
@@ -683,12 +708,14 @@ export function OverviewView({
           </div>
         </section>
 
-        <section className="lg:col-span-5 bg-white border border-emerald-950/10 rounded-xl p-6 flex flex-col justify-between">
+        <section className="lg:col-span-5 bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5 flex flex-col justify-between">
           <div>
-            <div className="mb-5">
-              <h2 className="text-base font-semibold text-slate-900">Comparativa quincenal</h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Desglose de {formatMonthLabel(selectedMonth)} por quincena
+            <div className="mb-3">
+              <h2 className="text-base font-bold sm:font-semibold text-slate-900">
+                Comparativa quincenal
+              </h2>
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
+                Desglose de {formatMonthLabel(selectedMonth)}
               </p>
             </div>
 
@@ -700,22 +727,22 @@ export function OverviewView({
                 const isSelected = selectedQuincena === q;
 
                 return (
-                  <div key={q} className="py-4 first:pt-0 last:pb-0">
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <div>
+                  <div key={q} className="py-2.5 sm:py-3.5 first:pt-0 last:pb-0">
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <div className="min-w-0">
                         <button
                           type="button"
                           onClick={() => onChangeQuincena(isSelected ? 'all' : q)}
-                          className="text-sm font-semibold text-slate-900 hover:text-[#0F5132] transition-colors text-left"
+                          className="text-[15px] sm:text-sm font-bold text-slate-900 hover:text-[#0F5132] transition-colors text-left"
                         >
                           {q === 1 ? '1ª Quincena' : '2ª Quincena'}
                         </button>
-                        <span className="text-xs text-slate-500 ml-2">
+                        <span className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 ml-2">
                           {getQuincenaRangeLabel(selectedMonth, q)} · {stats.count} mov.
                         </span>
                       </div>
                       <span
-                        className={`text-sm font-mono font-semibold tabular-nums ${
+                        className={`text-[15px] sm:text-sm font-mono font-bold tabular-nums shrink-0 ${
                           stats.net >= 0 ? 'text-slate-900' : 'text-rose-700'
                         }`}
                       >
@@ -724,12 +751,12 @@ export function OverviewView({
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs font-mono tabular-nums mb-2">
+                    <div className="flex items-center justify-between text-[13px] sm:text-xs font-mono font-bold sm:font-medium tabular-nums mb-1.5">
                       <span className="text-emerald-700">
-                        Ingresos: +{formatCurrency(stats.income, currency)}
+                        +{formatCurrency(stats.income, currency)}
                       </span>
                       <span className="text-rose-700">
-                        Gastos: −{formatCurrency(stats.expense, currency)}
+                        −{formatCurrency(stats.expense, currency)}
                       </span>
                     </div>
 
@@ -745,11 +772,11 @@ export function OverviewView({
                         }}
                       />
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-1.5">
+                    <p className="text-xs sm:text-[11px] font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-1">
                       {stats.income > 0
-                        ? `Gasto equivalente al ${Math.round((stats.expense / stats.income) * 100)}% del ingreso de esta quincena`
+                        ? `Gasto del ${Math.round((stats.expense / stats.income) * 100)}% sobre el ingreso`
                         : stats.expense > 0
-                          ? 'Gastos registrados sin ingresos en esta quincena'
+                          ? 'Gastos registrados sin ingresos'
                           : 'Sin movimientos en esta quincena'}
                     </p>
                   </div>
@@ -758,12 +785,14 @@ export function OverviewView({
             </div>
           </div>
 
-          <div className="pt-5 mt-5 border-t border-emerald-950/10 flex items-center justify-between">
-            <span className="text-xs text-slate-500">Análisis detallado por categoría</span>
+          <div className="pt-3 mt-3 border-t border-emerald-950/10 flex items-center justify-between">
+            <span className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500">
+              Análisis por categoría
+            </span>
             <button
               type="button"
               onClick={() => onNavigate('graficas')}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-[#12663F] hover:underline whitespace-nowrap"
+              className="inline-flex items-center gap-1 text-[13px] sm:text-xs font-bold text-[#12663F] hover:underline whitespace-nowrap"
             >
               Ver gráficas
               <ArrowRight className="w-3.5 h-3.5" />
@@ -772,21 +801,23 @@ export function OverviewView({
         </section>
       </div>
 
-      {/* Recent Ledger Table */}
+      {/* Recent Ledger Section (Ultra-compact mobile list + high-density desktop table) */}
       <section className="bg-white border border-emerald-950/10 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-emerald-950/10 flex items-center justify-between gap-4">
+        <div className="px-3.5 py-2.5 sm:px-5 sm:py-3 border-b border-emerald-950/10 flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-base font-semibold text-slate-900">Movimientos recientes</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <h2 className="text-base font-bold sm:font-semibold text-slate-900">
+              Movimientos recientes
+            </h2>
+            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
               {selectedQuincena === 'all'
                 ? formatMonthLabel(selectedMonth)
-                : `${selectedQuincena === 1 ? '1ª' : '2ª'} Quincena de ${formatMonthLabel(selectedMonth)}`}
+                : `${selectedQuincena === 1 ? '1ª' : '2ª'} Quincena · ${formatMonthLabel(selectedMonth)}`}
             </p>
           </div>
           <button
             type="button"
             onClick={() => onNavigate('movimientos')}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-[#12663F] hover:underline whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-1 text-[13px] sm:text-xs font-bold text-[#12663F] hover:underline whitespace-nowrap shrink-0"
           >
             Ver todos
             <ArrowRight className="w-3.5 h-3.5" />
@@ -796,78 +827,110 @@ export function OverviewView({
         {loadingData ? (
           <div className="divide-y divide-slate-100">
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="px-6 py-3.5 flex items-center justify-between">
-                <div className="h-4 w-56 bg-emerald-950/[0.06] rounded animate-pulse" />
-                <div className="h-4 w-24 bg-emerald-950/[0.06] rounded animate-pulse" />
+              <div key={n} className="px-4 py-2.5 flex items-center justify-between">
+                <div className="h-4 w-48 bg-emerald-950/[0.06] rounded animate-pulse" />
+                <div className="h-4 w-20 bg-emerald-950/[0.06] rounded animate-pulse" />
               </div>
             ))}
           </div>
         ) : recentTransactions.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <p className="text-sm font-medium text-slate-900">
+          <div className="px-4 py-8 text-center">
+            <p className="text-base sm:text-sm font-bold text-slate-900">
               Aún no hay movimientos en este periodo
             </p>
-            <p className="text-xs text-slate-500 mt-1 mb-5 max-w-md mx-auto">
-              Registra tu primer ingreso quincenal o gasto para ver el balance en tiempo real y
-              alimentar tus gráficas mensuales.
+            <p className="text-sm sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-1 mb-4 max-w-md mx-auto">
+              Registra tu primer ingreso quincenal o gasto para ver el balance en tiempo real.
             </p>
             <button
               type="button"
               onClick={onOpenNewTransaction}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#12663F] hover:bg-[#0D4F30] rounded-lg transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm sm:text-xs font-bold text-white bg-[#12663F] hover:bg-[#0D4F30] rounded-lg transition-colors whitespace-nowrap"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               Registrar primer movimiento
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-emerald-950/10 bg-[#F4F8F5] text-xs font-medium text-emerald-950/65">
-                  <th className="py-2.5 pl-6 pr-3">Fecha</th>
-                  <th className="py-2.5 px-3">Concepto</th>
-                  <th className="py-2.5 px-3">Categoría</th>
-                  <th className="py-2.5 px-3">Periodo</th>
-                  <th className="py-2.5 pl-3 pr-6 text-right">Monto</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
-                {recentTransactions.map((tx) => (
-                  <tr
-                    key={tx.id}
-                    onClick={() => onEditTransaction(tx)}
-                    className="hover:bg-slate-50 cursor-pointer transition-colors"
-                  >
-                    <td className="py-3 pl-6 pr-3 text-xs font-mono tabular-nums text-slate-500 whitespace-nowrap">
-                      {formatShortDate(tx.date)}
-                    </td>
-                    <td className="py-3 px-3">
-                      <p className="font-medium text-slate-900 truncate max-w-xs">{tx.description}</p>
-                      <p className="text-xs text-slate-500">
-                        {getPaymentMethodLabel(tx.paymentMethod)}
-                        {tx.notes ? ` · ${tx.notes}` : ''}
-                      </p>
-                    </td>
-                    <td className="py-3 px-3 text-xs text-slate-600 whitespace-nowrap">
-                      {tx.categoryName}
-                    </td>
-                    <td className="py-3 px-3 text-xs text-slate-500 whitespace-nowrap">
-                      {tx.quincena === 1 ? '1ª Quincena' : '2ª Quincena'}
-                    </td>
-                    <td
-                      className={`py-3 pl-3 pr-6 text-right font-mono font-medium tabular-nums whitespace-nowrap ${
+          <>
+            {/* Mobile Compact Ledger Rows */}
+            <ul className="sm:hidden divide-y divide-slate-100">
+              {recentTransactions.map((tx) => (
+                <li
+                  key={tx.id}
+                  onClick={() => onEditTransaction(tx)}
+                  className="px-3.5 py-2 active:bg-slate-50 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="text-[15px] font-bold text-slate-900 truncate leading-snug">
+                      {tx.description}
+                    </p>
+                    <span
+                      className={`text-[15px] font-mono font-bold tabular-nums whitespace-nowrap shrink-0 ${
                         tx.type === 'ingreso' ? 'text-emerald-700' : 'text-rose-700'
                       }`}
                     >
                       {tx.type === 'ingreso' ? '+' : '−'}
                       {formatCurrency(tx.amount, currency)}
-                    </td>
+                    </span>
+                  </div>
+                  <p className="text-[13px] font-semibold text-slate-600 truncate leading-tight mt-0.5">
+                    {formatShortDate(tx.date)} · {tx.categoryName} · {tx.quincena === 1 ? '1ª Q' : '2ª Q'}
+                  </p>
+                </li>
+              ))}
+            </ul>
+
+            {/* Desktop High-Density Table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-emerald-950/10 bg-[#F4F8F5] text-xs font-semibold text-emerald-950/70">
+                    <th className="py-2 pl-5 pr-2.5">Fecha</th>
+                    <th className="py-2 px-2.5">Concepto</th>
+                    <th className="py-2 px-2.5">Categoría</th>
+                    <th className="py-2 px-2.5">Periodo</th>
+                    <th className="py-2 pl-2.5 pr-5 text-right">Monto</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-sm">
+                  {recentTransactions.map((tx) => (
+                    <tr
+                      key={tx.id}
+                      onClick={() => onEditTransaction(tx)}
+                      className="hover:bg-slate-50 cursor-pointer transition-colors"
+                    >
+                      <td className="py-2 pl-5 pr-2.5 text-xs font-mono tabular-nums text-slate-600 whitespace-nowrap">
+                        {formatShortDate(tx.date)}
+                      </td>
+                      <td className="py-2 px-2.5">
+                        <p className="font-semibold text-slate-900 truncate max-w-xs leading-tight">
+                          {tx.description}
+                        </p>
+                        <p className="text-xs text-slate-500 leading-tight mt-0.5">
+                          {getPaymentMethodLabel(tx.paymentMethod)}
+                          {tx.notes ? ` · ${tx.notes}` : ''}
+                        </p>
+                      </td>
+                      <td className="py-2 px-2.5 text-xs font-medium text-slate-700 whitespace-nowrap">
+                        {tx.categoryName}
+                      </td>
+                      <td className="py-2 px-2.5 text-xs text-slate-500 whitespace-nowrap">
+                        {tx.quincena === 1 ? '1ª Quincena' : '2ª Quincena'}
+                      </td>
+                      <td
+                        className={`py-2 pl-2.5 pr-5 text-right font-mono font-semibold tabular-nums whitespace-nowrap ${
+                          tx.type === 'ingreso' ? 'text-emerald-700' : 'text-rose-700'
+                        }`}
+                      >
+                        {tx.type === 'ingreso' ? '+' : '−'}
+                        {formatCurrency(tx.amount, currency)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
     </div>

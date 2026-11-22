@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { AlertCircle, AlertTriangle } from 'lucide-react';
 import {
   Area,
   AreaChart,
@@ -25,10 +26,15 @@ import {
 
 interface AnalyticsViewProps {
   selectedMonth: string;
+  alertThresholdPct: number;
   onSelectMonth: (monthKey: string) => void;
 }
 
-export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewProps) {
+export function AnalyticsView({
+  selectedMonth,
+  alertThresholdPct,
+  onSelectMonth,
+}: AnalyticsViewProps) {
   const { transactions, categories, currency } = useFinance();
   const [monthsSpan, setMonthsSpan] = useState<6 | 12>(6);
 
@@ -137,23 +143,23 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
   }, [categories, transactions, selectedMonth]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3.5 sm:space-y-5">
       {/* Range Toggle */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Gráficas mensuales</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <h2 className="text-lg font-bold sm:font-semibold text-slate-900">Gráficas mensuales</h2>
+          <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
             Evolución histórica terminando en {formatMonthLabel(selectedMonth)}
           </p>
         </div>
-        <div className="inline-flex items-center gap-1 p-1 bg-emerald-950/[0.06] rounded-lg w-fit">
+        <div className="inline-flex items-center gap-1 p-1 bg-emerald-950/[0.06] rounded-lg w-full sm:w-fit">
           <button
             type="button"
             onClick={() => setMonthsSpan(6)}
-            className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
+            className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
               monthsSpan === 6
                 ? 'bg-white text-[#0B3B24] shadow-xs'
-                : 'text-slate-600 hover:text-[#0B3B24]'
+                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24]'
             }`}
           >
             Últimos 6 meses
@@ -161,10 +167,10 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
           <button
             type="button"
             onClick={() => setMonthsSpan(12)}
-            className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
+            className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-medium rounded-md transition-colors whitespace-nowrap shrink-0 ${
               monthsSpan === 12
                 ? 'bg-white text-[#0B3B24] shadow-xs'
-                : 'text-slate-600 hover:text-[#0B3B24]'
+                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24]'
             }`}
           >
             Últimos 12 meses
@@ -173,15 +179,17 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
       </div>
 
       {/* Chart 1: Monthly Income vs Expense Bar Chart */}
-      <section className="bg-white border border-emerald-950/10 rounded-xl p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+      <section className="bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5 sm:mb-4">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">Ingresos vs. Gastos por mes</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Haz clic en cualquier mes para inspeccionar su desglose
+            <h3 className="text-base font-bold sm:font-semibold text-slate-900">
+              Ingresos vs. Gastos por mes
+            </h3>
+            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
+              Toca cualquier mes para inspeccionar su desglose
             </p>
           </div>
-          <div className="flex items-center gap-4 text-xs text-slate-600">
+          <div className="flex items-center gap-3.5 text-[13px] sm:text-xs font-bold sm:font-normal text-slate-700 sm:text-slate-600">
             <span className="inline-flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-xs bg-[#15803D]" aria-hidden="true" />
               Ingresos
@@ -193,11 +201,11 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
           </div>
         </div>
 
-        <div className="h-72 w-full">
+        <div className="h-60 sm:h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={monthlySeries}
-              margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+              margin={{ top: 6, right: 6, left: 0, bottom: 0 }}
               onClick={(state) => {
                 const key = (state as { activePayload?: { payload?: { monthKey?: string } }[] })
                   ?.activePayload?.[0]?.payload?.monthKey;
@@ -209,13 +217,13 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                 dataKey="label"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: '#64748B', fontSize: 12 }}
+                tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                width={72}
-                tick={{ fill: '#64748B', fontSize: 11, fontFamily: 'IBM Plex Mono' }}
+                width={66}
+                tick={{ fill: '#475569', fontSize: 11, fontFamily: 'IBM Plex Mono', fontWeight: 600 }}
                 tickFormatter={(v) => formatCompactCurrency(Number(v), currency)}
               />
               <Tooltip
@@ -224,15 +232,15 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                   if (!active || !payload || payload.length === 0) return null;
                   const row = payload[0].payload as (typeof monthlySeries)[number];
                   return (
-                    <div className="bg-white border border-emerald-950/15 rounded-lg px-3.5 py-2.5 shadow-sm text-xs space-y-1">
-                      <p className="font-semibold text-slate-900">{label}</p>
-                      <p className="font-mono tabular-nums text-emerald-700">
+                    <div className="bg-white border border-emerald-950/15 rounded-lg px-3 py-2 shadow-sm text-xs space-y-1">
+                      <p className="font-bold text-slate-900">{label}</p>
+                      <p className="font-mono font-semibold tabular-nums text-emerald-700">
                         Ingresos: +{formatCurrency(row.ingresos, currency)}
                       </p>
-                      <p className="font-mono tabular-nums text-rose-700">
+                      <p className="font-mono font-semibold tabular-nums text-rose-700">
                         Gastos: −{formatCurrency(row.gastos, currency)}
                       </p>
-                      <p className="font-mono tabular-nums text-slate-900 pt-1 border-t border-slate-100">
+                      <p className="font-mono font-bold tabular-nums text-slate-900 pt-1 border-t border-slate-100">
                         Balance: {row.balance >= 0 ? '+' : '−'}
                         {formatCurrency(Math.abs(row.balance), currency)} ({row.savingsRate}%)
                       </p>
@@ -248,17 +256,19 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
       </section>
 
       {/* Charts 2 & 3: Net Savings Area Chart + Category Donut */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <section className="lg:col-span-7 bg-white border border-emerald-950/10 rounded-xl p-6 flex flex-col">
-          <div className="mb-5">
-            <h3 className="text-base font-semibold text-slate-900">Balance neto mensual</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Diferencia entre ingresos y gastos totales por mes
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
+        <section className="lg:col-span-7 bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5 flex flex-col">
+          <div className="mb-3.5 sm:mb-4">
+            <h3 className="text-base font-bold sm:font-semibold text-slate-900">
+              Balance neto mensual
+            </h3>
+            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
+              Diferencia entre ingresos y gastos por mes
             </p>
           </div>
-          <div className="h-64 w-full">
+          <div className="h-56 sm:h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={monthlySeries} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <AreaChart data={monthlySeries} margin={{ top: 6, right: 6, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="netBalanceFill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
@@ -270,13 +280,13 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                   dataKey="label"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#64748B', fontSize: 12 }}
+                  tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  width={72}
-                  tick={{ fill: '#64748B', fontSize: 11, fontFamily: 'IBM Plex Mono' }}
+                  width={66}
+                  tick={{ fill: '#475569', fontSize: 11, fontFamily: 'IBM Plex Mono', fontWeight: 600 }}
                   tickFormatter={(v) => formatCompactCurrency(Number(v), currency)}
                 />
                 <ReferenceLine y={0} stroke="#94A3B8" strokeDasharray="4 4" />
@@ -285,10 +295,10 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                     if (!active || !payload || payload.length === 0) return null;
                     const row = payload[0].payload as (typeof monthlySeries)[number];
                     return (
-                      <div className="bg-white border border-slate-200 rounded-lg px-3.5 py-2 shadow-sm text-xs">
-                        <p className="font-semibold text-slate-900 mb-1">{label}</p>
+                      <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm text-xs">
+                        <p className="font-bold text-slate-900 mb-1">{label}</p>
                         <p
-                          className={`font-mono tabular-nums ${
+                          className={`font-mono font-bold tabular-nums ${
                             row.balance >= 0 ? 'text-emerald-700' : 'text-rose-700'
                           }`}
                         >
@@ -311,26 +321,28 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
           </div>
         </section>
 
-        <section className="lg:col-span-5 bg-white border border-emerald-950/10 rounded-xl p-6 flex flex-col">
-          <div className="mb-4">
-            <h3 className="text-base font-semibold text-slate-900">Gastos por categoría</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+        <section className="lg:col-span-5 bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5 flex flex-col">
+          <div className="mb-3">
+            <h3 className="text-base font-bold sm:font-semibold text-slate-900">
+              Gastos por categoría
+            </h3>
+            <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500">
               {formatMonthLabel(selectedMonth)} · Total{' '}
-              <span className="font-mono tabular-nums text-slate-700">
+              <span className="font-mono font-bold tabular-nums text-slate-900">
                 {formatCurrency(expenseBreakdown.total, currency)}
               </span>
             </p>
           </div>
 
           {expenseBreakdown.items.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center py-12 text-center">
-              <p className="text-xs text-slate-500 max-w-xs">
+            <div className="flex-1 flex items-center justify-center py-8 text-center">
+              <p className="text-sm sm:text-xs font-medium text-slate-500 max-w-xs">
                 No hay gastos registrados en {formatMonthLabel(selectedMonth)}.
               </p>
             </div>
           ) : (
-            <div className="flex flex-col gap-4 flex-1">
-              <div className="h-48 w-full">
+            <div className="flex flex-col gap-3 flex-1">
+              <div className="h-44 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -339,8 +351,8 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                       nameKey="name"
                       cx="50%"
                       cy="50%"
-                      innerRadius={52}
-                      outerRadius={82}
+                      innerRadius={48}
+                      outerRadius={76}
                       paddingAngle={2}
                     >
                       {expenseBreakdown.items.map((entry) => (
@@ -353,8 +365,8 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                         const item = payload[0].payload as (typeof expenseBreakdown.items)[number];
                         return (
                           <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm text-xs">
-                            <p className="font-semibold text-slate-900">{item.name}</p>
-                            <p className="font-mono tabular-nums text-slate-700 mt-0.5">
+                            <p className="font-bold text-slate-900">{item.name}</p>
+                            <p className="font-mono font-semibold tabular-nums text-slate-700 mt-0.5">
                               {formatCurrency(item.amount, currency)} ({item.percent.toFixed(1)}%)
                             </p>
                           </div>
@@ -365,11 +377,11 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                 </ResponsiveContainer>
               </div>
 
-              <div className="divide-y divide-slate-100 max-h-48 overflow-y-auto">
+              <div className="divide-y divide-slate-100 max-h-52 overflow-y-auto">
                 {expenseBreakdown.items.map((item) => (
                   <div
                     key={item.id}
-                    className="py-2 flex items-center justify-between gap-3 text-xs"
+                    className="py-1.5 flex items-center justify-between gap-2.5 text-[14px] sm:text-xs"
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <span
@@ -377,11 +389,15 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                         style={{ backgroundColor: item.color }}
                         aria-hidden="true"
                       />
-                      <span className="text-slate-700 truncate">{item.name}</span>
+                      <span className="font-bold sm:font-medium text-slate-800 truncate">
+                        {item.name}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0 font-mono tabular-nums">
-                      <span className="text-slate-400">{item.percent.toFixed(0)}%</span>
-                      <span className="font-medium text-slate-900">
+                    <div className="flex items-center gap-2.5 shrink-0 font-mono tabular-nums">
+                      <span className="text-slate-500 font-semibold sm:font-normal">
+                        {item.percent.toFixed(0)}%
+                      </span>
+                      <span className="font-bold text-slate-900">
                         {formatCurrency(item.amount, currency)}
                       </span>
                     </div>
@@ -394,19 +410,18 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
       </div>
 
       {/* Category Budget Progress (if any budgets configured) */}
-      <section className="bg-white border border-emerald-950/10 rounded-xl p-6">
-        <div className="mb-4">
-          <h3 className="text-base font-semibold text-slate-900">
+      <section className="bg-white border border-emerald-950/10 rounded-xl p-3.5 sm:p-5">
+        <div className="mb-3">
+          <h3 className="text-base font-bold sm:font-semibold text-slate-900">
             Seguimiento de presupuestos mensuales
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Comparación del gasto acumulado en {formatMonthLabel(selectedMonth)} contra tus límites
-            por categoría
+          <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
+            Gasto acumulado en {formatMonthLabel(selectedMonth)} frente a límites por categoría
           </p>
         </div>
 
         {budgetRows.length === 0 ? (
-          <p className="text-xs text-slate-500 py-4">
+          <p className="text-sm sm:text-xs font-medium text-slate-500 py-3">
             Aún no has asignado presupuestos mensuales a tus categorías de gasto. Puedes definirlos
             desde la sección de Categorías.
           </p>
@@ -414,7 +429,7 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
           <div className="divide-y divide-slate-100">
             {budgetRows.map((row) => {
               const overBudget = row.remaining < 0;
-              const warning = !overBudget && row.pct >= 85;
+              const warning = !overBudget && row.pct >= alertThresholdPct;
               const statusText = overBudget
                 ? `Excedido por ${formatCurrency(Math.abs(row.remaining), currency)}`
                 : warning
@@ -422,18 +437,20 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                   : `Disponible ${formatCurrency(row.remaining, currency)}`;
 
               return (
-                <div key={row.id} className="py-3.5 first:pt-1 last:pb-1 space-y-2">
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                    <div className="flex items-center gap-2">
+                <div key={row.id} className="py-2 sm:py-2.5 first:pt-0.5 last:pb-0.5 space-y-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-1.5">
+                    <div className="flex items-center gap-2 min-w-0">
                       <span
                         className="w-2.5 h-2.5 rounded-xs shrink-0"
                         style={{ backgroundColor: row.color }}
                         aria-hidden="true"
                       />
-                      <span className="font-medium text-slate-900">{row.name}</span>
+                      <span className="text-[15px] sm:text-sm font-bold text-slate-900 truncate">
+                        {row.name}
+                      </span>
                     </div>
-                    <div className="font-mono text-xs tabular-nums text-slate-600">
-                      <span className="font-semibold text-slate-900">
+                    <div className="font-mono text-[13px] sm:text-xs tabular-nums text-slate-600">
+                      <span className="font-bold text-slate-900">
                         {formatCurrency(row.spent, currency)}
                       </span>{' '}
                       / {formatCurrency(row.budget, currency)} ({Math.round(row.pct)}%)
@@ -452,15 +469,17 @@ export function AnalyticsView({ selectedMonth, onSelectMonth }: AnalyticsViewPro
                     />
                   </div>
                   <p
-                    className={`text-xs ${
+                    className={`inline-flex items-center gap-1 text-[13px] sm:text-xs ${
                       overBudget
-                        ? 'text-rose-700 font-medium'
+                        ? 'text-rose-700 font-bold'
                         : warning
-                          ? 'text-amber-700'
-                          : 'text-slate-500'
+                          ? 'text-amber-700 font-bold'
+                          : 'text-slate-600 sm:text-slate-500 font-semibold sm:font-normal'
                     }`}
                   >
-                    {statusText}
+                    {overBudget && <AlertCircle className="w-3.5 h-3.5 shrink-0" />}
+                    {warning && <AlertTriangle className="w-3.5 h-3.5 shrink-0" />}
+                    <span>{statusText}</span>
                   </p>
                 </div>
               );
