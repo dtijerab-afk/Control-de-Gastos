@@ -17,8 +17,15 @@ import {
   sanitizeTransactionInput,
 } from '../lib/financeUtils';
 import {
+  makeTransactionSignature,
+  normalizeCategoryLookupKey,
+  type BackupImportReport,
+  type QuincenaBackupFile,
+} from '../lib/backupUtils';
+import {
   DEFAULT_CATEGORIES,
   VALIDATION_LIMITS,
+  type Category,
   type CategoryInput,
   type CurrencyCode,
   type QuincenaNumber,
@@ -313,3 +320,212 @@ export async function copyTransactionsToQuincena(
     handleFirestoreError(error, OperationType.CREATE, path);
   }
 }
+
+export async function importBackupToFirestore(
+  uid: string,
+  backup: QuincenaBackupFile,
+  existingProfile: UserProfile | null,
+  existingCategories: Category[],
+  existingTransactions: Transaction[]
+): Promise<BackupImportReport> {
+  let profileUpdated = false;
+  let categoriesCreated = 0;
+  let categoriesMatched = 0;
+  let categoriesUpdated = 0;
+  let transactionsImported = 0;
+  let transactionsSkipped = 0;
+
+  // 1. Restore non-destructive profile preferences (currency & global monthly budget)
+  const profileUpdates: { currency?: CurrencyCode; monthlyBudget?: number } = {};
+  if (backup.profile.currency && backup.profile.currency !== existingProfile?.currency) {
+    profileUpdates.currency = backup.profile.currency;
+  }
+  if (
+    backup.profile.monthlyBudget > 0 &&
+    backup.profile.monthlyBudget !== (existingProfile?.monthlyBudget ?? 0)
+  ) {
+    profileUpdates.monthlyBudget = backup.profile.monthlyBudget;
+  }
+  if (Object.keys(profileUpdates).length > 0) {
+    await updateUserPreferences(uid, profileUpdates);
+    profileUpdated = true;
+  }
+
+  // 2. Remap categories by (type, normalizedName) -> targetCategoryId (preserving existing, never deleting)
+  const byKey = new Map<string, Category>();
+  for (const cat of existingCategories) {
+    byKey.set(normalizeCategoryLookupKey(cat.type, cat.name), cat);
+  }
+
+  const categoryIdMap = new Map<string, { id: string; name: string }>();
+
+  for (const srcCat of backup.categories) {
+    const key = normalizeCategoryLookupKey(srcCat.type, srcCat.name);
+    const existing = byKey.get(key);
+
+    if (existing) {
+      categoriesMatched += 1;
+      categoryIdMap.set(srcCat.sourceId, { id: existing.id, name: existing.name });
+
+      // Preserve user's category budget/color from backup if existing category has no budget set
+      const shouldRestoreBudget =
+        srcCat.type === 'gasto' && srcCat.monthlyBudget > 0 && existing.monthlyBudget === 0;
+      const shouldRestoreColor = existing.color.toUpperCase() !== srcCat.color.toUpperCase();
+
+      if (shouldRestoreBudget || shouldRestoreColor) {
+        await updateCategory(uid, existing.id, {
+          name: existing.name,
+          type: existing.type,
+          color: srcCat.color,
+          monthlyBudget: shouldRestoreBudget ? srcCat.monthlyBudget : existing.monthlyBudget,
+        });
+        categoriesUpdated += 1;
+      }
+    } else {
+      const createdId = await createCategory(uid, {
+        name: srcCat.name,
+        type: srcCat.type,
+        color: srcCat.color,
+        monthlyBudget: srcCat.monthlyBudget,
+      });
+      const createdObj: Category = {
+        id: createdId,
+        ownerId: uid,
+        name: srcCat.name,
+        type: srcCat.type,
+        color: srcCat.color,
+        monthlyBudget: srcCat.monthlyBudget,
+      };
+      byKey.set(key, createdObj);
+      categoryIdMap.set(srcCat.sourceId, { id: createdId, name: srcCat.name });
+      categoriesCreated += 1;
+    }
+  }
+
+  // Ensure any transaction referencing a previously deleted category gets a valid remapped category
+  for (const srcTx of backup.transactions) {
+    if (categoryIdMap.has(srcTx.sourceCategoryId)) continue;
+    const key = normalizeCategoryLookupKey(srcTx.type, srcTx.categoryName);
+    const matched = byKey.get(key);
+    if (matched) {
+      if (srcTx.sourceCategoryId) {
+        categoryIdMap.set(srcTx.sourceCategoryId, { id: matched.id, name: matched.name });
+      }
+      continue;
+    }
+    const createdId = await createCategory(uid, {
+      name: srcTx.categoryName,
+      type: srcTx.type,
+      color: srcTx.type === 'ingreso' ? '#0F5132' : '#475569',
+      monthlyBudget: 0,
+    });
+    const createdObj: Category = {
+      id: createdId,
+      ownerId: uid,
+      name: srcTx.categoryName,
+      type: srcTx.type,
+      color: srcTx.type === 'ingreso' ? '#0F5132' : '#475569',
+      monthlyBudget: 0,
+    };
+    byKey.set(key, createdObj);
+    if (srcTx.sourceCategoryId) {
+      categoryIdMap.set(srcTx.sourceCategoryId, { id: createdId, name: srcTx.categoryName });
+    }
+    categoriesCreated += 1;
+  }
+
+  // 3. Multiset deduplication of existing transactions to allow idempotent re-imports without losing valid duplicates
+  const existingCounts = new Map<string, number>();
+  for (const tx of existingTransactions) {
+    const sig = makeTransactionSignature(tx);
+    existingCounts.set(sig, (existingCounts.get(sig) ?? 0) + 1);
+  }
+
+  const toCreate: ReturnType<typeof sanitizeTransactionInput>[] = [];
+  for (const srcTx of backup.transactions) {
+    const remapped =
+      (srcTx.sourceCategoryId ? categoryIdMap.get(srcTx.sourceCategoryId) : undefined) ??
+      (() => {
+        const byName = byKey.get(normalizeCategoryLookupKey(srcTx.type, srcTx.categoryName));
+        return byName ? { id: byName.id, name: byName.name } : undefined;
+      })();
+
+    if (!remapped) {
+      transactionsSkipped += 1;
+      continue;
+    }
+
+    const candidateSig = makeTransactionSignature({
+      date: srcTx.date,
+      type: srcTx.type,
+      amount: srcTx.amount,
+      quincena: srcTx.quincena,
+      description: srcTx.description,
+      categoryName: remapped.name,
+      paymentMethod: srcTx.paymentMethod,
+      notes: srcTx.notes,
+    });
+
+    const availableExisting = existingCounts.get(candidateSig) ?? 0;
+    if (availableExisting > 0) {
+      existingCounts.set(candidateSig, availableExisting - 1);
+      transactionsSkipped += 1;
+      continue;
+    }
+
+    const clean = sanitizeTransactionInput({
+      type: srcTx.type,
+      amount: srcTx.amount,
+      description: srcTx.description,
+      categoryId: remapped.id,
+      categoryName: remapped.name,
+      date: srcTx.date,
+      quincena: srcTx.quincena,
+      paymentMethod: srcTx.paymentMethod,
+      notes: srcTx.notes,
+    });
+    toCreate.push(clean);
+  }
+
+  // 4. Write new transactions in safe Firestore batches (<= 400 writes per batch)
+  const txPath = `users/${uid}/transactions`;
+  const BATCH_SIZE = 400;
+  try {
+    for (let offset = 0; offset < toCreate.length; offset += BATCH_SIZE) {
+      const chunk = toCreate.slice(offset, offset + BATCH_SIZE);
+      const batch = writeBatch(db);
+      for (const clean of chunk) {
+        const ref = doc(collection(db, 'users', uid, 'transactions'));
+        batch.set(ref, {
+          ownerId: uid,
+          type: clean.type,
+          amount: clean.amount,
+          description: clean.description,
+          categoryId: clean.categoryId,
+          categoryName: clean.categoryName,
+          date: clean.date,
+          monthKey: clean.monthKey,
+          quincena: clean.quincena,
+          paymentMethod: clean.paymentMethod,
+          notes: clean.notes,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      }
+      await batch.commit();
+      transactionsImported += chunk.length;
+    }
+  } catch (error) {
+    handleFirestoreError(error, OperationType.CREATE, txPath);
+  }
+
+  return {
+    profileUpdated,
+    categoriesCreated,
+    categoriesMatched,
+    categoriesUpdated,
+    transactionsImported,
+    transactionsSkipped,
+  };
+}
+

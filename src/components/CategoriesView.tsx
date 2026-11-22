@@ -1,10 +1,20 @@
-import React, { useMemo, useState } from 'react';
-import { Pencil, Plus, Trash2, X } from 'lucide-react';
+import React, { useMemo, useRef, useState } from 'react';
+import { Download, Pencil, Plus, Trash2, Upload, X } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
+import {
+  buildQuincenaBackup,
+  downloadQuincenaBackup,
+  MAX_BACKUP_FILE_BYTES,
+  parseAndValidateQuincenaBackup,
+  type BackupImportReport,
+  type QuincenaBackupFile,
+} from '../lib/backupUtils';
+import { db } from '../lib/firebase';
 import { formatCurrency, formatMonthLabel } from '../lib/financeUtils';
 import {
   createCategory,
   deleteCategory,
+  importBackupToFirestore,
   updateCategory,
   updateUserPreferences,
 } from '../services/financeService';
@@ -22,7 +32,7 @@ interface CategoriesViewProps {
 }
 
 export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
-  const { user, categories, transactions, currency } = useFinance();
+  const { user, profile, categories, transactions, currency } = useFinance();
   const [activeType, setActiveType] = useState<TransactionType>('gasto');
   const [formOpen, setFormOpen] = useState(false);
   const [editingCat, setEditingCat] = useState<Category | null>(null);
@@ -38,6 +48,17 @@ export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [savingCurrency, setSavingCurrency] = useState(false);
+
+  // Backup export & import state
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [exportSummary, setExportSummary] = useState<string | null>(null);
+  const [pendingImport, setPendingImport] = useState<{
+    fileName: string;
+    backup: QuincenaBackupFile;
+  } | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importReport, setImportReport] = useState<BackupImportReport | null>(null);
 
   const visibleCategories = useMemo(
     () => categories.filter((c) => c.type === activeType),
@@ -134,6 +155,74 @@ export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
       await updateUserPreferences(user.uid, { currency: nextCurrency });
     } finally {
       setSavingCurrency(false);
+    }
+  };
+
+  const handleExportBackup = () => {
+    if (!user) return;
+    setImportError(null);
+    const sourceProjectId = String(db.app.options.projectId ?? '');
+    const backup = buildQuincenaBackup({
+      profile,
+      fallbackDisplayName: user.displayName || user.email?.split('@')[0] || 'Usuario',
+      currency,
+      categories,
+      transactions,
+      sourceProjectId,
+    });
+    const filename = downloadQuincenaBackup(backup);
+    setExportSummary(
+      `Respaldo "${filename}" descargado: ${backup.counts.categories} categorías, ${backup.counts.transactions} movimientos (${backup.counts.ingresos} ingresos y ${backup.counts.gastos} gastos), moneda ${backup.profile.currency} y presupuesto global ${formatCurrency(backup.profile.monthlyBudget, backup.profile.currency)}.`
+    );
+  };
+
+  const handleSelectImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    setImportError(null);
+    setImportReport(null);
+    setPendingImport(null);
+
+    if (file.size > MAX_BACKUP_FILE_BYTES) {
+      setImportError('El archivo supera el límite máximo permitido de 10 MB.');
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const result = parseAndValidateQuincenaBackup(text);
+      if (!result.ok) {
+        setImportError(result.error);
+        return;
+      }
+      setPendingImport({ fileName: file.name, backup: result.backup });
+    } catch {
+      setImportError('No se pudo leer el archivo seleccionado.');
+    }
+  };
+
+  const handleConfirmImport = async () => {
+    if (!user || !pendingImport) return;
+    setImporting(true);
+    setImportError(null);
+    try {
+      const report = await importBackupToFirestore(
+        user.uid,
+        pendingImport.backup,
+        profile,
+        categories,
+        transactions
+      );
+      setImportReport(report);
+      setPendingImport(null);
+    } catch (err) {
+      setImportError(
+        err instanceof Error ? err.message : 'No se pudo completar la importación del respaldo.'
+      );
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -441,6 +530,153 @@ export function CategoriesView({ selectedMonth }: CategoriesViewProps) {
             </option>
           ))}
         </select>
+      </section>
+
+      {/* Backup & Migration Section (JSON Export / Validated Import with UID & Category Remapping) */}
+      <section
+        aria-label="Respaldo y migración de datos"
+        className="bg-white border border-emerald-950/10 rounded-xl p-6 space-y-4"
+      >
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Respaldo completo (JSON)</h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Exporta tu perfil, moneda, presupuesto mensual global, categorías personalizadas y
+              todos tus movimientos, o importa un respaldo previo sin sobrescribir ni duplicar
+              registros.
+            </p>
+            <p className="text-xs text-slate-600 mt-2 font-mono tabular-nums">
+              En tu cuenta actual: {categories.length}{' '}
+              {categories.length === 1 ? 'categoría' : 'categorías'} · {transactions.length}{' '}
+              {transactions.length === 1 ? 'movimiento' : 'movimientos'} · Presupuesto global{' '}
+              {formatCurrency(profile?.monthlyBudget ?? 0, currency)}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={handleExportBackup}
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#12663F] hover:bg-[#0D4F30] rounded-lg transition-colors whitespace-nowrap"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Exportar respaldo JSON
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json,application/json"
+              onChange={handleSelectImportFile}
+              className="hidden"
+            />
+            <button
+              type="button"
+              disabled={importing}
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#0B3B24] bg-[#F3F7F4] border border-emerald-900/15 hover:bg-emerald-50 disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
+            >
+              <Upload className="w-3.5 h-3.5 text-[#12663F]" />
+              Importar respaldo JSON
+            </button>
+          </div>
+        </div>
+
+        {exportSummary && (
+          <div className="px-4 py-3 text-xs text-emerald-950 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start justify-between gap-4">
+            <span>{exportSummary}</span>
+            <button
+              type="button"
+              onClick={() => setExportSummary(null)}
+              className="font-medium hover:underline shrink-0"
+            >
+              Cerrar
+            </button>
+          </div>
+        )}
+
+        {importError && (
+          <div
+            role="alert"
+            className="px-4 py-3 text-xs text-rose-800 bg-rose-50 border border-rose-200 rounded-lg flex items-start justify-between gap-4"
+          >
+            <span>{importError}</span>
+            <button
+              type="button"
+              onClick={() => setImportError(null)}
+              className="font-medium hover:underline shrink-0"
+            >
+              Cerrar
+            </button>
+          </div>
+        )}
+
+        {pendingImport && (
+          <div className="p-4 bg-[#F4F8F5] border border-emerald-950/15 rounded-lg space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold text-slate-900">
+                  Vista previa del respaldo: {pendingImport.fileName}
+                </p>
+                <p className="text-xs text-slate-600 mt-1 font-mono tabular-nums">
+                  {pendingImport.backup.counts.categories} categorías ·{' '}
+                  {pendingImport.backup.counts.transactions} movimientos (
+                  {pendingImport.backup.counts.ingresos} ingresos /{' '}
+                  {pendingImport.backup.counts.gastos} gastos) · Moneda{' '}
+                  {pendingImport.backup.profile.currency} · Meta global{' '}
+                  {formatCurrency(
+                    pendingImport.backup.profile.monthlyBudget,
+                    pendingImport.backup.profile.currency
+                  )}
+                </p>
+                <p className="text-xs text-slate-500 mt-1.5">
+                  Los registros se asociarán automáticamente a tu cuenta actual (UID y categorías
+                  remapeadas). No se eliminará ningún dato existente y se omitirán duplicados.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 pt-1">
+              <button
+                type="button"
+                disabled={importing}
+                onClick={handleConfirmImport}
+                className="px-4 py-2 text-xs font-semibold text-white bg-[#12663F] hover:bg-[#0D4F30] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap"
+              >
+                {importing ? 'Importando respaldo...' : 'Confirmar importación'}
+              </button>
+              <button
+                type="button"
+                disabled={importing}
+                onClick={() => setPendingImport(null)}
+                className="px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors whitespace-nowrap"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {importReport && (
+          <div className="px-4 py-3 text-xs text-emerald-950 bg-emerald-50 border border-emerald-200 rounded-lg space-y-1">
+            <div className="flex items-center justify-between gap-4">
+              <p className="font-semibold">Importación completada correctamente</p>
+              <button
+                type="button"
+                onClick={() => setImportReport(null)}
+                className="font-medium hover:underline"
+              >
+                Cerrar
+              </button>
+            </div>
+            <p className="font-mono tabular-nums">
+              Categorías creadas: {importReport.categoriesCreated} · Emparejadas:{' '}
+              {importReport.categoriesMatched} · Movimientos importados:{' '}
+              {importReport.transactionsImported} · Duplicados omitidos:{' '}
+              {importReport.transactionsSkipped}
+              {importReport.profileUpdated ? ' · Preferencias actualizadas' : ''}
+            </p>
+          </div>
+        )}
       </section>
     </div>
   );
