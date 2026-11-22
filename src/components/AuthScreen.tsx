@@ -5,46 +5,61 @@ import {
   BarChart3,
   CalendarRange,
   FolderKanban,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
+import { useTheme } from '../context/ThemeContext';
 import { BrandLogo } from './BrandLogo';
 
 export function AuthScreen() {
   const { signInWithGoogle, signingIn, authError } = useFinance();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-emerald-950/15 bg-gradient-to-r from-[#072B1A] via-[#0B3B24] to-[#082D1C] text-white">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-8">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4 sm:gap-8">
           <BrandLogo size="sm" tone="light" />
           <div className="hidden md:flex items-center gap-6 text-sm text-emerald-100/85">
             <span className="whitespace-nowrap shrink-0">Control quincenal</span>
             <span className="whitespace-nowrap shrink-0">Plan de ahorro</span>
             <span className="whitespace-nowrap shrink-0">Gráficas mensuales</span>
           </div>
-          <button
-            type="button"
-            onClick={signInWithGoogle}
-            disabled={signingIn}
-            className="px-4 py-2 text-sm font-bold text-[#072B1A] bg-emerald-300 hover:bg-emerald-200 disabled:opacity-60 rounded-xl shadow-xs transition-all whitespace-nowrap shrink-0"
-          >
-            {signingIn ? 'Conectando...' : 'Iniciar sesión'}
-          </button>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              title={isDark ? 'Modo claro' : 'Modo oscuro'}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-emerald-100 transition-colors"
+            >
+              {isDark ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <button
+              type="button"
+              onClick={signInWithGoogle}
+              disabled={signingIn}
+              className="px-4 py-2 text-sm font-bold text-[#072B1A] bg-emerald-300 hover:bg-emerald-200 disabled:opacity-60 rounded-xl shadow-xs transition-all whitespace-nowrap shrink-0"
+            >
+              {signingIn ? 'Conectando...' : 'Iniciar sesión'}
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="flex-1 flex items-center">
         <div className="max-w-6xl w-full mx-auto px-6 py-14 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
           <div className="lg:col-span-6 flex flex-col justify-center">
-            <p className="text-sm font-semibold text-[#12663F] mb-3">
+            <p className="text-sm font-semibold text-[#12663F] dark:text-emerald-400 mb-3">
               Finanzas personales diseñadas alrededor de cada quincena
             </p>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-tight [text-wrap:balance] mb-5">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 leading-tight [text-wrap:balance] mb-5">
               Ordena tus ingresos y gastos quincena por quincena
             </h1>
-            <p className="text-base text-slate-600 leading-relaxed max-w-xl mb-8">
-              Registra tus movimientos del 1 al 15 y del 16 al cierre de mes, crea categorías a tu
-              medida con presupuestos mensuales y consulta gráficas claras de tu flujo y ahorro.
+            <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl mb-8">
+              Registra tus movimientos del pago del 15–16 y del 30 al 1, crea categorías a tu medida
+              con presupuestos mensuales, diseña tu plan de ahorro y consulta gráficas claras.
             </p>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-10">
@@ -63,7 +78,7 @@ export function AuthScreen() {
                 {signingIn ? 'Iniciando sesión...' : 'Continuar con Google'}
                 <ArrowRight className="w-4 h-4 shrink-0" />
               </button>
-              <span className="text-xs text-slate-600">
+              <span className="text-xs text-slate-600 dark:text-slate-400">
                 Tus registros se guardan de forma privada en tu cuenta.
               </span>
             </div>
@@ -71,37 +86,43 @@ export function AuthScreen() {
             {authError && (
               <div
                 role="alert"
-                className="mb-8 px-4 py-3 text-sm text-rose-800 bg-rose-50 border border-rose-200 rounded-xl max-w-xl"
+                className="mb-8 px-4 py-3 text-sm text-rose-800 dark:text-rose-200 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-500/35 rounded-xl max-w-xl"
               >
                 {authError}
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-emerald-950/10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-emerald-950/10 dark:border-emerald-400/15">
               <div>
-                <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center mb-2.5">
+                <span className="w-8 h-8 rounded-xl bg-white dark:bg-[#0F261B] border border-emerald-900/12 dark:border-emerald-400/20 shadow-2xs text-[#0F5A36] dark:text-emerald-400 flex items-center justify-center mb-2.5">
                   <CalendarRange className="w-4 h-4" />
                 </span>
-                <h2 className="text-sm font-bold text-slate-900 mb-1">Ciclo quincenal</h2>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Separa automáticamente 1ª quincena (1–15) y 2ª quincena (16–fin).
+                <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  Ciclo quincenal
+                </h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Separa 1ª quincena (pago 15–16) y 2ª quincena (pago 30–1).
                 </p>
               </div>
               <div>
-                <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center mb-2.5">
+                <span className="w-8 h-8 rounded-xl bg-white dark:bg-[#0F261B] border border-emerald-900/12 dark:border-emerald-400/20 shadow-2xs text-[#0F5A36] dark:text-emerald-400 flex items-center justify-center mb-2.5">
                   <FolderKanban className="w-4 h-4" />
                 </span>
-                <h2 className="text-sm font-bold text-slate-900 mb-1">Categorías propias</h2>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  Categorías propias
+                </h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                   Define tus categorías de ingreso y gasto con límites mensuales.
                 </p>
               </div>
               <div>
-                <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center mb-2.5">
+                <span className="w-8 h-8 rounded-xl bg-white dark:bg-[#0F261B] border border-emerald-900/12 dark:border-emerald-400/20 shadow-2xs text-[#0F5A36] dark:text-emerald-400 flex items-center justify-center mb-2.5">
                   <BarChart3 className="w-4 h-4" />
                 </span>
-                <h2 className="text-sm font-bold text-slate-900 mb-1">Gráficas mensuales</h2>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  Gráficas mensuales
+                </h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                   Visualiza ingresos vs. gastos mes a mes y distribución por categoría.
                 </p>
               </div>
@@ -111,39 +132,47 @@ export function AuthScreen() {
           <div className="lg:col-span-6 flex">
             <div className="w-full mf-card p-6 sm:p-8 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between pb-4 border-b border-emerald-950/10">
+                <div className="flex items-center justify-between pb-4 border-b border-emerald-950/10 dark:border-emerald-400/15">
                   <div>
-                    <p className="text-xs text-emerald-800/75">Vista previa del libro mensual</p>
-                    <p className="text-base font-semibold text-slate-900 mt-0.5">
+                    <p className="text-xs text-emerald-800/75 dark:text-emerald-400/80">
+                      Vista previa del libro mensual
+                    </p>
+                    <p className="text-base font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
                       Estructura por quincenas
                     </p>
                   </div>
-                  <span className="text-xs font-mono text-emerald-800/80 tabular-nums">Q1 · Q2</span>
+                  <span className="text-xs font-mono text-emerald-800/80 dark:text-emerald-300 tabular-nums">
+                    Q1 · Q2
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-2 divide-x divide-emerald-950/10 border-b border-emerald-950/10 py-5">
+                <div className="grid grid-cols-2 divide-x divide-emerald-950/10 dark:divide-emerald-400/15 border-b border-emerald-950/10 dark:border-emerald-400/15 py-5">
                   <div className="pr-5">
-                    <p className="text-xs text-slate-500">1ª Quincena · días 1–15</p>
-                    <p className="text-xl font-mono font-semibold text-emerald-700 tabular-nums mt-1">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      1ª Quincena · pago 15–16
+                    </p>
+                    <p className="text-xl font-mono font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums mt-1">
                       +$18,500.00
                     </p>
-                    <p className="text-xs font-mono text-rose-700 tabular-nums mt-1">
+                    <p className="text-xs font-mono text-rose-700 dark:text-rose-400 tabular-nums mt-1">
                       −$11,420.00 en gastos
                     </p>
                   </div>
                   <div className="pl-5">
-                    <p className="text-xs text-slate-500">2ª Quincena · días 16–30</p>
-                    <p className="text-xl font-mono font-semibold text-emerald-700 tabular-nums mt-1">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      2ª Quincena · pago 30–1
+                    </p>
+                    <p className="text-xl font-mono font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums mt-1">
                       +$18,500.00
                     </p>
-                    <p className="text-xs font-mono text-rose-700 tabular-nums mt-1">
+                    <p className="text-xs font-mono text-rose-700 dark:text-rose-400 tabular-nums mt-1">
                       −$9,880.00 en gastos
                     </p>
                   </div>
                 </div>
 
                 <div className="py-5">
-                  <div className="flex items-center justify-between text-xs text-slate-500 mb-3">
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-3">
                     <span>Flujo comparativo mensual</span>
                     <span>Ingresos / Gastos</span>
                   </div>
@@ -159,52 +188,54 @@ export function AuthScreen() {
                       <div key={bar.m} className="flex flex-col items-center gap-2 h-full justify-end">
                         <div className="w-full flex items-end justify-center gap-1 h-24">
                           <div
-                            className="w-2.5 bg-[#12663F] rounded-t-sm"
+                            className="w-2.5 bg-[#12663F] dark:bg-emerald-400 rounded-t-sm"
                             style={{ height: `${bar.inc}%` }}
                           />
                           <div
-                            className="w-2.5 bg-emerald-200 rounded-t-sm"
+                            className="w-2.5 bg-emerald-200 dark:bg-emerald-900 rounded-t-sm"
                             style={{ height: `${bar.exp}%` }}
                           />
                         </div>
-                        <span className="text-[11px] font-mono text-slate-500">{bar.m}</span>
+                        <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                          {bar.m}
+                        </span>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-emerald-950/[0.08] space-y-2.5">
+              <div className="pt-4 border-t border-emerald-950/[0.08] dark:border-emerald-400/15 space-y-2.5">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="inline-flex items-center gap-2 text-slate-800 font-medium">
-                    <span className="w-6 h-6 rounded-lg bg-emerald-50 border border-emerald-200/70 text-emerald-700 flex items-center justify-center shrink-0">
+                  <span className="inline-flex items-center gap-2 text-slate-800 dark:text-slate-200 font-medium">
+                    <span className="w-6 h-6 rounded-lg bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200/70 dark:border-emerald-400/25 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </span>
                     Nómina 1ª quincena · 1ª Q
                   </span>
-                  <span className="font-mono font-semibold text-emerald-700 tabular-nums">
+                  <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
                     +$18,500.00
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="inline-flex items-center gap-2 text-slate-800 font-medium">
-                    <span className="w-6 h-6 rounded-lg bg-rose-50 border border-rose-200/70 text-rose-700 flex items-center justify-center shrink-0">
+                  <span className="inline-flex items-center gap-2 text-slate-800 dark:text-slate-200 font-medium">
+                    <span className="w-6 h-6 rounded-lg bg-rose-50 dark:bg-rose-500/15 border border-rose-200/70 dark:border-rose-400/25 text-rose-700 dark:text-rose-400 flex items-center justify-center shrink-0">
                       <ArrowDownRight className="w-3.5 h-3.5" />
                     </span>
                     Vivienda y renta · 1ª Q
                   </span>
-                  <span className="font-mono font-semibold text-rose-700 tabular-nums">
+                  <span className="font-mono font-semibold text-rose-700 dark:text-rose-400 tabular-nums">
                     −$7,500.00
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="inline-flex items-center gap-2 text-slate-800 font-medium">
-                    <span className="w-6 h-6 rounded-lg bg-rose-50 border border-rose-200/70 text-rose-700 flex items-center justify-center shrink-0">
+                  <span className="inline-flex items-center gap-2 text-slate-800 dark:text-slate-200 font-medium">
+                    <span className="w-6 h-6 rounded-lg bg-rose-50 dark:bg-rose-500/15 border border-rose-200/70 dark:border-rose-400/25 text-rose-700 dark:text-rose-400 flex items-center justify-center shrink-0">
                       <ArrowDownRight className="w-3.5 h-3.5" />
                     </span>
                     Supermercado y despensa · 2ª Q
                   </span>
-                  <span className="font-mono font-semibold text-rose-700 tabular-nums">
+                  <span className="font-mono font-semibold text-rose-700 dark:text-rose-400 tabular-nums">
                     −$2,340.00
                   </span>
                 </div>

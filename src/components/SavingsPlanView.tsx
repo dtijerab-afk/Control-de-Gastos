@@ -22,6 +22,7 @@ import {
   YAxis,
 } from 'recharts';
 import { useFinance } from '../context/FinanceContext';
+import { useTheme } from '../context/ThemeContext';
 import {
   formatCompactCurrency,
   formatCurrency,
@@ -29,6 +30,7 @@ import {
   formatShortDate,
   getDefaultDateForPeriod,
   getQuincenaFromDate,
+  getQuincenaRangeLabel,
   getTodayDateStr,
 } from '../lib/financeUtils';
 import {
@@ -67,6 +69,7 @@ const PRIORITY_LABELS: Record<SavingsGoalPriority, string> = {
 
 export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
   const { user, transactions, categories, currency, loadingData } = useFinance();
+  const { isDark } = useTheme();
 
   const [plan, setPlan] = useState<SavingsPlanState>(() =>
     user ? loadSavingsPlan(user.uid) : loadSavingsPlan('')
@@ -451,7 +454,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
     <div className="space-y-3 sm:space-y-5">
       {/* Feedback banner */}
       {feedback && (
-        <div className="px-3.5 py-2 text-[13px] sm:text-xs font-semibold text-emerald-900 bg-emerald-50 border border-emerald-200/80 rounded-xl shadow-xs flex items-center justify-between gap-3">
+        <div className="px-3.5 py-2 text-[13px] sm:text-xs font-semibold text-emerald-900 dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-400/25 rounded-xl shadow-xs flex items-center justify-between gap-3">
           <span>{feedback}</span>
           <button
             type="button"
@@ -468,71 +471,73 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
         aria-label="Resumen del plan de ahorro"
         className="mf-card grid grid-cols-2 lg:grid-cols-4 overflow-hidden"
       >
-        <div className="p-3 sm:p-4 lg:p-5 border-b border-r border-emerald-950/[0.08] lg:border-b-0 bg-gradient-to-b from-emerald-50/40 to-transparent">
+        <div className="p-3 sm:p-4 lg:p-5 border-b border-r border-emerald-950/[0.08] dark:border-emerald-400/12 lg:border-b-0 bg-gradient-to-b from-emerald-50/40 dark:from-emerald-500/[0.07] to-transparent">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500">
+            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500 dark:text-slate-300">
               Meta mensual
             </p>
-            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 border border-emerald-900/10 dark:border-emerald-400/20 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
               <Target className="w-4 h-4" />
             </span>
           </div>
           {loadingData ? (
-            <div className="h-6 sm:h-7 w-24 bg-slate-100 rounded mt-2 animate-pulse" />
+            <div className="h-6 sm:h-7 w-24 bg-slate-100 dark:bg-emerald-950/60 rounded mt-2 animate-pulse" />
           ) : (
-            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-[#0B3B24] tabular-nums mt-1 sm:mt-1.5 truncate">
+            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-[#0B3B24] dark:text-emerald-300 tabular-nums mt-1 sm:mt-1.5 truncate">
               {formatCurrency(summary.monthlyTargetAmount, currency)}
             </p>
           )}
-          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 sm:mt-1 truncate">
+          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">
             {plan.monthlyRule.mode === 'percentage'
               ? `${plan.monthlyRule.targetPercentage}% sobre ingresos`
               : 'Monto fijo mensual'}
           </p>
         </div>
 
-        <div className="p-3 sm:p-4 lg:p-5 border-b lg:border-b-0 lg:border-r border-emerald-950/[0.08] bg-gradient-to-b from-teal-50/30 to-transparent">
+        <div className="p-3 sm:p-4 lg:p-5 border-b lg:border-b-0 lg:border-r border-emerald-950/[0.08] dark:border-emerald-400/12 bg-gradient-to-b from-teal-50/30 dark:from-teal-500/[0.06] to-transparent">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500">
+            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500 dark:text-slate-300">
               Por quincena
             </p>
-            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-teal-50 border border-teal-200/70 text-teal-700 flex items-center justify-center shrink-0">
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-teal-50 dark:bg-teal-500/15 border border-teal-200/70 dark:border-teal-400/25 text-teal-700 dark:text-teal-300 flex items-center justify-center shrink-0">
               <CalendarClock className="w-4 h-4" />
             </span>
           </div>
           {loadingData ? (
-            <div className="h-6 sm:h-7 w-24 bg-slate-100 rounded mt-2 animate-pulse" />
+            <div className="h-6 sm:h-7 w-24 bg-slate-100 dark:bg-emerald-950/60 rounded mt-2 animate-pulse" />
           ) : (
-            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-emerald-700 tabular-nums mt-1 sm:mt-1.5 truncate">
+            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums mt-1 sm:mt-1.5 truncate">
               {formatCurrency(summary.quincenaTargetAmount, currency)}
             </p>
           )}
-          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 sm:mt-1 truncate">
-            Apartar en 1ª Q y 2ª Q
+          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">
+            Apartar en 1ª Q (15–16) y 2ª Q (30–1)
           </p>
         </div>
 
-        <div className="p-3 sm:p-4 lg:p-5 border-r border-emerald-950/[0.08]">
+        <div className="p-3 sm:p-4 lg:p-5 border-r border-emerald-950/[0.08] dark:border-emerald-400/12">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500">
+            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500 dark:text-slate-300">
               Ahorro del mes
             </p>
-            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-100/80 border border-emerald-200/70 text-emerald-700 flex items-center justify-center shrink-0">
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-100/80 dark:bg-emerald-500/15 border border-emerald-200/70 dark:border-emerald-400/25 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
               <PiggyBank className="w-4 h-4" />
             </span>
           </div>
           {loadingData ? (
-            <div className="h-6 sm:h-7 w-24 bg-slate-100 rounded mt-2 animate-pulse" />
+            <div className="h-6 sm:h-7 w-24 bg-slate-100 dark:bg-emerald-950/60 rounded mt-2 animate-pulse" />
           ) : (
             <p
               className={`text-lg sm:text-2xl font-mono font-bold sm:font-semibold tabular-nums mt-1 sm:mt-1.5 truncate ${
-                summary.targetReached ? 'text-emerald-700' : 'text-slate-900'
+                summary.targetReached
+                  ? 'text-emerald-700 dark:text-emerald-400'
+                  : 'text-slate-900 dark:text-slate-100'
               }`}
             >
               {formatCurrency(summary.effectiveMonthlySaved, currency)}
             </p>
           )}
-          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 sm:mt-1 truncate">
+          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">
             {summary.monthlyTargetAmount > 0
               ? `${Math.round(summary.progressPct)}% de tu meta`
               : `${summary.savingsRatePct.toFixed(1)}% de ingresos`}
@@ -541,17 +546,17 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
 
         <div className="p-3 sm:p-4 lg:p-5">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500">
+            <p className="text-[13px] sm:text-xs font-bold sm:font-semibold text-slate-700 sm:text-slate-500 dark:text-slate-300">
               Total en metas
             </p>
-            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-50 border border-amber-200/70 text-amber-700 flex items-center justify-center shrink-0">
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-50 dark:bg-amber-500/15 border border-amber-200/70 dark:border-amber-400/25 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
               <Coins className="w-4 h-4" />
             </span>
           </div>
-          <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-slate-900 tabular-nums mt-1 sm:mt-1.5 truncate">
+          <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-slate-900 dark:text-slate-100 tabular-nums mt-1 sm:mt-1.5 truncate">
             {formatCurrency(goalsTotals.totalSaved, currency)}
           </p>
-          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 sm:mt-1 truncate">
+          <p className="text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 truncate">
             {goalsTotals.totalTarget > 0
               ? `De ${formatCurrency(goalsTotals.totalTarget, currency)}`
               : 'Sin metas activas'}
@@ -563,14 +568,14 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
       <section className="mf-card p-3.5 sm:p-5 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 border border-emerald-900/10 dark:border-emerald-400/20 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
               <SlidersHorizontal className="w-4 h-4" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+              <h2 className="text-base font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                 Regla de ahorro · {formatMonthLabel(selectedMonth)}
               </h2>
-              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5">
                 Define cuánto apartar cada mes (se divide automáticamente en 1ª y 2ª quincena).
               </p>
             </div>
@@ -579,7 +584,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
           <div className="flex flex-wrap items-center gap-1.5 shrink-0">
             {!editingRule && (
               <>
-                <div className="inline-flex items-center gap-0.5 p-1 bg-[#EFF5F1] border border-emerald-950/[0.08] rounded-xl">
+                <div className="inline-flex items-center gap-0.5 p-1 bg-[#EFF5F1] dark:bg-[#0D2118] border border-emerald-950/[0.08] dark:border-emerald-400/15 rounded-xl">
                   {PCT_PRESETS.map((pct) => {
                     const active =
                       plan.monthlyRule.mode === 'percentage' &&
@@ -591,8 +596,8 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                         onClick={() => handleQuickPctSelect(pct)}
                         className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
                           active
-                            ? 'bg-[#0B3B24] text-white shadow-xs'
-                            : 'text-slate-700 hover:text-[#0B3B24] hover:bg-white/60'
+                            ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
+                            : 'text-slate-700 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-white/60 dark:hover:bg-emerald-400/10'
                         }`}
                       >
                         {pct}%
@@ -603,9 +608,9 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                 <button
                   type="button"
                   onClick={openRuleEditor}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold text-[#0B3B24] bg-[#F3F8F5] border border-emerald-900/15 hover:bg-emerald-50 hover:border-emerald-800/30 rounded-xl transition-all whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold text-[#0B3B24] dark:text-emerald-200 bg-[#F3F8F5] dark:bg-[#10291E] border border-emerald-900/15 dark:border-emerald-400/20 hover:bg-emerald-50 dark:hover:bg-emerald-500/15 hover:border-emerald-800/30 rounded-xl transition-all whitespace-nowrap"
                 >
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#12663F]" />
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#12663F] dark:text-emerald-400" />
                   Personalizar
                 </button>
               </>
@@ -616,16 +621,16 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
         {editingRule && (
           <form
             onSubmit={handleSaveRule}
-            className="pt-3 border-t border-emerald-950/10 space-y-3"
+            className="pt-3 border-t border-emerald-950/10 dark:border-emerald-400/15 space-y-3"
           >
-            <div className="inline-flex items-center gap-1 p-1 bg-[#EFF5F1] border border-emerald-950/[0.08] rounded-xl">
+            <div className="inline-flex items-center gap-1 p-1 bg-[#EFF5F1] dark:bg-[#0D2118] border border-emerald-950/[0.08] dark:border-emerald-400/15 rounded-xl">
               <button
                 type="button"
                 onClick={() => setRuleMode('percentage')}
                 className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
                   ruleMode === 'percentage'
-                    ? 'bg-white text-[#0B3B24] shadow-xs ring-1 ring-emerald-950/10'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-[#143324] text-[#0B3B24] dark:text-emerald-200 shadow-xs ring-1 ring-emerald-950/10 dark:ring-emerald-400/20'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Porcentaje de ingresos
@@ -633,10 +638,10 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
               <button
                 type="button"
                 onClick={() => setRuleMode('fixed')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors whitespace-nowrap ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
                   ruleMode === 'fixed'
-                    ? 'bg-white text-[#0B3B24] shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-[#143324] text-[#0B3B24] dark:text-emerald-200 shadow-xs ring-1 ring-emerald-950/10 dark:ring-emerald-400/20'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Monto fijo mensual
@@ -648,7 +653,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                 <div className="flex-1 max-w-xs">
                   <label
                     htmlFor="savings-rule-pct"
-                    className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 mb-1"
+                    className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Porcentaje a ahorrar (1% – 80%)
                   </label>
@@ -660,14 +665,14 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                     step="1"
                     value={rulePct}
                     onChange={(e) => setRulePct(e.target.value)}
-                    className="w-full px-3 py-2 text-base sm:text-sm font-mono font-bold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                    className="w-full px-3 py-2 text-base sm:text-sm font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F] dark:focus:border-emerald-400"
                   />
                 </div>
               ) : (
                 <div className="flex-1 max-w-xs">
                   <label
                     htmlFor="savings-rule-fixed"
-                    className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 mb-1"
+                    className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 mb-1"
                   >
                     Monto fijo mensual ({currency})
                   </label>
@@ -681,7 +686,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                     placeholder="Ej. 5000.00"
                     value={ruleFixed}
                     onChange={(e) => setRuleFixed(e.target.value)}
-                    className="w-full px-3 py-2 text-base sm:text-sm font-mono font-bold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                    className="w-full px-3 py-2 text-base sm:text-sm font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F] dark:focus:border-emerald-400"
                   />
                 </div>
               )}
@@ -696,7 +701,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                 <button
                   type="button"
                   onClick={() => setEditingRule(false)}
-                  className="px-3 py-2 text-sm sm:text-xs font-bold sm:font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors whitespace-nowrap"
+                  className="px-3 py-2 text-sm sm:text-xs font-bold sm:font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-emerald-400/10 rounded-lg transition-colors whitespace-nowrap"
                 >
                   Cancelar
                 </button>
@@ -704,7 +709,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
             </div>
 
             {ruleError && (
-              <p role="alert" className="text-xs font-semibold text-rose-700">
+              <p role="alert" className="text-xs font-semibold text-rose-700 dark:text-rose-400">
                 {ruleError}
               </p>
             )}
@@ -712,11 +717,11 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
         )}
 
         {/* Monthly progress bar + Q1/Q2 breakdown */}
-        <div className="pt-2.5 border-t border-slate-100 space-y-2">
+        <div className="pt-2.5 border-t border-slate-100 dark:border-emerald-400/12 space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] sm:text-xs">
-            <span className="font-bold text-slate-800 inline-flex items-center gap-1.5">
+            <span className="font-bold text-slate-800 dark:text-slate-200 inline-flex items-center gap-1.5">
               {summary.targetReached && (
-                <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
               )}
               {summary.monthlyTargetAmount > 0
                 ? summary.targetReached
@@ -724,13 +729,13 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   : `Faltan ${formatCurrency(summary.remainingToGoal, currency)} para completar tu meta`
                 : 'Registra tus ingresos del mes o define un monto fijo para activar el seguimiento'}
             </span>
-            <span className="font-mono font-bold tabular-nums text-[#0B3B24]">
+            <span className="font-mono font-bold tabular-nums text-[#0B3B24] dark:text-emerald-300">
               {Math.round(summary.progressPct)}%
             </span>
           </div>
 
           <div
-            className="h-3 w-full bg-emerald-950/[0.07] ring-1 ring-inset ring-emerald-950/[0.05] rounded-full overflow-hidden"
+            className="h-3 w-full bg-emerald-950/[0.07] dark:bg-emerald-950/70 ring-1 ring-inset ring-emerald-950/[0.05] dark:ring-emerald-400/15 rounded-full overflow-hidden"
             role="progressbar"
             aria-valuenow={Math.round(summary.progressPct)}
             aria-valuemin={0}
@@ -740,38 +745,38 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
             <div
               className={`h-full rounded-full transition-all ${
                 summary.targetReached
-                  ? 'bg-gradient-to-r from-[#0F5A36] to-emerald-400'
-                  : 'bg-gradient-to-r from-[#0B4A2B] to-[#10B981]'
+                  ? 'bg-gradient-to-r from-[#0F5A36] to-emerald-400 dark:from-emerald-500 dark:to-teal-300'
+                  : 'bg-gradient-to-r from-[#0B4A2B] to-[#10B981] dark:from-emerald-600 dark:to-emerald-400'
               }`}
               style={{ width: `${Math.min(100, summary.progressPct)}%` }}
             />
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs font-semibold sm:font-normal text-slate-600">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs font-semibold sm:font-normal text-slate-600 dark:text-slate-400">
             <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 font-mono tabular-nums">
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#0F5A36]" aria-hidden="true" />
+                <span className="w-2 h-2 rounded-full bg-[#0F5A36] dark:bg-emerald-400" aria-hidden="true" />
                 1ª Q: {formatCurrency(summary.q1Saved, currency)}
               </span>
-              <span aria-hidden="true" className="text-emerald-900/25">
+              <span aria-hidden="true" className="text-emerald-900/25 dark:text-emerald-400/30">
                 ·
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-teal-300" aria-hidden="true" />
                 2ª Q: {formatCurrency(summary.q2Saved, currency)}
               </span>
               {summary.explicitSavingsLogged > 0 && (
                 <>
-                  <span aria-hidden="true" className="text-emerald-900/25">
+                  <span aria-hidden="true" className="text-emerald-900/25 dark:text-emerald-400/30">
                     ·
                   </span>
-                  <span className="text-emerald-700 font-semibold">
+                  <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
                     Aportes en Ahorro: {formatCurrency(summary.explicitSavingsLogged, currency)}
                   </span>
                 </>
               )}
             </div>
-            <span className="text-[11.5px] text-slate-500">
+            <span className="text-[11.5px] text-slate-500 dark:text-slate-400">
               Incluye excedente neto + aportes en categoría Ahorro
             </span>
           </div>
@@ -780,16 +785,16 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
 
       {/* Savings Goals Section */}
       <section className="mf-card overflow-hidden">
-        <div className="px-3.5 sm:px-5 py-3 border-b border-emerald-950/[0.08] bg-gradient-to-r from-[#F6FAF7] to-white flex items-center justify-between gap-3">
+        <div className="px-3.5 sm:px-5 py-3 border-b border-emerald-950/[0.08] dark:border-emerald-400/15 bg-gradient-to-r from-[#F6FAF7] to-white dark:from-[#0E241A] dark:to-[#0B1D15] flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-xl bg-white dark:bg-emerald-500/15 border border-emerald-900/12 dark:border-emerald-400/20 shadow-2xs text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
               <Target className="w-4 h-4" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+              <h2 className="text-base font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                 Metas de ahorro ({plan.goals.length})
               </h2>
-              <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 truncate">
+              <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                 {goalsTotals.activeCount > 0
                   ? `Aporte combinado sugerido: ${formatCurrency(goalsTotals.totalReqPerQuincena, currency)} / quincena`
                   : 'Crea objetivos concretos con fecha límite y cuota quincenal'}
@@ -810,10 +815,10 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
         {formOpen && (
           <form
             onSubmit={handleSaveGoal}
-            className="p-3 sm:p-5 bg-[#F7FAF8] border-b border-emerald-950/10 space-y-3"
+            className="p-3 sm:p-5 bg-[#F7FAF8] dark:bg-[#0F261B] border-b border-emerald-950/10 dark:border-emerald-400/15 space-y-3"
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-[#0B3B24]">
+              <h3 className="text-sm font-bold text-[#0B3B24] dark:text-emerald-300">
                 {editingGoalId ? 'Editar meta de ahorro' : 'Crear nueva meta de ahorro'}
               </h3>
               <button
@@ -822,7 +827,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   setFormOpen(false);
                   setEditingGoalId(null);
                 }}
-                className="text-xs font-bold text-slate-600 hover:text-slate-900"
+                className="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
               >
                 Cerrar
               </button>
@@ -832,7 +837,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
               <div className="sm:col-span-2">
                 <label
                   htmlFor="goal-name"
-                  className="block text-xs font-bold text-slate-700 mb-1"
+                  className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1"
                 >
                   Nombre de la meta
                 </label>
@@ -844,14 +849,14 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   placeholder="Ej. Fondo de emergencia, Vacaciones..."
                   value={goalName}
                   onChange={(e) => setGoalName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-semibold text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                  className="w-full px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F] dark:focus:border-emerald-400"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="goal-target"
-                  className="block text-xs font-bold text-slate-700 mb-1"
+                  className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1"
                 >
                   Meta total ({currency})
                 </label>
@@ -866,14 +871,14 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   placeholder="30000"
                   value={goalTarget}
                   onChange={(e) => setGoalTarget(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono font-bold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                  className="w-full px-3 py-2 text-sm font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F] dark:focus:border-emerald-400"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="goal-saved"
-                  className="block text-xs font-bold text-slate-700 mb-1"
+                  className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1"
                 >
                   Ya ahorrado ({currency})
                 </label>
@@ -887,14 +892,14 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   placeholder="0"
                   value={goalSaved}
                   onChange={(e) => setGoalSaved(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono font-bold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                  className="w-full px-3 py-2 text-sm font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F] dark:focus:border-emerald-400"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="goal-date"
-                  className="block text-xs font-bold text-slate-700 mb-1"
+                  className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1"
                 >
                   Fecha objetivo
                 </label>
@@ -904,14 +909,14 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   required
                   value={goalDate}
                   onChange={(e) => setGoalDate(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-mono font-semibold text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                  className="w-full px-3 py-2 text-sm font-mono font-semibold text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F] dark:focus:border-emerald-400"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="goal-priority"
-                  className="block text-xs font-bold text-slate-700 mb-1"
+                  className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1"
                 >
                   Prioridad
                 </label>
@@ -919,7 +924,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   id="goal-priority"
                   value={goalPriority}
                   onChange={(e) => setGoalPriority(e.target.value as SavingsGoalPriority)}
-                  className="w-full px-3 py-2 text-sm font-semibold text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                  className="w-full px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F] dark:focus:border-emerald-400"
                 >
                   <option value="alta">Alta</option>
                   <option value="media">Media</option>
@@ -930,7 +935,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
               <div className="sm:col-span-2">
                 <label
                   htmlFor="goal-notes"
-                  className="block text-xs font-bold text-slate-700 mb-1"
+                  className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1"
                 >
                   Notas (opcional)
                 </label>
@@ -941,14 +946,14 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   placeholder="Ej. Cuenta de rendimiento, fondo separado..."
                   value={goalNotes}
                   onChange={(e) => setGoalNotes(e.target.value)}
-                  className="w-full px-3 py-2 text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                  className="w-full px-3 py-2 text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F] dark:focus:border-emerald-400"
                 />
               </div>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-bold text-slate-600 mr-1">Color:</span>
+                <span className="text-xs font-bold text-slate-600 dark:text-slate-300 mr-1">Color:</span>
                 {CATEGORY_COLOR_SWATCHES.slice(0, 8).map((sw) => (
                   <button
                     key={sw.hex}
@@ -957,7 +962,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                     onClick={() => setGoalColor(sw.hex)}
                     className={`w-6 h-6 rounded-full transition-transform ${
                       goalColor.toUpperCase() === sw.hex.toUpperCase()
-                        ? 'ring-2 ring-offset-2 ring-slate-900 scale-105'
+                        ? 'ring-2 ring-offset-2 dark:ring-offset-[#0F261B] ring-slate-900 dark:ring-emerald-300 scale-105'
                         : 'opacity-80 hover:opacity-100'
                     }`}
                     style={{ backgroundColor: sw.hex }}
@@ -972,7 +977,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                     setFormOpen(false);
                     setEditingGoalId(null);
                   }}
-                  className="px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200/70 rounded-lg"
+                  className="px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-emerald-400/10 rounded-lg"
                 >
                   Cancelar
                 </button>
@@ -986,7 +991,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
             </div>
 
             {goalError && (
-              <p role="alert" className="text-xs font-semibold text-rose-700">
+              <p role="alert" className="text-xs font-semibold text-rose-700 dark:text-rose-400">
                 {goalError}
               </p>
             )}
@@ -997,13 +1002,13 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
         {goalsWithSchedule.length === 0 ? (
           <div className="p-4 sm:p-6 text-center space-y-4">
             <div className="max-w-md mx-auto space-y-1">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#12663F] flex items-center justify-center mx-auto mb-2">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200/60 dark:border-emerald-400/20 text-[#12663F] dark:text-emerald-300 flex items-center justify-center mx-auto mb-2">
                 <PiggyBank className="w-5 h-5" />
               </div>
-              <p className="text-base sm:text-sm font-bold text-slate-900">
+              <p className="text-base sm:text-sm font-bold text-slate-900 dark:text-slate-100">
                 Crea tu primera meta de ahorro
               </p>
-              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600">
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 dark:text-slate-400">
                 Calculamos automáticamente cuánto apartar cada quincena y mes para lograrla a tiempo.
               </p>
             </div>
@@ -1014,18 +1019,18 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   key={tpl.name}
                   type="button"
                   onClick={() => openNewGoalForm(tpl)}
-                  className="p-3 bg-[#F7FAF8] hover:bg-emerald-50/80 border border-emerald-950/10 rounded-xl transition-colors flex flex-col justify-between gap-1.5"
+                  className="p-3 bg-[#F7FAF8] dark:bg-[#0F261B] hover:bg-emerald-50/80 dark:hover:bg-emerald-500/15 border border-emerald-950/10 dark:border-emerald-400/15 rounded-xl transition-colors flex flex-col justify-between gap-1.5"
                 >
                   <div className="flex items-center gap-2">
                     <span
                       className="w-2.5 h-2.5 rounded-full shrink-0"
                       style={{ backgroundColor: tpl.color }}
                     />
-                    <span className="text-sm sm:text-xs font-bold text-slate-900 truncate">
+                    <span className="text-sm sm:text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
                       {tpl.name}
                     </span>
                   </div>
-                  <p className="text-xs font-mono font-bold text-[#12663F] tabular-nums">
+                  <p className="text-xs font-mono font-bold text-[#12663F] dark:text-emerald-400 tabular-nums">
                     Meta sug.: {formatCurrency(tpl.suggestedTarget, currency)} · {tpl.monthsAhead} meses
                   </p>
                 </button>
@@ -1033,31 +1038,31 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
             </div>
           </div>
         ) : (
-          <ul className="divide-y divide-emerald-950/[0.06]">
+          <ul className="divide-y divide-emerald-950/[0.06] dark:divide-emerald-400/10">
             {goalsWithSchedule.map(({ goal, schedule }) => {
               const isContributing = contributingGoalId === goal.id;
               const isDeleting = confirmDeleteId === goal.id;
 
               return (
-                <li key={goal.id} className="px-3.5 sm:px-5 py-3 sm:py-3.5 space-y-2 hover:bg-[#F7FBF8]/70 transition-colors">
+                <li key={goal.id} className="px-3.5 sm:px-5 py-3 sm:py-3.5 space-y-2 hover:bg-[#F7FBF8]/70 dark:hover:bg-emerald-400/[0.05] transition-colors">
                   <div className="flex items-start justify-between gap-2.5">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
                         <span
-                          className="w-3 h-3 rounded-full ring-2 ring-white shadow-xs shrink-0"
+                          className="w-3 h-3 rounded-full ring-2 ring-white dark:ring-[#0B1D15] shadow-xs shrink-0"
                           style={{ backgroundColor: goal.color }}
                         />
-                        <h3 className="text-[15px] sm:text-sm font-bold text-slate-900 truncate leading-tight">
+                        <h3 className="text-[15px] sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate leading-tight">
                           {goal.name}
                         </h3>
                         {schedule.isCompleted && (
-                          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 shrink-0">
+                          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-400 shrink-0">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             Lograda
                           </span>
                         )}
                       </div>
-                      <p className="text-[12.5px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5 truncate">
+                      <p className="text-[12.5px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                         {PRIORITY_LABELS[goal.priority]} · Objetivo: {formatShortDate(goal.targetDate)}
                         {schedule.isOverdue ? ' · Fecha vencida' : ` · ${schedule.quincenasRemaining} quincenas`}
                         {goal.notes ? ` · ${goal.notes}` : ''}
@@ -1065,14 +1070,14 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                     </div>
 
                     <div className="text-right shrink-0">
-                      <p className="text-[15px] sm:text-sm font-mono font-bold text-slate-900 tabular-nums leading-tight">
+                      <p className="text-[15px] sm:text-sm font-mono font-bold text-slate-900 dark:text-slate-100 tabular-nums leading-tight">
                         {formatCurrency(goal.savedAmount, currency)}
-                        <span className="text-slate-400 font-normal">
+                        <span className="text-slate-400 dark:text-slate-500 font-normal">
                           {' '}
                           / {formatCurrency(goal.targetAmount, currency)}
                         </span>
                       </p>
-                      <p className="text-xs font-mono font-bold text-[#12663F] tabular-nums mt-0.5">
+                      <p className="text-xs font-mono font-bold text-[#12663F] dark:text-emerald-400 tabular-nums mt-0.5">
                         {Math.round(schedule.progressPct)}%
                         {!schedule.isCompleted &&
                           ` · ${formatCurrency(schedule.requiredPerQuincena, currency)}/Q`}
@@ -1081,7 +1086,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   </div>
 
                   {/* Compact progress bar */}
-                  <div className="h-2.5 w-full bg-emerald-950/[0.07] ring-1 ring-inset ring-emerald-950/[0.04] rounded-full overflow-hidden">
+                  <div className="h-2.5 w-full bg-emerald-950/[0.07] dark:bg-emerald-950/70 ring-1 ring-inset ring-emerald-950/[0.04] dark:ring-emerald-400/15 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all"
                       style={{
@@ -1093,7 +1098,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
 
                   {/* Row footer: required cadence + compact actions */}
                   <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
-                    <span className="text-xs font-semibold sm:font-normal text-slate-600 font-mono tabular-nums">
+                    <span className="text-xs font-semibold sm:font-normal text-slate-600 dark:text-slate-400 font-mono tabular-nums">
                       {schedule.isCompleted
                         ? 'Meta completada al 100%'
                         : `Faltan ${formatCurrency(schedule.remainingAmount, currency)} (${formatCurrency(schedule.requiredPerMonth, currency)}/mes)`}
@@ -1101,7 +1106,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
 
                     {isDeleting ? (
                       <div className="inline-flex items-center gap-1.5 text-xs">
-                        <span className="font-bold text-rose-800">¿Eliminar?</span>
+                        <span className="font-bold text-rose-800 dark:text-rose-300">¿Eliminar?</span>
                         <button
                           type="button"
                           onClick={() => handleDeleteGoal(goal.id)}
@@ -1112,7 +1117,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                         <button
                           type="button"
                           onClick={() => setConfirmDeleteId(null)}
-                          className="px-2 py-1 font-bold text-slate-600 hover:text-slate-900"
+                          className="px-2 py-1 font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                         >
                           No
                         </button>
@@ -1126,16 +1131,16 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                               ? setContributingGoalId(null)
                               : openContributePanel(goal, schedule.requiredPerQuincena)
                           }
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-[#0B3B24] bg-emerald-50 hover:bg-emerald-100 border border-emerald-900/15 rounded-md transition-colors whitespace-nowrap"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-[#0B3B24] dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-500/15 hover:bg-emerald-100 dark:hover:bg-emerald-500/25 border border-emerald-900/15 dark:border-emerald-400/25 rounded-md transition-colors whitespace-nowrap"
                         >
-                          <Plus className="w-3.5 h-3.5 text-[#12663F]" />
+                          <Plus className="w-3.5 h-3.5 text-[#12663F] dark:text-emerald-400" />
                           Aportar
                         </button>
                         <button
                           type="button"
                           onClick={() => openEditGoalForm(goal)}
                           aria-label={`Editar ${goal.name}`}
-                          className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
+                          className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-emerald-400/10 rounded-md transition-colors"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
@@ -1146,7 +1151,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                             setContributingGoalId(null);
                           }}
                           aria-label={`Eliminar ${goal.name}`}
-                          className="p-1.5 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-md transition-colors"
+                          className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/15 rounded-md transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -1156,12 +1161,12 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
 
                   {/* Quick inline contribution panel */}
                   {isContributing && (
-                    <div className="mt-2 p-3 bg-[#F4F8F5] border border-emerald-950/12 rounded-lg space-y-2.5">
+                    <div className="mt-2 p-3 bg-[#F4F8F5] dark:bg-[#0F261B] border border-emerald-950/12 dark:border-emerald-400/20 rounded-lg space-y-2.5">
                       <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
                         <div className="sm:col-span-4">
                           <label
                             htmlFor={`contrib-amount-${goal.id}`}
-                            className="block text-xs font-bold text-slate-700 mb-1"
+                            className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1"
                           >
                             Monto a aportar ({currency})
                           </label>
@@ -1173,14 +1178,14 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                             step="0.01"
                             value={contribAmount}
                             onChange={(e) => setContribAmount(e.target.value)}
-                            className="w-full px-3 py-1.5 text-sm font-mono font-bold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                            className="w-full px-3 py-1.5 text-sm font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F] dark:focus:border-emerald-400"
                           />
                         </div>
 
-                        <div className="sm:col-span-3">
+                        <div className="sm:col-span-4">
                           <label
                             htmlFor={`contrib-q-${goal.id}`}
-                            className="block text-xs font-bold text-slate-700 mb-1"
+                            className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1"
                           >
                             Quincena
                           </label>
@@ -1190,18 +1195,22 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                             onChange={(e) =>
                               setContribQuincena(Number(e.target.value) as QuincenaNumber)
                             }
-                            className="w-full px-2.5 py-1.5 text-sm font-semibold text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F]"
+                            className="w-full px-2.5 py-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#12663F] dark:focus:border-emerald-400"
                           >
-                            <option value={1}>1ª Quincena</option>
-                            <option value={2}>2ª Quincena</option>
+                            <option value={1}>
+                              1ª Q ({getQuincenaRangeLabel(selectedMonth, 1)})
+                            </option>
+                            <option value={2}>
+                              2ª Q ({getQuincenaRangeLabel(selectedMonth, 2)})
+                            </option>
                           </select>
                         </div>
 
-                        <div className="sm:col-span-5 flex items-center justify-end gap-2">
+                        <div className="sm:col-span-4 flex items-center justify-end gap-2">
                           <button
                             type="button"
                             onClick={() => setContributingGoalId(null)}
-                            className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-200/70 rounded-lg"
+                            className="px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-emerald-400/10 rounded-lg"
                           >
                             Cancelar
                           </button>
@@ -1217,13 +1226,13 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                       </div>
 
                       {expenseCategories.length > 0 && (
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-1.5 border-t border-emerald-950/10 text-xs">
-                          <label className="inline-flex items-center gap-2 font-semibold text-slate-700 cursor-pointer">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-1.5 border-t border-emerald-950/10 dark:border-emerald-400/15 text-xs">
+                          <label className="inline-flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
                             <input
                               type="checkbox"
                               checked={contribRecordTx}
                               onChange={(e) => setContribRecordTx(e.target.checked)}
-                              className="rounded border-slate-300 text-[#12663F] focus:ring-emerald-700/30"
+                              className="rounded border-slate-300 dark:border-emerald-400/30 text-[#12663F] focus:ring-emerald-700/30"
                             />
                             Registrar también en mis movimientos
                           </label>
@@ -1232,7 +1241,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                               aria-label="Categoría del aporte"
                               value={contribCategoryId}
                               onChange={(e) => setContribCategoryId(e.target.value)}
-                              className="px-2.5 py-1 text-xs font-semibold text-slate-800 bg-white border border-slate-300 rounded-md"
+                              className="px-2.5 py-1 text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-md"
                             >
                               {expenseCategories.map((cat) => (
                                 <option key={cat.id} value={cat.id}>
@@ -1245,7 +1254,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                       )}
 
                       {contribError && (
-                        <p role="alert" className="text-xs font-semibold text-rose-700">
+                        <p role="alert" className="text-xs font-semibold text-rose-700 dark:text-rose-400">
                           {contribError}
                         </p>
                       )}
@@ -1263,25 +1272,25 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
         <section className="lg:col-span-7 mf-card p-3.5 sm:p-5 flex flex-col">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3.5">
             <div className="flex items-center gap-2.5 min-w-0">
-              <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 border border-emerald-900/10 dark:border-emerald-400/20 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
                 <TrendingUp className="w-4 h-4" />
               </span>
               <div className="min-w-0">
-                <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+                <h2 className="text-base font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                   Proyección de ahorro (12 meses)
                 </h2>
-                <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+                <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5">
                   Saldo acumulado partiendo de tus metas actuales
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-xs font-bold sm:font-medium text-slate-700 shrink-0">
+            <div className="flex items-center gap-3 text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 shrink-0">
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#12663F] ring-2 ring-emerald-100" aria-hidden="true" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#12663F] dark:bg-emerald-400 ring-2 ring-emerald-100 dark:ring-emerald-500/20" aria-hidden="true" />
                 Plan objetivo
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#0D9488] ring-2 ring-teal-100" aria-hidden="true" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#0D9488] dark:bg-teal-300 ring-2 ring-teal-100 dark:ring-teal-500/20" aria-hidden="true" />
                 Ritmo actual
               </span>
             </div>
@@ -1292,26 +1301,35 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
               <AreaChart data={projectionData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="mfSavingsPlanFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#12663F" stopOpacity={0.22} />
-                    <stop offset="95%" stopColor="#12663F" stopOpacity={0.02} />
+                    <stop offset="5%" stopColor={isDark ? '#34D399' : '#12663F'} stopOpacity={0.25} />
+                    <stop offset="95%" stopColor={isDark ? '#34D399' : '#12663F'} stopOpacity={0.02} />
                   </linearGradient>
                   <linearGradient id="mfSavingsActualFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0D9488" stopOpacity={0.18} />
-                    <stop offset="95%" stopColor="#0D9488" stopOpacity={0.01} />
+                    <stop offset="5%" stopColor={isDark ? '#2DD4BF' : '#0D9488'} stopOpacity={0.2} />
+                    <stop offset="95%" stopColor={isDark ? '#2DD4BF' : '#0D9488'} stopOpacity={0.01} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2ECE5" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke={isDark ? '#183829' : '#E2ECE5'}
+                />
                 <XAxis
                   dataKey="label"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#475569', fontSize: 11, fontWeight: 600 }}
+                  tick={{ fill: isDark ? '#94A3B8' : '#475569', fontSize: 11, fontWeight: 600 }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
                   width={64}
-                  tick={{ fill: '#475569', fontSize: 11, fontFamily: 'IBM Plex Mono', fontWeight: 600 }}
+                  tick={{
+                    fill: isDark ? '#94A3B8' : '#475569',
+                    fontSize: 11,
+                    fontFamily: 'IBM Plex Mono',
+                    fontWeight: 600,
+                  }}
                   tickFormatter={(v) => formatCompactCurrency(Number(v), currency)}
                 />
                 <Tooltip
@@ -1322,12 +1340,12 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                       ritmoActualAcumulado: number;
                     };
                     return (
-                      <div className="bg-white border border-emerald-950/15 rounded-xl px-3 py-2 shadow-md text-xs space-y-1">
-                        <p className="font-bold text-slate-900">{label}</p>
-                        <p className="font-mono font-semibold tabular-nums text-[#12663F]">
+                      <div className="bg-white dark:bg-[#0D2118] border border-emerald-950/15 dark:border-emerald-400/25 rounded-xl px-3 py-2 shadow-md text-xs space-y-1">
+                        <p className="font-bold text-slate-900 dark:text-slate-100">{label}</p>
+                        <p className="font-mono font-semibold tabular-nums text-[#12663F] dark:text-emerald-400">
                           Plan objetivo: {formatCurrency(row.planAcumulado, currency)}
                         </p>
-                        <p className="font-mono font-semibold tabular-nums text-teal-700">
+                        <p className="font-mono font-semibold tabular-nums text-teal-700 dark:text-teal-300">
                           Ritmo actual: {formatCurrency(row.ritmoActualAcumulado, currency)}
                         </p>
                       </div>
@@ -1338,7 +1356,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   type="monotone"
                   dataKey="planAcumulado"
                   name="Plan objetivo"
-                  stroke="#12663F"
+                  stroke={isDark ? '#34D399' : '#12663F'}
                   strokeWidth={2.5}
                   fill="url(#mfSavingsPlanFill)"
                 />
@@ -1346,7 +1364,7 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
                   type="monotone"
                   dataKey="ritmoActualAcumulado"
                   name="Ritmo actual"
-                  stroke="#0D9488"
+                  stroke={isDark ? '#2DD4BF' : '#0D9488'}
                   strokeWidth={2}
                   strokeDasharray="4 4"
                   fill="url(#mfSavingsActualFill)"
@@ -1359,83 +1377,83 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
         <section className="lg:col-span-5 mf-card p-3.5 sm:p-5 flex flex-col justify-between gap-4">
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
-              <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 border border-emerald-900/10 dark:border-emerald-400/20 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
                 <Compass className="w-4 h-4" />
               </span>
               <div className="min-w-0">
-                <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+                <h2 className="text-base font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                   Guía 50 / 30 / 20
                 </h2>
-                <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+                <p className="text-[12.5px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5">
                   Referencia sobre tus ingresos de {formatMonthLabel(selectedMonth)}
                 </p>
               </div>
             </div>
 
             {summary.monthIncome > 0 ? (
-              <div className="divide-y divide-emerald-950/[0.08]">
+              <div className="divide-y divide-emerald-950/[0.08] dark:divide-emerald-400/12">
                 <div className="py-2.5 flex items-center justify-between gap-2">
                   <div className="flex items-start gap-2 min-w-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-slate-500 mt-1.5 shrink-0" aria-hidden="true" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-500 dark:bg-slate-400 mt-1.5 shrink-0" aria-hidden="true" />
                     <div>
-                      <p className="text-sm font-bold text-slate-900">Necesidades (50%)</p>
-                      <p className="text-xs text-slate-500">Vivienda, despensa, servicios, transporte</p>
+                      <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Necesidades (50%)</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Vivienda, despensa, servicios, transporte</p>
                     </div>
                   </div>
-                  <span className="text-sm font-mono font-bold text-slate-900 tabular-nums shrink-0">
+                  <span className="text-sm font-mono font-bold text-slate-900 dark:text-slate-100 tabular-nums shrink-0">
                     {formatCurrency(rule503020.needs, currency)}
                   </span>
                 </div>
                 <div className="py-2.5 flex items-center justify-between gap-2">
                   <div className="flex items-start gap-2 min-w-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 mt-1.5 shrink-0" aria-hidden="true" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 dark:bg-amber-400 mt-1.5 shrink-0" aria-hidden="true" />
                     <div>
-                      <p className="text-sm font-bold text-slate-900">Estilo de vida (30%)</p>
-                      <p className="text-xs text-slate-500">Restaurantes, ocio, compras personales</p>
+                      <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Estilo de vida (30%)</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Restaurantes, ocio, compras personales</p>
                     </div>
                   </div>
-                  <span className="text-sm font-mono font-bold text-slate-900 tabular-nums shrink-0">
+                  <span className="text-sm font-mono font-bold text-slate-900 dark:text-slate-100 tabular-nums shrink-0">
                     {formatCurrency(rule503020.wants, currency)}
                   </span>
                 </div>
                 <div className="py-2.5 flex items-center justify-between gap-2">
                   <div className="flex items-start gap-2 min-w-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#12663F] mt-1.5 shrink-0" aria-hidden="true" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#12663F] dark:bg-emerald-400 mt-1.5 shrink-0" aria-hidden="true" />
                     <div>
-                      <p className="text-sm font-bold text-[#0B3B24]">Ahorro e inversión (20%)</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-sm font-bold text-[#0B3B24] dark:text-emerald-300">Ahorro e inversión (20%)</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         {formatCurrency(rule503020.savings / 2, currency)} cada quincena
                       </p>
                     </div>
                   </div>
-                  <span className="text-sm font-mono font-bold text-emerald-700 tabular-nums shrink-0">
+                  <span className="text-sm font-mono font-bold text-emerald-700 dark:text-emerald-400 tabular-nums shrink-0">
                     {formatCurrency(rule503020.savings, currency)}
                   </span>
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-slate-600 py-3">
+              <p className="text-xs text-slate-600 dark:text-slate-400 py-3">
                 Registra tus ingresos en {formatMonthLabel(selectedMonth)} para calcular tu distribución sugerida 50/30/20 automáticamente.
               </p>
             )}
           </div>
 
-          <div className="pt-3 border-t border-emerald-950/10 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-              <Target className="w-3.5 h-3.5 text-[#12663F] shrink-0" />
+          <div className="pt-3 border-t border-emerald-950/10 dark:border-emerald-400/15 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+              <Target className="w-3.5 h-3.5 text-[#12663F] dark:text-emerald-400 shrink-0" />
               <span>Cobertura de tus metas activas</span>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               {goalsTotals.activeCount === 0 ? (
                 'Cuando agregues metas activas, aquí verás si tu ahorro quincenal planeado es suficiente para cumplirlas a tiempo.'
               ) : summary.quincenaTargetAmount >= goalsTotals.totalReqPerQuincena ? (
                 <>
                   Tu ahorro planeado de{' '}
-                  <span className="font-mono font-bold text-emerald-700 tabular-nums">
+                  <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">
                     {formatCurrency(summary.quincenaTargetAmount, currency)}/Q
                   </span>{' '}
                   cubre los{' '}
-                  <span className="font-mono font-bold text-slate-900 tabular-nums">
+                  <span className="font-mono font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                     {formatCurrency(goalsTotals.totalReqPerQuincena, currency)}/Q
                   </span>{' '}
                   necesarios para tus {goalsTotals.activeCount}{' '}
@@ -1444,11 +1462,11 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
               ) : (
                 <>
                   Tus metas requieren{' '}
-                  <span className="font-mono font-bold text-amber-700 tabular-nums">
+                  <span className="font-mono font-bold text-amber-700 dark:text-amber-400 tabular-nums">
                     {formatCurrency(goalsTotals.totalReqPerQuincena, currency)}/Q
                   </span>
                   , frente a tu meta actual de{' '}
-                  <span className="font-mono font-bold text-slate-900 tabular-nums">
+                  <span className="font-mono font-bold text-slate-900 dark:text-slate-100 tabular-nums">
                     {formatCurrency(summary.quincenaTargetAmount, currency)}/Q
                   </span>
                   . Considera ajustar el plazo o incrementar tu cuota quincenal.

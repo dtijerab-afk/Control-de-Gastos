@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
@@ -14,12 +16,25 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  html.dark {
+    color: #ecfdf5;
+    background-color: #06130d;
+  }
+
   body {
     background-color: #eef5f0;
     background-image:
-      radial-gradient(circle at 12% 0%, rgba(16, 185, 129, 0.07) 0%, transparent 42%),
-      radial-gradient(circle at 92% 10%, rgba(11, 59, 36, 0.04) 0%, transparent 38%);
+      radial-gradient(circle at 12% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 44%),
+      radial-gradient(circle at 92% 10%, rgba(11, 59, 36, 0.05) 0%, transparent 40%);
     background-attachment: fixed;
+    transition: background-color 180ms ease, color 180ms ease;
+  }
+
+  html.dark body {
+    background-color: #06130d;
+    background-image:
+      radial-gradient(circle at 14% 0%, rgba(16, 185, 129, 0.14) 0%, transparent 46%),
+      radial-gradient(circle at 88% 12%, rgba(20, 83, 45, 0.2) 0%, transparent 42%);
   }
 
   h1, h2, h3, h4 {
@@ -29,11 +44,26 @@
 
 .mf-card {
   background-color: #ffffff;
-  border: 1px solid rgba(11, 59, 36, 0.1);
+  border: 1px solid rgba(11, 59, 36, 0.12);
   border-radius: 1rem;
   box-shadow:
-    0 1px 2px rgba(11, 59, 36, 0.04),
-    0 6px 18px -6px rgba(11, 59, 36, 0.05);
+    0 1px 2px rgba(11, 59, 36, 0.05),
+    0 8px 20px -8px rgba(11, 59, 36, 0.08);
+}
+
+.dark .mf-card {
+  background-color: #0b1d15;
+  border-color: rgba(52, 211, 153, 0.14);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    0 10px 24px -10px rgba(0, 0, 0, 0.65);
+}
+
+/* Form controls clean styling in dark mode */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+  color-scheme: dark;
 }
 
 .tabular-nums {

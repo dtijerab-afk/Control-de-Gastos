@@ -249,14 +249,14 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
     <div className="space-y-3.5 sm:space-y-5">
       {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
-        <div className="inline-flex items-center gap-1 p-1 bg-white/80 border border-emerald-950/10 shadow-xs rounded-xl w-full sm:w-fit">
+        <div className="inline-flex items-center gap-1 p-1 bg-white/80 dark:bg-[#0D2118] border border-emerald-950/10 dark:border-emerald-400/15 shadow-xs rounded-xl w-full sm:w-fit">
           <button
             type="button"
             onClick={() => setActiveType('gasto')}
             className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
               activeType === 'gasto'
-                ? 'bg-[#0B3B24] text-white shadow-xs'
-                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24] hover:bg-emerald-950/[0.04]'
+                ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
+                : 'text-slate-700 sm:text-slate-600 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-emerald-950/[0.04] dark:hover:bg-emerald-400/10'
             }`}
           >
             Gastos ({categories.filter((c) => c.type === 'gasto').length})
@@ -266,8 +266,8 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
             onClick={() => setActiveType('ingreso')}
             className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
               activeType === 'ingreso'
-                ? 'bg-[#0B3B24] text-white shadow-xs'
-                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24] hover:bg-emerald-950/[0.04]'
+                ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
+                : 'text-slate-700 sm:text-slate-600 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-emerald-950/[0.04] dark:hover:bg-emerald-400/10'
             }`}
           >
             Ingresos ({categories.filter((c) => c.type === 'ingreso').length})
@@ -288,14 +288,14 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
       {formOpen && (
         <section className="mf-card p-3.5 sm:p-5">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-slate-900">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
               {editingCat ? 'Editar categoría' : 'Crear categoría personalizada'}
             </h3>
             <button
               type="button"
               onClick={() => setFormOpen(false)}
               aria-label="Cerrar formulario"
-              className="p-1.5 text-slate-500 hover:text-slate-900 rounded-xl hover:bg-emerald-950/[0.05] transition-colors"
+              className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-emerald-950/[0.05] dark:hover:bg-emerald-400/10 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -304,7 +304,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
           <form onSubmit={handleSaveCategory} className="space-y-3.5">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
               <div className="md:col-span-5">
-                <label htmlFor="cat-name" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
+                <label htmlFor="cat-name" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 dark:text-slate-300 mb-1">
                   Nombre de la categoría
                 </label>
                 <input
@@ -315,19 +315,19 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
                   placeholder="Ej. Educación, Gimnasio, Bonos"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3.5 py-2 text-base sm:text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                  className="w-full px-3.5 py-2 text-base sm:text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132] dark:focus:border-emerald-400"
                 />
               </div>
 
               <div className="md:col-span-3">
-                <label htmlFor="cat-type" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
+                <label htmlFor="cat-type" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 dark:text-slate-300 mb-1">
                   Tipo
                 </label>
                 <select
                   id="cat-type"
                   value={type}
                   onChange={(e) => setType(e.target.value as TransactionType)}
-                  className="w-full px-3.5 py-2 text-base sm:text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                  className="w-full px-3.5 py-2 text-base sm:text-sm font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132] dark:focus:border-emerald-400"
                 >
                   <option value="gasto">Gasto</option>
                   <option value="ingreso">Ingreso</option>
@@ -338,7 +338,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
                 <div className="md:col-span-4">
                   <label
                     htmlFor="cat-budget"
-                    className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1"
+                    className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 dark:text-slate-300 mb-1"
                   >
                     Presupuesto mensual ({currency})
                   </label>
@@ -352,14 +352,14 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
                     placeholder="Sin límite"
                     value={monthlyBudget}
                     onChange={(e) => setMonthlyBudget(e.target.value)}
-                    className="w-full px-3.5 py-2 text-base sm:text-sm font-mono font-bold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                    className="w-full px-3.5 py-2 text-base sm:text-sm font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-[#0D2118] border border-slate-300 dark:border-emerald-400/25 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132] dark:focus:border-emerald-400"
                   />
                 </div>
               )}
             </div>
 
             <div>
-              <span className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1.5">
+              <span className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 dark:text-slate-300 mb-1.5">
                 Color en gráficas
               </span>
               <div className="flex items-center gap-2 flex-wrap">
@@ -372,7 +372,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
                     aria-label={`Color ${swatch.name}`}
                     className={`w-7 h-7 rounded-md transition-transform ${
                       color.toUpperCase() === swatch.hex.toUpperCase()
-                        ? 'ring-2 ring-offset-2 ring-slate-900 scale-105'
+                        ? 'ring-2 ring-offset-2 dark:ring-offset-[#0B1D15] ring-slate-900 dark:ring-emerald-300 scale-105'
                         : 'hover:scale-105'
                     }`}
                     style={{ backgroundColor: swatch.hex }}
@@ -384,17 +384,17 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
             {formError && (
               <div
                 role="alert"
-                className="px-3.5 py-2 text-sm font-semibold text-rose-800 bg-rose-50 border border-rose-200 rounded-lg"
+                className="px-3.5 py-2 text-sm font-semibold text-rose-800 dark:text-rose-200 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-400/30 rounded-lg"
               >
                 {formError}
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-100 dark:border-emerald-400/12">
               <button
                 type="button"
                 onClick={() => setFormOpen(false)}
-                className="px-4 py-2 text-sm sm:text-xs font-bold sm:font-medium text-slate-700 hover:bg-slate-100 rounded-lg"
+                className="px-4 py-2 text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-emerald-400/10 rounded-lg"
               >
                 Cancelar
               </button>
@@ -412,16 +412,16 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
 
       {/* Categories List (Ultra-compact single-row alignment on mobile & desktop) */}
       <section className="mf-card overflow-hidden">
-        <div className="px-3.5 py-2.5 sm:px-5 sm:py-3 border-b border-emerald-950/[0.08] bg-gradient-to-r from-[#F6FAF7] to-white flex items-center justify-between">
+        <div className="px-3.5 py-2.5 sm:px-5 sm:py-3 border-b border-emerald-950/[0.08] dark:border-emerald-400/15 bg-gradient-to-r from-[#F6FAF7] to-white dark:from-[#0E241A] dark:to-[#0B1D15] flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-xl bg-white dark:bg-emerald-500/15 border border-emerald-900/12 dark:border-emerald-400/20 shadow-2xs text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
               <Tags className="w-4 h-4" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+              <h2 className="text-base font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                 {activeType === 'gasto' ? 'Categorías de gasto' : 'Categorías de ingreso'}
               </h2>
-              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5">
                 Acumulado en {formatMonthLabel(selectedMonth)}
               </p>
             </div>
@@ -430,10 +430,10 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
 
         {visibleCategories.length === 0 ? (
           <div className="px-4 py-9 text-center">
-            <p className="text-base sm:text-sm font-bold text-slate-900">
+            <p className="text-base sm:text-sm font-bold text-slate-900 dark:text-slate-100">
               No hay categorías en esta sección
             </p>
-            <p className="text-sm sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-1 mb-4">
+            <p className="text-sm sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-1 mb-4">
               Crea una categoría personalizada para organizar tus registros quincenales.
             </p>
             <button
@@ -446,7 +446,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-emerald-950/[0.06]">
+          <div className="divide-y divide-emerald-950/[0.06] dark:divide-emerald-400/10">
             {visibleCategories.map((cat) => {
               const stats = statsByCategory.get(cat.id) ?? { monthTotal: 0, totalCount: 0 };
               const isConfirming = confirmDeleteId === cat.id;
@@ -459,31 +459,31 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
               return (
                 <div
                   key={cat.id}
-                  className="px-3.5 py-2.5 sm:px-5 sm:py-3 flex items-center justify-between gap-2.5 hover:bg-[#F5FAF7] transition-colors"
+                  className="px-3.5 py-2.5 sm:px-5 sm:py-3 flex items-center justify-between gap-2.5 hover:bg-[#F5FAF7] dark:hover:bg-emerald-400/[0.06] transition-colors"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span
-                      className="w-3.5 h-3.5 rounded-full ring-2 ring-white shadow-xs shrink-0"
+                      className="w-3.5 h-3.5 rounded-full ring-2 ring-white dark:ring-[#0B1D15] shadow-xs shrink-0"
                       style={{ backgroundColor: cat.color }}
                       aria-hidden="true"
                     />
                     <div className="min-w-0">
-                      <p className="text-[15px] sm:text-sm font-bold sm:font-semibold text-slate-900 truncate leading-snug">
+                      <p className="text-[15px] sm:text-sm font-bold sm:font-semibold text-slate-900 dark:text-slate-100 truncate leading-snug">
                         {cat.name}
                       </p>
-                      <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 truncate leading-tight">
+                      <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 truncate leading-tight">
                         <span>{stats.totalCount} mov.</span>
                         {hasBudget && (
                           <>
                             <span> · Meta {formatCurrency(cat.monthlyBudget, currency)}</span>
                             {isOver && (
-                              <span className="inline-flex items-center gap-0.5 text-rose-700 font-bold ml-1.5">
+                              <span className="inline-flex items-center gap-0.5 text-rose-700 dark:text-rose-400 font-bold ml-1.5">
                                 <AlertCircle className="w-3 h-3 shrink-0" />
                                 {Math.round(budgetPct)}%
                               </span>
                             )}
                             {isNear && (
-                              <span className="inline-flex items-center gap-0.5 text-amber-700 font-bold ml-1.5">
+                              <span className="inline-flex items-center gap-0.5 text-amber-700 dark:text-amber-400 font-bold ml-1.5">
                                 <AlertTriangle className="w-3 h-3 shrink-0" />
                                 {Math.round(budgetPct)}%
                               </span>
@@ -499,17 +499,17 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
                       <p
                         className={`text-[15px] sm:text-sm font-mono font-bold sm:font-semibold tabular-nums leading-snug ${
                           cat.type === 'ingreso'
-                            ? 'text-emerald-700'
+                            ? 'text-emerald-700 dark:text-emerald-400'
                             : isOver
-                              ? 'text-rose-700'
+                              ? 'text-rose-700 dark:text-rose-400'
                               : isNear
-                                ? 'text-amber-700'
-                                : 'text-slate-900'
+                                ? 'text-amber-700 dark:text-amber-400'
+                                : 'text-slate-900 dark:text-slate-100'
                         }`}
                       >
                         {formatCurrency(stats.monthTotal, currency)}
                       </p>
-                      <p className="text-[11px] font-semibold sm:font-normal text-slate-500 leading-tight">
+                      <p className="text-[11px] font-semibold sm:font-normal text-slate-500 dark:text-slate-400 leading-tight">
                         este mes
                       </p>
                     </div>
@@ -527,7 +527,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
                         <button
                           type="button"
                           onClick={() => setConfirmDeleteId(null)}
-                          className="px-1.5 py-1 font-bold sm:font-normal text-slate-600 hover:text-slate-900"
+                          className="px-1.5 py-1 font-bold sm:font-normal text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                         >
                           No
                         </button>
@@ -539,7 +539,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
                           onClick={() => openEditForm(cat)}
                           aria-label={`Editar ${cat.name}`}
                           title="Editar categoría"
-                          className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
+                          className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-emerald-400/10 rounded-md transition-colors"
                         >
                           <Pencil className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                         </button>
@@ -548,7 +548,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
                           onClick={() => setConfirmDeleteId(cat.id)}
                           aria-label={`Eliminar ${cat.name}`}
                           title="Eliminar categoría"
-                          className="p-1.5 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-md transition-colors"
+                          className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/15 rounded-md transition-colors"
                         >
                           <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                         </button>
@@ -565,14 +565,14 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
       {/* Workspace Currency Preferences */}
       <section className="mf-card p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+          <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 border border-emerald-900/10 dark:border-emerald-400/20 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
             <Globe className="w-4 h-4" />
           </span>
           <div className="min-w-0">
-            <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-900 leading-tight">
+            <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
               Moneda de visualización
             </h3>
-            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5">
               Define la divisa con la que se muestran tus montos y gráficas mensuales.
             </p>
           </div>
@@ -582,7 +582,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
           value={currency}
           disabled={savingCurrency}
           onChange={(e) => handleCurrencyChange(e.target.value as CurrencyCode)}
-          className="px-3.5 py-2 text-base sm:text-sm font-semibold sm:font-medium text-slate-900 bg-[#F5F9F6] border border-emerald-950/15 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132] w-full sm:w-64 transition-colors"
+          className="px-3.5 py-2 text-base sm:text-sm font-semibold sm:font-medium text-slate-900 dark:text-slate-100 bg-[#F5F9F6] dark:bg-[#0D2118] border border-emerald-950/15 dark:border-emerald-400/20 rounded-xl focus:bg-white dark:focus:bg-[#10291E] focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132] dark:focus:border-emerald-400 w-full sm:w-64 transition-colors"
         >
           {CURRENCIES.map((c) => (
             <option key={c.code} value={c.code}>
@@ -599,19 +599,19 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
       >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div className="flex items-start gap-2.5 min-w-0">
-            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0 mt-0.5">
+            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 border border-emerald-900/10 dark:border-emerald-400/20 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
               <HardDriveDownload className="w-4 h-4" />
             </span>
             <div className="min-w-0">
-              <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-900 leading-tight">
+              <h3 className="text-base sm:text-sm font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                 Respaldo completo (JSON)
               </h3>
-              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5">
                 Exporta tu perfil, moneda, presupuesto mensual global, categorías personalizadas y
                 todos tus movimientos, o importa un respaldo previo sin sobrescribir ni duplicar
                 registros.
               </p>
-              <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-700 sm:text-slate-600 mt-1.5 font-mono tabular-nums">
+              <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-700 sm:text-slate-600 dark:text-slate-300 mt-1.5 font-mono tabular-nums">
                 {categories.length} {categories.length === 1 ? 'categoría' : 'categorías'} ·{' '}
                 {transactions.length} {transactions.length === 1 ? 'movimiento' : 'movimientos'} ·
                 Meta {formatCurrency(profile?.monthlyBudget ?? 0, currency)}
@@ -640,16 +640,16 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
               type="button"
               disabled={importing}
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-sm sm:text-xs font-bold sm:font-semibold text-[#0B3B24] bg-[#F3F8F5] border border-emerald-900/15 hover:bg-emerald-50 hover:border-emerald-800/30 disabled:opacity-60 rounded-xl transition-all whitespace-nowrap"
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-sm sm:text-xs font-bold sm:font-semibold text-[#0B3B24] dark:text-emerald-200 bg-[#F3F8F5] dark:bg-[#10291E] border border-emerald-900/15 dark:border-emerald-400/20 hover:bg-emerald-50 dark:hover:bg-emerald-500/15 hover:border-emerald-800/30 disabled:opacity-60 rounded-xl transition-all whitespace-nowrap"
             >
-              <Upload className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#12663F]" />
+              <Upload className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#12663F] dark:text-emerald-400" />
               Importar respaldo JSON
             </button>
           </div>
         </div>
 
         {exportSummary && (
-          <div className="px-3.5 py-2.5 text-[13px] sm:text-xs font-semibold sm:font-normal text-emerald-950 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start justify-between gap-3">
+          <div className="px-3.5 py-2.5 text-[13px] sm:text-xs font-semibold sm:font-normal text-emerald-950 dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-400/25 rounded-lg flex items-start justify-between gap-3">
             <span>{exportSummary}</span>
             <button
               type="button"
@@ -664,7 +664,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
         {importError && (
           <div
             role="alert"
-            className="px-3.5 py-2.5 text-[13px] sm:text-xs font-semibold text-rose-800 bg-rose-50 border border-rose-200 rounded-lg flex items-start justify-between gap-3"
+            className="px-3.5 py-2.5 text-[13px] sm:text-xs font-semibold text-rose-800 dark:text-rose-200 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-400/30 rounded-lg flex items-start justify-between gap-3"
           >
             <span>{importError}</span>
             <button
@@ -678,12 +678,12 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
         )}
 
         {pendingImport && (
-          <div className="p-3.5 bg-[#F4F8F5] border border-emerald-950/15 rounded-lg space-y-2.5">
+          <div className="p-3.5 bg-[#F4F8F5] dark:bg-[#0F261B] border border-emerald-950/15 dark:border-emerald-400/20 rounded-lg space-y-2.5">
             <div>
-              <p className="text-sm sm:text-xs font-bold text-slate-900">
+              <p className="text-sm sm:text-xs font-bold text-slate-900 dark:text-slate-100">
                 Vista previa del respaldo: {pendingImport.fileName}
               </p>
-              <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-700 sm:text-slate-600 mt-1 font-mono tabular-nums">
+              <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-700 sm:text-slate-600 dark:text-slate-300 mt-1 font-mono tabular-nums">
                 {pendingImport.backup.counts.categories} categorías ·{' '}
                 {pendingImport.backup.counts.transactions} movimientos (
                 {pendingImport.backup.counts.ingresos} ingresos /{' '}
@@ -694,7 +694,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
                   pendingImport.backup.profile.currency
                 )}
               </p>
-              <p className="text-[13px] sm:text-xs text-slate-600 sm:text-slate-500 mt-1">
+              <p className="text-[13px] sm:text-xs text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-1">
                 Los registros se asociarán automáticamente a tu cuenta actual (UID y categorías
                 remapeadas). No se eliminará ningún dato existente y se omitirán duplicados.
               </p>
@@ -712,7 +712,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
                 type="button"
                 disabled={importing}
                 onClick={() => setPendingImport(null)}
-                className="px-3 py-2 text-sm sm:text-xs font-bold sm:font-medium text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors whitespace-nowrap"
+                className="px-3 py-2 text-sm sm:text-xs font-bold sm:font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-emerald-400/10 rounded-lg transition-colors whitespace-nowrap"
               >
                 Cancelar
               </button>
@@ -721,7 +721,7 @@ export function CategoriesView({ selectedMonth, alertThresholdPct }: CategoriesV
         )}
 
         {importReport && (
-          <div className="px-3.5 py-2.5 text-[13px] sm:text-xs text-emerald-950 bg-emerald-50 border border-emerald-200 rounded-lg space-y-1">
+          <div className="px-3.5 py-2.5 text-[13px] sm:text-xs text-emerald-950 dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-400/25 rounded-lg space-y-1">
             <div className="flex items-center justify-between gap-3">
               <p className="font-bold">Importación completada correctamente</p>
               <button

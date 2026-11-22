@@ -244,7 +244,7 @@ export function TransactionModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#061D12]/55 backdrop-blur-xs p-3 sm:p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#061D12]/60 dark:bg-black/70 backdrop-blur-xs p-3 sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="tx-modal-title"
@@ -252,13 +252,13 @@ export function TransactionModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-white border border-emerald-950/15 rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-emerald-950/[0.08] bg-gradient-to-r from-[#F6FAF7] to-white">
+      <div className="bg-white dark:bg-[#0B1D15] border border-emerald-950/15 dark:border-emerald-400/20 rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-emerald-950/[0.08] dark:border-emerald-400/15 bg-gradient-to-r from-[#F6FAF7] to-white dark:from-[#10291D] dark:to-[#0B1D15]">
           <div className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-xl bg-white border border-emerald-900/12 shadow-2xs text-[#0F5A36] flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-xl bg-white dark:bg-[#143324] border border-emerald-900/12 dark:border-emerald-400/20 shadow-2xs text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
               <ReceiptText className="w-4 h-4" />
             </span>
-            <h2 id="tx-modal-title" className="text-base font-bold text-slate-900">
+            <h2 id="tx-modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
               {editingTransaction ? 'Editar movimiento' : 'Registrar movimiento'}
             </h2>
           </div>
@@ -266,7 +266,7 @@ export function TransactionModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar ventana"
-            className="p-2 text-slate-500 hover:text-slate-900 rounded-xl hover:bg-emerald-950/[0.05] transition-colors"
+            className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-emerald-950/[0.05] dark:hover:bg-white/10 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -275,17 +275,17 @@ export function TransactionModal({
         <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4">
           {/* Type Segmented Control */}
           <div>
-            <label className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1.5">
+            <label className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 mb-1.5">
               Tipo de movimiento
             </label>
-            <div className="grid grid-cols-2 gap-1 p-1 bg-[#EFF5F1] border border-emerald-950/[0.08] rounded-xl">
+            <div className="grid grid-cols-2 gap-1 p-1 bg-[#EFF5F1] dark:bg-[#0F261B] border border-emerald-950/[0.08] dark:border-emerald-400/15 rounded-xl">
               <button
                 type="button"
                 onClick={() => setType('gasto')}
                 className={`py-2 px-3 text-sm font-bold rounded-lg transition-all whitespace-nowrap inline-flex items-center justify-center gap-1.5 ${
                   type === 'gasto'
-                    ? 'bg-white text-rose-700 shadow-xs ring-1 ring-rose-200/80'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 shadow-xs ring-1 ring-rose-200/80 dark:ring-rose-400/35'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <ArrowDownRight className="w-4 h-4" />
@@ -296,8 +296,8 @@ export function TransactionModal({
                 onClick={() => setType('ingreso')}
                 className={`py-2 px-3 text-sm font-bold rounded-lg transition-all whitespace-nowrap inline-flex items-center justify-center gap-1.5 ${
                   type === 'ingreso'
-                    ? 'bg-white text-emerald-700 shadow-xs ring-1 ring-emerald-200/80'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 shadow-xs ring-1 ring-emerald-200/80 dark:ring-emerald-400/35'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <ArrowUpRight className="w-4 h-4" />
@@ -309,7 +309,7 @@ export function TransactionModal({
           {/* Amount & Date */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label htmlFor="tx-amount" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
+              <label htmlFor="tx-amount" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Monto ({currency})
               </label>
               <input
@@ -323,12 +323,12 @@ export function TransactionModal({
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-base font-mono font-bold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                className="w-full px-3.5 py-2.5 text-base font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0F261B] border border-slate-300 dark:border-emerald-400/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 dark:focus:ring-emerald-400/30 focus:border-[#0F5132] dark:focus:border-emerald-400"
               />
             </div>
 
             <div>
-              <label htmlFor="tx-date" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
+              <label htmlFor="tx-date" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Fecha
               </label>
               <input
@@ -337,14 +337,14 @@ export function TransactionModal({
                 required
                 value={date}
                 onChange={(e) => handleDateChange(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-mono font-semibold tabular-nums text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-mono font-semibold tabular-nums text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0F261B] border border-slate-300 dark:border-emerald-400/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 dark:focus:ring-emerald-400/30 focus:border-[#0F5132] dark:focus:border-emerald-400"
               />
             </div>
           </div>
 
           {/* Quincena Selector */}
           <div>
-            <label className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
+            <label className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 mb-1">
               Quincena asignada
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -353,13 +353,13 @@ export function TransactionModal({
                 onClick={() => setQuincena(1)}
                 className={`px-3.5 py-2.5 text-left rounded-xl border transition-all ${
                   quincena === 1
-                    ? 'border-[#12663F] bg-emerald-50/70 text-[#0B3B24] shadow-2xs ring-1 ring-[#12663F]/20'
-                    : 'border-emerald-950/12 text-slate-600 hover:border-emerald-900/25 hover:bg-slate-50/60'
+                    ? 'border-[#12663F] dark:border-emerald-400/60 bg-emerald-50/70 dark:bg-emerald-500/15 text-[#0B3B24] dark:text-emerald-200 shadow-2xs ring-1 ring-[#12663F]/20 dark:ring-emerald-400/25'
+                    : 'border-emerald-950/12 dark:border-emerald-400/15 text-slate-600 dark:text-slate-300 hover:border-emerald-900/25 dark:hover:border-emerald-400/30 hover:bg-slate-50/60 dark:hover:bg-white/[0.04]'
                 }`}
               >
                 <span className="block text-sm sm:text-xs font-bold">1ª Quincena</span>
-                <span className="block text-xs font-semibold sm:font-normal text-slate-500 mt-0.5">
-                  {getQuincenaRangeLabel(activeMonthKey, 1)}
+                <span className="block text-xs font-semibold sm:font-normal text-slate-500 dark:text-slate-400 mt-0.5">
+                  Pago {getQuincenaRangeLabel(activeMonthKey, 1)}
                 </span>
               </button>
               <button
@@ -367,13 +367,13 @@ export function TransactionModal({
                 onClick={() => setQuincena(2)}
                 className={`px-3.5 py-2.5 text-left rounded-xl border transition-all ${
                   quincena === 2
-                    ? 'border-[#12663F] bg-emerald-50/70 text-[#0B3B24] shadow-2xs ring-1 ring-[#12663F]/20'
-                    : 'border-emerald-950/12 text-slate-600 hover:border-emerald-900/25 hover:bg-slate-50/60'
+                    ? 'border-[#12663F] dark:border-emerald-400/60 bg-emerald-50/70 dark:bg-emerald-500/15 text-[#0B3B24] dark:text-emerald-200 shadow-2xs ring-1 ring-[#12663F]/20 dark:ring-emerald-400/25'
+                    : 'border-emerald-950/12 dark:border-emerald-400/15 text-slate-600 dark:text-slate-300 hover:border-emerald-900/25 dark:hover:border-emerald-400/30 hover:bg-slate-50/60 dark:hover:bg-white/[0.04]'
                 }`}
               >
                 <span className="block text-sm sm:text-xs font-bold">2ª Quincena</span>
-                <span className="block text-xs font-semibold sm:font-normal text-slate-500 mt-0.5">
-                  {getQuincenaRangeLabel(activeMonthKey, 2)}
+                <span className="block text-xs font-semibold sm:font-normal text-slate-500 dark:text-slate-400 mt-0.5">
+                  Pago {getQuincenaRangeLabel(activeMonthKey, 2)}
                 </span>
               </button>
             </div>
@@ -381,7 +381,7 @@ export function TransactionModal({
 
           {/* Description */}
           <div>
-            <label htmlFor="tx-desc" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
+            <label htmlFor="tx-desc" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 mb-1">
               Concepto o descripción
             </label>
             <input
@@ -392,20 +392,20 @@ export function TransactionModal({
               placeholder={type === 'ingreso' ? 'Ej. Pago de nómina quincenal' : 'Ej. Despensa semanal'}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+              className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0F261B] border border-slate-300 dark:border-emerald-400/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 dark:focus:ring-emerald-400/30 focus:border-[#0F5132] dark:focus:border-emerald-400"
             />
           </div>
 
           {/* Category + Inline Quick Create */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label htmlFor="tx-category" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600">
+              <label htmlFor="tx-category" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300">
                 Categoría
               </label>
               <button
                 type="button"
                 onClick={() => setCreatingCategory((prev) => !prev)}
-                className="inline-flex items-center gap-1 text-sm sm:text-xs font-bold sm:font-medium text-[#12663F] hover:underline"
+                className="inline-flex items-center gap-1 text-sm sm:text-xs font-bold sm:font-medium text-[#12663F] dark:text-emerald-400 hover:underline"
               >
                 <Plus className="w-3.5 h-3.5" />
                 {creatingCategory ? 'Cancelar nueva' : 'Nueva categoría'}
@@ -413,14 +413,14 @@ export function TransactionModal({
             </div>
 
             {creatingCategory ? (
-              <div className="p-3 bg-[#F4F8F5] border border-emerald-950/12 rounded-lg space-y-3">
+              <div className="p-3 bg-[#F4F8F5] dark:bg-[#0F261B] border border-emerald-950/12 dark:border-emerald-400/18 rounded-xl space-y-3">
                 <input
                   type="text"
                   maxLength={VALIDATION_LIMITS.CATEGORY_NAME_MAX}
                   placeholder={`Nombre de categoría de ${type}`}
                   value={newCatName}
                   onChange={(e) => setNewCatName(e.target.value)}
-                  className="w-full px-3 py-2 text-base sm:text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#0F5132]"
+                  className="w-full px-3 py-2 text-base sm:text-sm text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0B1D15] border border-slate-300 dark:border-emerald-400/20 rounded-lg focus:outline-none focus:border-[#0F5132] dark:focus:border-emerald-400"
                 />
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -430,9 +430,9 @@ export function TransactionModal({
                         type="button"
                         onClick={() => setNewCatColor(swatch.hex)}
                         aria-label={`Color ${swatch.name}`}
-                        className={`w-6 h-6 rounded-md transition-transform ${
+                        className={`w-6 h-6 rounded-full transition-transform ${
                           newCatColor === swatch.hex
-                            ? 'ring-2 ring-offset-1 ring-slate-900 scale-105'
+                            ? 'ring-2 ring-offset-1 ring-slate-900 dark:ring-white dark:ring-offset-[#0F261B] scale-105'
                             : 'hover:scale-105'
                         }`}
                         style={{ backgroundColor: swatch.hex }}
@@ -443,7 +443,7 @@ export function TransactionModal({
                     type="button"
                     disabled={savingCategory}
                     onClick={handleQuickCreateCategory}
-                    className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F5132] hover:bg-[#0B3D26] disabled:opacity-60 rounded-md whitespace-nowrap shrink-0"
+                    className="px-3 py-1.5 text-xs font-bold text-white bg-[#0F5132] hover:bg-[#0B3D26] dark:bg-emerald-500 dark:hover:bg-emerald-400 dark:text-[#041A10] disabled:opacity-60 rounded-lg whitespace-nowrap shrink-0"
                   >
                     {savingCategory ? 'Creando...' : 'Crear y elegir'}
                   </button>
@@ -455,7 +455,7 @@ export function TransactionModal({
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 required
-                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0F261B] border border-slate-300 dark:border-emerald-400/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 dark:focus:ring-emerald-400/30 focus:border-[#0F5132] dark:focus:border-emerald-400"
               >
                 {filteredCategories.length === 0 ? (
                   <option value="">Sin categorías disponibles — crea una nueva</option>
@@ -473,14 +473,14 @@ export function TransactionModal({
           {/* Payment Method & Optional Notes */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label htmlFor="tx-method" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
+              <label htmlFor="tx-method" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Método de pago
               </label>
               <select
                 id="tx-method"
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0F261B] border border-slate-300 dark:border-emerald-400/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 dark:focus:ring-emerald-400/30 focus:border-[#0F5132] dark:focus:border-emerald-400"
               >
                 {PAYMENT_METHODS.map((pm) => (
                   <option key={pm.value} value={pm.value}>
@@ -491,7 +491,7 @@ export function TransactionModal({
             </div>
 
             <div>
-              <label htmlFor="tx-notes" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 mb-1">
+              <label htmlFor="tx-notes" className="block text-sm sm:text-xs font-bold sm:font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Nota breve (opcional)
               </label>
               <input
@@ -501,7 +501,7 @@ export function TransactionModal({
                 placeholder="Referencia o detalle"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 focus:border-[#0F5132]"
+                className="w-full px-3.5 py-2.5 text-base sm:text-sm font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-[#0F261B] border border-slate-300 dark:border-emerald-400/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F5132]/25 dark:focus:ring-emerald-400/30 focus:border-[#0F5132] dark:focus:border-emerald-400"
               />
             </div>
           </div>
@@ -510,10 +510,10 @@ export function TransactionModal({
           {projectedAlerts.length > 0 && (
             <div
               role="status"
-              className={`px-3.5 py-2.5 rounded-lg border space-y-1 ${
+              className={`px-3.5 py-2.5 rounded-xl border space-y-1 ${
                 hasProjectedExceeded
-                  ? 'bg-rose-50 border-rose-200 text-rose-950'
-                  : 'bg-amber-50 border-amber-200 text-amber-950'
+                  ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-500/35 text-rose-950 dark:text-rose-100'
+                  : 'bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-500/35 text-amber-950 dark:text-amber-100'
               }`}
             >
               {projectedAlerts.map((item) => {
@@ -521,9 +521,9 @@ export function TransactionModal({
                 return (
                   <div key={item.id} className="flex items-start gap-2">
                     {over ? (
-                      <AlertCircle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-rose-700 dark:text-rose-400 shrink-0 mt-0.5" />
                     ) : (
-                      <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                      <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
                     )}
                     <p className="text-[13px] sm:text-xs font-bold leading-snug">
                       Con este gasto, {item.label.toLowerCase()} llegará al{' '}
@@ -545,24 +545,24 @@ export function TransactionModal({
           {error && (
             <div
               role="alert"
-              className="px-3.5 py-2.5 text-sm font-semibold text-rose-800 bg-rose-50 border border-rose-200 rounded-lg"
+              className="px-3.5 py-2.5 text-sm font-semibold text-rose-800 dark:text-rose-200 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-500/35 rounded-xl"
             >
               {error}
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-emerald-950/[0.08]">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-emerald-950/[0.08] dark:border-emerald-400/15">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-bold sm:font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors whitespace-nowrap"
+              className="px-4 py-2 text-sm font-bold sm:font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl transition-colors whitespace-nowrap"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 text-sm font-bold text-white bg-gradient-to-b from-[#167A4B] to-[#0E5534] hover:from-[#12663F] hover:to-[#0A4127] shadow-xs shadow-emerald-950/20 disabled:opacity-60 rounded-xl transition-all whitespace-nowrap"
+              className="px-5 py-2 text-sm font-bold text-white bg-gradient-to-b from-[#167A4B] to-[#0E5534] hover:from-[#12663F] hover:to-[#0A4127] dark:from-emerald-500 dark:to-emerald-600 dark:hover:from-emerald-400 dark:hover:to-emerald-500 dark:text-[#041A10] shadow-xs shadow-emerald-950/20 disabled:opacity-60 rounded-xl transition-all whitespace-nowrap"
             >
               {saving
                 ? 'Guardando...'

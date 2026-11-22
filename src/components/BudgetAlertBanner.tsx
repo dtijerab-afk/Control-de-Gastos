@@ -35,15 +35,21 @@ export function BudgetAlertBanner({
   const extraCount = alerts.length - 1;
 
   const containerTone = hasExceeded
-    ? 'bg-rose-50 border-rose-200 text-rose-950'
-    : 'bg-amber-50 border-amber-200 text-amber-950';
+    ? 'bg-rose-50 dark:bg-rose-950/55 border-rose-200 dark:border-rose-500/35 text-rose-950 dark:text-rose-100'
+    : 'bg-amber-50 dark:bg-amber-950/45 border-amber-200 dark:border-amber-500/35 text-amber-950 dark:text-amber-100';
 
-  const iconTone = hasExceeded ? 'text-rose-700' : 'text-amber-700';
-  const subTextTone = hasExceeded ? 'text-rose-800' : 'text-amber-900/90';
-  const dividerTone = hasExceeded ? 'border-rose-200/80' : 'border-amber-200/80';
+  const iconTone = hasExceeded
+    ? 'text-rose-700 dark:text-rose-300'
+    : 'text-amber-700 dark:text-amber-300';
+  const subTextTone = hasExceeded
+    ? 'text-rose-800 dark:text-rose-200/90'
+    : 'text-amber-900/90 dark:text-amber-200/90';
+  const dividerTone = hasExceeded
+    ? 'border-rose-200/80 dark:border-rose-500/25'
+    : 'border-amber-200/80 dark:border-amber-500/25';
   const actionTone = hasExceeded
-    ? 'text-rose-800 hover:text-rose-950'
-    : 'text-amber-900 hover:text-amber-950';
+    ? 'text-rose-800 hover:text-rose-950 dark:text-rose-200 dark:hover:text-white'
+    : 'text-amber-900 hover:text-amber-950 dark:text-amber-200 dark:hover:text-white';
 
   const primaryTitle =
     primary.severity === 'exceeded'
@@ -71,8 +77,8 @@ export function BudgetAlertBanner({
           <span
             className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${
               hasExceeded
-                ? 'bg-rose-100/90 border-rose-200 text-rose-700'
-                : 'bg-amber-100/90 border-amber-200 text-amber-700'
+                ? 'bg-rose-100/90 dark:bg-rose-500/20 border-rose-200 dark:border-rose-400/30 text-rose-700 dark:text-rose-300'
+                : 'bg-amber-100/90 dark:bg-amber-500/20 border-amber-200 dark:border-amber-400/30 text-amber-700 dark:text-amber-300'
             }`}
           >
             {hasExceeded ? (
@@ -138,7 +144,7 @@ export function BudgetAlertBanner({
             aria-label="Porcentaje de aviso de presupuesto"
             value={thresholdPct}
             onChange={(e) => onChangeThreshold(Number(e.target.value))}
-            className="bg-white/90 border border-current/20 rounded-md px-1.5 py-0.5 text-[13px] sm:text-xs font-mono font-bold tabular-nums focus:outline-none"
+            className="bg-white/90 dark:bg-[#0B1D15] border border-current/20 rounded-lg px-1.5 py-0.5 text-[13px] sm:text-xs font-mono font-bold tabular-nums focus:outline-none"
           >
             {BUDGET_ALERT_THRESHOLD_OPTIONS.map((opt) => (
               <option key={opt} value={opt}>

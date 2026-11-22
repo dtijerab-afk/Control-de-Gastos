@@ -23,6 +23,7 @@ import {
   YAxis,
 } from 'recharts';
 import { useFinance } from '../context/FinanceContext';
+import { useTheme } from '../context/ThemeContext';
 import {
   formatCompactCurrency,
   formatCurrency,
@@ -43,6 +44,7 @@ export function AnalyticsView({
   onSelectMonth,
 }: AnalyticsViewProps) {
   const { transactions, categories, currency } = useFinance();
+  const { isDark } = useTheme();
   const [monthsSpan, setMonthsSpan] = useState<6 | 12>(6);
 
   const categoryMap = useMemo(() => {
@@ -154,19 +156,19 @@ export function AnalyticsView({
       {/* Range Toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
         <div>
-          <h2 className="text-lg font-bold sm:font-semibold text-slate-900">Gráficas mensuales</h2>
-          <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500">
+          <h2 className="text-lg font-bold sm:font-semibold text-slate-900 dark:text-slate-100">Gráficas mensuales</h2>
+          <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400">
             Evolución histórica terminando en {formatMonthLabel(selectedMonth)}
           </p>
         </div>
-        <div className="inline-flex items-center gap-1 p-1 bg-white/80 border border-emerald-950/10 shadow-xs rounded-xl w-full sm:w-fit">
+        <div className="inline-flex items-center gap-1 p-1 bg-white/80 dark:bg-[#0D2118] border border-emerald-950/10 dark:border-emerald-400/15 shadow-xs rounded-xl w-full sm:w-fit">
           <button
             type="button"
             onClick={() => setMonthsSpan(6)}
             className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
               monthsSpan === 6
-                ? 'bg-[#0B3B24] text-white shadow-xs'
-                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24] hover:bg-emerald-950/[0.04]'
+                ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
+                : 'text-slate-700 sm:text-slate-600 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-emerald-950/[0.04] dark:hover:bg-emerald-400/10'
             }`}
           >
             Últimos 6 meses
@@ -176,8 +178,8 @@ export function AnalyticsView({
             onClick={() => setMonthsSpan(12)}
             className={`flex-1 sm:flex-none px-3.5 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
               monthsSpan === 12
-                ? 'bg-[#0B3B24] text-white shadow-xs'
-                : 'text-slate-700 sm:text-slate-600 hover:text-[#0B3B24] hover:bg-emerald-950/[0.04]'
+                ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
+                : 'text-slate-700 sm:text-slate-600 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-emerald-950/[0.04] dark:hover:bg-emerald-400/10'
             }`}
           >
             Últimos 12 meses
@@ -189,25 +191,25 @@ export function AnalyticsView({
       <section className="mf-card p-3.5 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5 sm:mb-4">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 border border-emerald-900/10 dark:border-emerald-400/20 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
               <BarChart3 className="w-4 h-4" />
             </span>
             <div className="min-w-0">
-              <h3 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+              <h3 className="text-base font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                 Ingresos vs. Gastos por mes
               </h3>
-              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5">
                 Toca cualquier mes para inspeccionar su desglose
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3.5 text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600">
+          <div className="flex items-center gap-3.5 text-[13px] sm:text-xs font-bold sm:font-medium text-slate-700 sm:text-slate-600 dark:text-slate-300">
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#15803D] ring-2 ring-emerald-100" aria-hidden="true" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#15803D] dark:bg-emerald-400 ring-2 ring-emerald-100 dark:ring-emerald-500/20" aria-hidden="true" />
               Ingresos
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-600 ring-2 ring-rose-100" aria-hidden="true" />
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-600 dark:bg-rose-400 ring-2 ring-rose-100 dark:ring-rose-500/20" aria-hidden="true" />
               Gastos
             </span>
           </div>
@@ -224,35 +226,44 @@ export function AnalyticsView({
                 if (key) onSelectMonth(key);
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2ECE5" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke={isDark ? '#183829' : '#E2ECE5'}
+              />
               <XAxis
                 dataKey="label"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }}
+                tick={{ fill: isDark ? '#94A3B8' : '#475569', fontSize: 12, fontWeight: 600 }}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
                 width={66}
-                tick={{ fill: '#475569', fontSize: 11, fontFamily: 'IBM Plex Mono', fontWeight: 600 }}
+                tick={{
+                  fill: isDark ? '#94A3B8' : '#475569',
+                  fontSize: 11,
+                  fontFamily: 'IBM Plex Mono',
+                  fontWeight: 600,
+                }}
                 tickFormatter={(v) => formatCompactCurrency(Number(v), currency)}
               />
               <Tooltip
-                cursor={{ fill: '#F3F7F4' }}
+                cursor={{ fill: isDark ? 'rgba(52, 211, 153, 0.08)' : '#F3F7F4' }}
                 content={({ active, payload, label }) => {
                   if (!active || !payload || payload.length === 0) return null;
                   const row = payload[0].payload as (typeof monthlySeries)[number];
                   return (
-                    <div className="bg-white border border-emerald-950/15 rounded-lg px-3 py-2 shadow-sm text-xs space-y-1">
-                      <p className="font-bold text-slate-900">{label}</p>
-                      <p className="font-mono font-semibold tabular-nums text-emerald-700">
+                    <div className="bg-white dark:bg-[#0D2118] border border-emerald-950/15 dark:border-emerald-400/25 rounded-lg px-3 py-2 shadow-sm text-xs space-y-1">
+                      <p className="font-bold text-slate-900 dark:text-slate-100">{label}</p>
+                      <p className="font-mono font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">
                         Ingresos: +{formatCurrency(row.ingresos, currency)}
                       </p>
-                      <p className="font-mono font-semibold tabular-nums text-rose-700">
+                      <p className="font-mono font-semibold tabular-nums text-rose-700 dark:text-rose-400">
                         Gastos: −{formatCurrency(row.gastos, currency)}
                       </p>
-                      <p className="font-mono font-bold tabular-nums text-slate-900 pt-1 border-t border-slate-100">
+                      <p className="font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100 pt-1 border-t border-slate-100 dark:border-emerald-400/15">
                         Balance: {row.balance >= 0 ? '+' : '−'}
                         {formatCurrency(Math.abs(row.balance), currency)} ({row.savingsRate}%)
                       </p>
@@ -260,8 +271,18 @@ export function AnalyticsView({
                   );
                 }}
               />
-              <Bar dataKey="ingresos" fill="#15803D" radius={[4, 4, 0, 0]} maxBarSize={28} />
-              <Bar dataKey="gastos" fill="#E11D48" radius={[4, 4, 0, 0]} maxBarSize={28} />
+              <Bar
+                dataKey="ingresos"
+                fill={isDark ? '#10B981' : '#15803D'}
+                radius={[4, 4, 0, 0]}
+                maxBarSize={28}
+              />
+              <Bar
+                dataKey="gastos"
+                fill={isDark ? '#FB7185' : '#E11D48'}
+                radius={[4, 4, 0, 0]}
+                maxBarSize={28}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -271,14 +292,14 @@ export function AnalyticsView({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
         <section className="lg:col-span-7 mf-card p-3.5 sm:p-5 flex flex-col">
           <div className="flex items-center gap-2.5 mb-3.5 sm:mb-4">
-            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 border border-emerald-900/10 dark:border-emerald-400/20 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
               <TrendingUp className="w-4 h-4" />
             </span>
             <div className="min-w-0">
-              <h3 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+              <h3 className="text-base font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                 Balance neto mensual
               </h3>
-              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+              <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5">
                 Diferencia entre ingresos y gastos por mes
               </p>
             </div>
@@ -288,35 +309,50 @@ export function AnalyticsView({
               <AreaChart data={monthlySeries} margin={{ top: 6, right: 6, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="netBalanceFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.02} />
+                    <stop offset="5%" stopColor={isDark ? '#34D399' : '#10B981'} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={isDark ? '#34D399' : '#10B981'} stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2ECE5" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke={isDark ? '#183829' : '#E2ECE5'}
+                />
                 <XAxis
                   dataKey="label"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }}
+                  tick={{ fill: isDark ? '#94A3B8' : '#475569', fontSize: 12, fontWeight: 600 }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
                   width={66}
-                  tick={{ fill: '#475569', fontSize: 11, fontFamily: 'IBM Plex Mono', fontWeight: 600 }}
+                  tick={{
+                    fill: isDark ? '#94A3B8' : '#475569',
+                    fontSize: 11,
+                    fontFamily: 'IBM Plex Mono',
+                    fontWeight: 600,
+                  }}
                   tickFormatter={(v) => formatCompactCurrency(Number(v), currency)}
                 />
-                <ReferenceLine y={0} stroke="#94A3B8" strokeDasharray="4 4" />
+                <ReferenceLine
+                  y={0}
+                  stroke={isDark ? '#334155' : '#94A3B8'}
+                  strokeDasharray="4 4"
+                />
                 <Tooltip
                   content={({ active, payload, label }) => {
                     if (!active || !payload || payload.length === 0) return null;
                     const row = payload[0].payload as (typeof monthlySeries)[number];
                     return (
-                      <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm text-xs">
-                        <p className="font-bold text-slate-900 mb-1">{label}</p>
+                      <div className="bg-white dark:bg-[#0D2118] border border-slate-200 dark:border-emerald-400/25 rounded-lg px-3 py-2 shadow-sm text-xs">
+                        <p className="font-bold text-slate-900 dark:text-slate-100 mb-1">{label}</p>
                         <p
                           className={`font-mono font-bold tabular-nums ${
-                            row.balance >= 0 ? 'text-emerald-700' : 'text-rose-700'
+                            row.balance >= 0
+                              ? 'text-emerald-700 dark:text-emerald-400'
+                              : 'text-rose-700 dark:text-rose-400'
                           }`}
                         >
                           {row.balance >= 0 ? '+' : '−'}
@@ -329,7 +365,7 @@ export function AnalyticsView({
                 <Area
                   type="monotone"
                   dataKey="balance"
-                  stroke="#12663F"
+                  stroke={isDark ? '#34D399' : '#12663F'}
                   strokeWidth={2.25}
                   fill="url(#netBalanceFill)"
                 />
@@ -340,16 +376,16 @@ export function AnalyticsView({
 
         <section className="lg:col-span-5 mf-card p-3.5 sm:p-5 flex flex-col">
           <div className="flex items-center gap-2.5 mb-3">
-            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 border border-emerald-900/10 dark:border-emerald-400/20 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
               <PieChartIcon className="w-4 h-4" />
             </span>
             <div className="min-w-0">
-              <h3 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+              <h3 className="text-base font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
                 Gastos por categoría
               </h3>
-              <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+              <p className="text-[13px] sm:text-xs font-semibold sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5">
                 {formatMonthLabel(selectedMonth)} · Total{' '}
-                <span className="font-mono font-bold tabular-nums text-slate-900">
+                <span className="font-mono font-bold tabular-nums text-slate-900 dark:text-slate-100">
                   {formatCurrency(expenseBreakdown.total, currency)}
                 </span>
               </p>
@@ -358,7 +394,7 @@ export function AnalyticsView({
 
           {expenseBreakdown.items.length === 0 ? (
             <div className="flex-1 flex items-center justify-center py-8 text-center">
-              <p className="text-sm sm:text-xs font-medium text-slate-500 max-w-xs">
+              <p className="text-sm sm:text-xs font-medium text-slate-500 dark:text-slate-400 max-w-xs">
                 No hay gastos registrados en {formatMonthLabel(selectedMonth)}.
               </p>
             </div>
@@ -378,7 +414,12 @@ export function AnalyticsView({
                       paddingAngle={2}
                     >
                       {expenseBreakdown.items.map((entry) => (
-                        <Cell key={entry.id} fill={entry.color} stroke="#FFFFFF" strokeWidth={2} />
+                        <Cell
+                          key={entry.id}
+                          fill={entry.color}
+                          stroke={isDark ? '#0B1D15' : '#FFFFFF'}
+                          strokeWidth={2}
+                        />
                       ))}
                     </Pie>
                     <Tooltip
@@ -386,9 +427,9 @@ export function AnalyticsView({
                         if (!active || !payload || payload.length === 0) return null;
                         const item = payload[0].payload as (typeof expenseBreakdown.items)[number];
                         return (
-                          <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm text-xs">
-                            <p className="font-bold text-slate-900">{item.name}</p>
-                            <p className="font-mono font-semibold tabular-nums text-slate-700 mt-0.5">
+                          <div className="bg-white dark:bg-[#0D2118] border border-slate-200 dark:border-emerald-400/25 rounded-lg px-3 py-2 shadow-sm text-xs">
+                            <p className="font-bold text-slate-900 dark:text-slate-100">{item.name}</p>
+                            <p className="font-mono font-semibold tabular-nums text-slate-700 dark:text-slate-300 mt-0.5">
                               {formatCurrency(item.amount, currency)} ({item.percent.toFixed(1)}%)
                             </p>
                           </div>
@@ -399,7 +440,7 @@ export function AnalyticsView({
                 </ResponsiveContainer>
               </div>
 
-              <div className="divide-y divide-emerald-950/[0.06] max-h-52 overflow-y-auto">
+              <div className="divide-y divide-emerald-950/[0.06] dark:divide-emerald-400/10 max-h-52 overflow-y-auto">
                 {expenseBreakdown.items.map((item) => (
                   <div
                     key={item.id}
@@ -407,19 +448,19 @@ export function AnalyticsView({
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <span
-                        className="w-3 h-3 rounded-full ring-2 ring-white shadow-xs shrink-0"
+                        className="w-3 h-3 rounded-full ring-2 ring-white dark:ring-[#0B1D15] shadow-xs shrink-0"
                         style={{ backgroundColor: item.color }}
                         aria-hidden="true"
                       />
-                      <span className="font-bold sm:font-medium text-slate-800 truncate">
+                      <span className="font-bold sm:font-medium text-slate-800 dark:text-slate-200 truncate">
                         {item.name}
                       </span>
                     </div>
                     <div className="flex items-center gap-2.5 shrink-0 font-mono tabular-nums">
-                      <span className="text-slate-500 font-semibold sm:font-normal">
+                      <span className="text-slate-500 dark:text-slate-400 font-semibold sm:font-normal">
                         {item.percent.toFixed(0)}%
                       </span>
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-slate-900 dark:text-slate-100">
                         {formatCurrency(item.amount, currency)}
                       </span>
                     </div>
@@ -434,26 +475,26 @@ export function AnalyticsView({
       {/* Category Budget Progress (if any budgets configured) */}
       <section className="mf-card p-3.5 sm:p-5">
         <div className="flex items-center gap-2.5 mb-3.5">
-          <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] border border-emerald-900/10 text-[#0F5A36] flex items-center justify-center shrink-0">
+          <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 border border-emerald-900/10 dark:border-emerald-400/20 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
             <Gauge className="w-4 h-4" />
           </span>
           <div className="min-w-0">
-            <h3 className="text-base font-bold sm:font-semibold text-slate-900 leading-tight">
+            <h3 className="text-base font-bold sm:font-semibold text-slate-900 dark:text-slate-100 leading-tight">
               Seguimiento de presupuestos mensuales
             </h3>
-            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 mt-0.5">
+            <p className="text-[13px] sm:text-xs font-medium sm:font-normal text-slate-600 sm:text-slate-500 dark:text-slate-400 mt-0.5">
               Gasto acumulado en {formatMonthLabel(selectedMonth)} frente a límites por categoría
             </p>
           </div>
         </div>
 
         {budgetRows.length === 0 ? (
-          <p className="text-sm sm:text-xs font-medium text-slate-500 py-3">
+          <p className="text-sm sm:text-xs font-medium text-slate-500 dark:text-slate-400 py-3">
             Aún no has asignado presupuestos mensuales a tus categorías de gasto. Puedes definirlos
             desde la sección de Categorías.
           </p>
         ) : (
-          <div className="divide-y divide-emerald-950/[0.06]">
+          <div className="divide-y divide-emerald-950/[0.06] dark:divide-emerald-400/10">
             {budgetRows.map((row) => {
               const overBudget = row.remaining < 0;
               const warning = !overBudget && row.pct >= alertThresholdPct;
@@ -468,29 +509,29 @@ export function AnalyticsView({
                   <div className="flex flex-wrap items-center justify-between gap-1.5">
                     <div className="flex items-center gap-2 min-w-0">
                       <span
-                        className="w-3 h-3 rounded-full ring-2 ring-white shadow-xs shrink-0"
+                        className="w-3 h-3 rounded-full ring-2 ring-white dark:ring-[#0B1D15] shadow-xs shrink-0"
                         style={{ backgroundColor: row.color }}
                         aria-hidden="true"
                       />
-                      <span className="text-[15px] sm:text-sm font-bold text-slate-900 truncate">
+                      <span className="text-[15px] sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
                         {row.name}
                       </span>
                     </div>
-                    <div className="font-mono text-[13px] sm:text-xs tabular-nums text-slate-600">
-                      <span className="font-bold text-slate-900">
+                    <div className="font-mono text-[13px] sm:text-xs tabular-nums text-slate-600 dark:text-slate-400">
+                      <span className="font-bold text-slate-900 dark:text-slate-100">
                         {formatCurrency(row.spent, currency)}
                       </span>{' '}
                       / {formatCurrency(row.budget, currency)} ({Math.round(row.pct)}%)
                     </div>
                   </div>
-                  <div className="h-2.5 w-full bg-emerald-950/[0.07] ring-1 ring-inset ring-emerald-950/[0.04] rounded-full overflow-hidden">
+                  <div className="h-2.5 w-full bg-emerald-950/[0.07] dark:bg-emerald-950/70 ring-1 ring-inset ring-emerald-950/[0.04] dark:ring-emerald-400/15 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
                         overBudget
                           ? 'bg-gradient-to-r from-rose-600 to-rose-500'
                           : warning
                             ? 'bg-gradient-to-r from-amber-600 to-amber-400'
-                            : 'bg-gradient-to-r from-[#0F5A36] to-[#10B981]'
+                            : 'bg-gradient-to-r from-[#0F5A36] to-[#10B981] dark:from-emerald-500 dark:to-teal-400'
                       }`}
                       style={{ width: `${Math.min(100, row.pct)}%` }}
                     />
@@ -498,10 +539,10 @@ export function AnalyticsView({
                   <p
                     className={`inline-flex items-center gap-1 text-[13px] sm:text-xs ${
                       overBudget
-                        ? 'text-rose-700 font-bold'
+                        ? 'text-rose-700 dark:text-rose-400 font-bold'
                         : warning
-                          ? 'text-amber-700 font-bold'
-                          : 'text-slate-600 sm:text-slate-500 font-semibold sm:font-normal'
+                          ? 'text-amber-700 dark:text-amber-400 font-bold'
+                          : 'text-slate-600 sm:text-slate-500 dark:text-slate-400 font-semibold sm:font-normal'
                     }`}
                   >
                     {overBudget && <AlertCircle className="w-3.5 h-3.5 shrink-0" />}

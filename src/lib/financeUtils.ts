@@ -84,9 +84,19 @@ export function getMonthKeyFromDate(dateStr: string): string {
   return dateStr.slice(0, 7);
 }
 
+/**
+ * Payroll quincena schedule:
+ * - 1ª Quincena: pago del día 15–16 del mes (cubre del 15 al 29; en febrero hasta el penúltimo día).
+ * - 2ª Quincena: pago del día 30 al 1 (cubre el 30/31 y del 1 al 14).
+ */
 export function getQuincenaFromDate(dateStr: string): QuincenaNumber {
-  const day = Number(dateStr.slice(8, 10));
-  return day <= 15 ? 1 : 2;
+  const [yearStr, monthStr, dayStr] = dateStr.split('-');
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  const day = Number(dayStr);
+  const lastDay = year && month ? getDaysInMonth(year, month) : 30;
+  const secondPayDay = Math.min(30, lastDay);
+  return day >= 15 && day < secondPayDay ? 1 : 2;
 }
 
 export function getDaysInMonth(year: number, monthOneBased: number): number {
@@ -113,10 +123,12 @@ export function getQuincenaRangeLabel(monthKey: string, quincena: QuincenaNumber
   const month = Number(monthStr);
   const shortMonth = SPANISH_SHORT_MONTHS[month - 1] ?? '';
   if (quincena === 1) {
-    return `1–15 ${shortMonth}`;
+    return `15–16 ${shortMonth}`;
   }
   const lastDay = getDaysInMonth(year, month);
-  return `16–${lastDay} ${shortMonth}`;
+  const payDay = Math.min(30, lastDay);
+  const nextShortMonth = SPANISH_SHORT_MONTHS[month % 12] ?? '';
+  return `${payDay}–1 ${nextShortMonth}`;
 }
 
 export function formatShortDate(dateStr: string): string {
@@ -151,10 +163,13 @@ export function getDefaultDateForPeriod(monthKey: string, quincena: QuincenaNumb
       return today;
     }
   }
+  const [yearStr, monthStr] = monthKey.split('-');
+  const lastDay = getDaysInMonth(Number(yearStr), Number(monthStr));
   if (quincena === 2) {
-    return `${monthKey}-16`;
+    const payDay = Math.min(30, lastDay);
+    return `${monthKey}-${String(payDay).padStart(2, '0')}`;
   }
-  return `${monthKey}-01`;
+  return `${monthKey}-15`;
 }
 
 export function mapDateToTargetQuincena(
@@ -166,15 +181,31 @@ export function mapDateToTargetQuincena(
   const year = Number(yearStr);
   const month = Number(monthStr);
   const lastDay = getDaysInMonth(year, month);
-  const origDay = Number(originalDate.slice(8, 10)) || 1;
+  const secondPayDay = Math.min(30, lastDay);
+  const origDay = Number(originalDate.slice(8, 10)) || 15;
 
   let day: number;
   if (targetQuincena === 1) {
-    day = origDay <= 15 ? origDay : Math.min(origDay - 15, 15);
-    day = Math.max(1, Math.min(15, day));
+    if (origDay >= 15 && origDay < secondPayDay) {
+      day = origDay;
+    } else if (origDay >= secondPayDay) {
+      day = 15;
+    } else if (origDay === 1) {
+      day = 16;
+    } else {
+      day = Math.min(secondPayDay - 1, origDay + 14);
+    }
+    day = Math.max(15, Math.min(secondPayDay - 1, day));
   } else {
-    day = origDay >= 16 ? Math.min(origDay, lastDay) : Math.min(origDay + 15, lastDay);
-    day = Math.max(16, Math.min(lastDay, day));
+    if (origDay >= secondPayDay || origDay <= 14) {
+      day = Math.min(origDay, lastDay);
+    } else if (origDay === 15) {
+      day = secondPayDay;
+    } else if (origDay === 16) {
+      day = 1;
+    } else {
+      day = Math.max(1, Math.min(14, origDay - 15));
+    }
   }
   return `${targetMonthKey}-${String(day).padStart(2, '0')}`;
 }

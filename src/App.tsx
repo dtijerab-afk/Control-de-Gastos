@@ -10,8 +10,10 @@ import {
   ListOrdered,
   LogOut,
   Menu,
+  Moon,
   PiggyBank,
   Plus,
+  Sun,
   X,
 } from 'lucide-react';
 import { AnalyticsView } from './components/AnalyticsView';
@@ -24,6 +26,7 @@ import { SavingsPlanView } from './components/SavingsPlanView';
 import { TransactionModal } from './components/TransactionModal';
 import { TransactionsView } from './components/TransactionsView';
 import { useFinance } from './context/FinanceContext';
+import { useTheme } from './context/ThemeContext';
 import {
   computeMonthlyBudgetAlerts,
   loadBudgetAlertThreshold,
@@ -48,6 +51,7 @@ const NAV_ITEMS: { id: NavSection; label: string; icon: typeof LayoutDashboard }
 
 export default function App() {
   const { user, authReady, profile, transactions, categories, currency, signOutUser } = useFinance();
+  const { isDark, toggleTheme } = useTheme();
 
   const [activeNav, setActiveNav] = useState<NavSection>('resumen');
   const [selectedMonth, setSelectedMonth] = useState<string>(() => getCurrentMonthKey());
@@ -112,10 +116,12 @@ export default function App() {
 
   if (!authReady) {
     return (
-      <div className="min-h-screen bg-[#F3F7F4] flex items-center justify-center">
+      <div className="min-h-screen bg-[#EEF5F0] dark:bg-[#06130D] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <BrandLogo size="md" tone="dark" />
-          <p className="text-sm font-semibold text-slate-600">Cargando tu espacio financiero...</p>
+          <BrandLogo size="md" tone={isDark ? 'light' : 'dark'} />
+          <p className="text-sm font-semibold text-slate-600 dark:text-emerald-100/75">
+            Cargando tu espacio financiero...
+          </p>
         </div>
       </div>
     );
@@ -196,8 +202,8 @@ export default function App() {
         })}
       </nav>
 
-      <div className="p-3.5 border-t border-white/10 space-y-2.5 bg-black/10">
-        <div className="flex items-center gap-2.5 px-1.5">
+      <div className="p-3.5 border-t border-white/10 space-y-2 bg-black/15">
+        <div className="flex items-center gap-2.5 px-1.5 pb-1">
           <span
             aria-hidden="true"
             className="w-9 h-9 rounded-xl bg-emerald-400/20 ring-1 ring-emerald-300/30 text-emerald-100 font-display font-bold text-sm flex items-center justify-center shrink-0"
@@ -211,6 +217,28 @@ export default function App() {
             <p className="text-xs text-emerald-200/75 truncate mt-0.5">{user.email}</p>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-bold text-emerald-100/90 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 rounded-xl transition-colors whitespace-nowrap"
+        >
+          <span className="inline-flex items-center gap-2">
+            {isDark ? (
+              <Sun className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+            ) : (
+              <Moon className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
+            )}
+            <span>{isDark ? 'Modo claro' : 'Modo oscuro'}</span>
+          </span>
+          <span
+            aria-hidden="true"
+            className={`w-8 h-4.5 rounded-full p-0.5 transition-colors flex items-center ${
+              isDark ? 'bg-emerald-400/35 justify-end' : 'bg-white/15 justify-start'
+            }`}
+          >
+            <span className="w-3.5 h-3.5 rounded-full bg-white shadow-xs" />
+          </span>
+        </button>
         <button
           type="button"
           onClick={signOutUser}
@@ -244,14 +272,14 @@ export default function App() {
 
       {/* Workspace Column */}
       <div className="flex-1 min-w-0 flex flex-col">
-        {/* Top Bar Contract: Breadcrumb — Month Navigator — Primary Action */}
-        <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white/92 backdrop-blur-md border-b border-emerald-950/[0.09] shadow-[0_1px_4px_rgba(11,59,36,0.04)] px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+        {/* Top Bar Contract: Breadcrumb — Month Navigator — Theme Toggle — Primary Action */}
+        <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white/92 dark:bg-[#091A12]/92 backdrop-blur-md border-b border-emerald-950/[0.09] dark:border-emerald-400/12 shadow-[0_1px_4px_rgba(11,59,36,0.04)] dark:shadow-[0_1px_8px_rgba(0,0,0,0.45)] px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Abrir menú de navegación"
-              className="lg:hidden p-1.5 -ml-1 text-slate-800 hover:text-[#0B3B24] rounded-xl hover:bg-emerald-50 border border-transparent hover:border-emerald-900/10 transition-colors shrink-0"
+              className="lg:hidden p-1.5 -ml-1 text-slate-800 dark:text-emerald-100 hover:text-[#0B3B24] dark:hover:text-white rounded-xl hover:bg-emerald-50 dark:hover:bg-white/10 border border-transparent hover:border-emerald-900/10 dark:hover:border-white/10 transition-colors shrink-0"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -261,40 +289,40 @@ export default function App() {
               aria-label="Ir al inicio de MoneyFlow"
               className="lg:hidden inline-flex items-center shrink-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700/30"
             >
-              <BrandLogo size="xs" tone="dark" showWordmark={false} />
+              <BrandLogo size="xs" tone={isDark ? 'light' : 'dark'} showWordmark={false} />
             </button>
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <span className="hidden sm:inline text-sm font-bold text-[#0B3B24] font-display whitespace-nowrap shrink-0">
+              <span className="hidden sm:inline text-sm font-bold text-[#0B3B24] dark:text-emerald-300 font-display whitespace-nowrap shrink-0">
                 MoneyFlow
               </span>
-              <span className="hidden sm:inline text-sm text-emerald-900/25" aria-hidden="true">
+              <span className="hidden sm:inline text-sm text-emerald-900/25 dark:text-emerald-400/30" aria-hidden="true">
                 /
               </span>
-              <h1 className="text-[15px] sm:text-sm font-bold sm:font-semibold text-slate-900 truncate">
+              <h1 className="text-[15px] sm:text-sm font-bold sm:font-semibold text-slate-900 dark:text-slate-100 truncate">
                 {activeNavItem.label}
               </h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* Month Switcher */}
-            <div className="flex items-center gap-0.5 sm:gap-1 border border-emerald-900/15 rounded-xl bg-[#F2F7F4] p-0.5 shadow-[inset_0_1px_2px_rgba(11,59,36,0.04)]">
+            <div className="flex items-center gap-0.5 sm:gap-1 border border-emerald-900/15 dark:border-emerald-400/20 rounded-xl bg-[#F2F7F4] dark:bg-[#0F261B] p-0.5 shadow-[inset_0_1px_2px_rgba(11,59,36,0.04)]">
               <button
                 type="button"
                 onClick={() => setSelectedMonth((m) => shiftMonthKey(m, -1))}
                 aria-label="Mes anterior"
-                className="p-1.5 text-emerald-950/80 hover:text-[#0B3B24] hover:bg-white hover:shadow-xs rounded-lg transition-all"
+                className="p-1.5 text-emerald-950/80 dark:text-emerald-200/80 hover:text-[#0B3B24] dark:hover:text-white hover:bg-white dark:hover:bg-white/10 hover:shadow-xs rounded-lg transition-all"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="px-1.5 sm:px-3 text-[13px] sm:text-sm font-bold sm:font-semibold text-slate-900 whitespace-nowrap min-w-[104px] sm:min-w-[136px] text-center">
+              <span className="px-1.5 sm:px-3 text-[13px] sm:text-sm font-bold sm:font-semibold text-slate-900 dark:text-slate-100 whitespace-nowrap min-w-[96px] sm:min-w-[136px] text-center">
                 {formatMonthLabel(selectedMonth)}
               </span>
               <button
                 type="button"
                 onClick={() => setSelectedMonth((m) => shiftMonthKey(m, 1))}
                 aria-label="Mes siguiente"
-                className="p-1.5 text-emerald-950/80 hover:text-[#0B3B24] hover:bg-white hover:shadow-xs rounded-lg transition-all"
+                className="p-1.5 text-emerald-950/80 dark:text-emerald-200/80 hover:text-[#0B3B24] dark:hover:text-white hover:bg-white dark:hover:bg-white/10 hover:shadow-xs rounded-lg transition-all"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -304,16 +332,27 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setSelectedMonth(currentMonthKey)}
-                className="hidden md:inline-flex text-xs font-bold text-[#12663F] hover:text-[#0B3B24] hover:underline whitespace-nowrap shrink-0"
+                className="hidden md:inline-flex text-xs font-bold text-[#12663F] dark:text-emerald-400 hover:text-[#0B3B24] dark:hover:text-emerald-300 hover:underline whitespace-nowrap shrink-0"
               >
                 Mes actual
               </button>
             )}
 
+            {/* Quick Light / Dark Mode Toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              title={isDark ? 'Modo claro' : 'Modo oscuro'}
+              className="p-2 rounded-xl border border-emerald-900/15 dark:border-emerald-400/20 bg-[#F2F7F4] dark:bg-[#0F261B] text-[#0B3B24] dark:text-amber-300 hover:bg-emerald-50 dark:hover:bg-[#153425] transition-all shrink-0"
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+
             <button
               type="button"
               onClick={handleOpenNew}
-              className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-bold sm:font-semibold text-white bg-gradient-to-b from-[#157548] to-[#0F5A36] hover:from-[#12663F] hover:to-[#0B472A] active:scale-[0.98] rounded-xl shadow-[0_1px_2px_rgba(11,59,36,0.22),0_4px_10px_rgba(18,102,63,0.18)] transition-all whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-bold sm:font-semibold text-white bg-gradient-to-b from-[#157548] to-[#0F5A36] hover:from-[#12663F] hover:to-[#0B472A] dark:from-emerald-500 dark:to-emerald-600 dark:hover:from-emerald-400 dark:hover:to-emerald-500 dark:text-[#041A10] active:scale-[0.98] rounded-xl shadow-[0_1px_2px_rgba(11,59,36,0.22),0_4px_10px_rgba(18,102,63,0.18)] transition-all whitespace-nowrap shrink-0"
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span className="hidden sm:inline">Nuevo movimiento</span>
@@ -339,7 +378,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setDismissedAlertIds([])}
-                className="inline-flex items-center gap-1.5 text-[13px] sm:text-xs font-bold text-amber-800 hover:underline"
+                className="inline-flex items-center gap-1.5 text-[13px] sm:text-xs font-bold text-amber-800 dark:text-amber-300 hover:underline"
               >
                 <AlertTriangle className="w-3.5 h-3.5" />
                 Mostrar {hiddenAlertCount}{' '}
@@ -397,17 +436,17 @@ export default function App() {
         <div
           role="status"
           aria-live="polite"
-          className={`fixed bottom-3.5 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-50 rounded-xl border px-4 py-3 shadow-lg flex items-start justify-between gap-3 ${
+          className={`fixed bottom-3.5 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-50 rounded-2xl border px-4 py-3 shadow-xl flex items-start justify-between gap-3 ${
             budgetToast.some((a) => a.severity === 'exceeded')
-              ? 'bg-rose-50 border-rose-300 text-rose-950'
-              : 'bg-amber-50 border-amber-300 text-amber-950'
+              ? 'bg-rose-50 dark:bg-rose-950/90 border-rose-300 dark:border-rose-500/40 text-rose-950 dark:text-rose-100'
+              : 'bg-amber-50 dark:bg-amber-950/90 border-amber-300 dark:border-amber-500/40 text-amber-950 dark:text-amber-100'
           }`}
         >
           <div className="flex items-start gap-2.5 min-w-0">
             {budgetToast.some((a) => a.severity === 'exceeded') ? (
-              <AlertCircle className="w-5 h-5 text-rose-700 shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-rose-700 dark:text-rose-400 shrink-0 mt-0.5" />
             ) : (
-              <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
             )}
             <div className="min-w-0 space-y-0.5">
               <p className="text-sm font-bold leading-snug">
