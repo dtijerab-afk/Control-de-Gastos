@@ -36,6 +36,7 @@ import {
 import {
   formatCurrency,
   formatMonthLabel,
+  formatShortMonthLabel,
   getCurrentMonthKey,
   shiftMonthKey,
 } from './lib/financeUtils';
@@ -272,14 +273,14 @@ export default function App() {
 
       {/* Workspace Column */}
       <div className="flex-1 min-w-0 flex flex-col">
-        {/* Top Bar Contract: Breadcrumb — Month Navigator — Theme Toggle — Primary Action */}
-        <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white/92 dark:bg-[#091A12]/92 backdrop-blur-md border-b border-emerald-950/[0.09] dark:border-emerald-400/12 shadow-[0_1px_4px_rgba(11,59,36,0.04)] dark:shadow-[0_1px_8px_rgba(0,0,0,0.45)] px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        {/* Top Bar Contract: Menu/Breadcrumb — Month Navigator — Theme Toggle — Primary Action */}
+        <header className="sticky top-0 z-30 h-14 sm:h-16 bg-white/92 dark:bg-[#091A12]/92 backdrop-blur-md border-b border-emerald-950/[0.09] dark:border-emerald-400/12 shadow-[0_1px_4px_rgba(11,59,36,0.04)] dark:shadow-[0_1px_8px_rgba(0,0,0,0.45)] px-2.5 sm:px-6 lg:px-8 flex items-center justify-between gap-1.5 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 sm:min-w-0 sm:shrink">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Abrir menú de navegación"
-              className="lg:hidden p-1.5 -ml-1 text-slate-800 dark:text-emerald-100 hover:text-[#0B3B24] dark:hover:text-white rounded-xl hover:bg-emerald-50 dark:hover:bg-white/10 border border-transparent hover:border-emerald-900/10 dark:hover:border-white/10 transition-colors shrink-0"
+              className="lg:hidden w-9 h-9 flex items-center justify-center text-[#0B3B24] dark:text-emerald-100 hover:text-[#0B3B24] dark:hover:text-white rounded-xl bg-[#F2F7F4] dark:bg-[#0F261B] hover:bg-emerald-50 dark:hover:bg-[#153425] border border-emerald-900/15 dark:border-emerald-400/20 transition-colors shrink-0"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -287,42 +288,43 @@ export default function App() {
               type="button"
               onClick={() => handleSelectNav('resumen')}
               aria-label="Ir al inicio de MoneyFlow"
-              className="lg:hidden inline-flex items-center shrink-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700/30"
+              className="hidden sm:inline-flex lg:hidden items-center shrink-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700/30"
             >
               <BrandLogo size="xs" tone={isDark ? 'light' : 'dark'} showWordmark={false} />
             </button>
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <span className="hidden sm:inline text-sm font-bold text-[#0B3B24] dark:text-emerald-300 font-display whitespace-nowrap shrink-0">
+            <div className="hidden sm:flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <span className="text-sm font-bold text-[#0B3B24] dark:text-emerald-300 font-display whitespace-nowrap shrink-0">
                 MoneyFlow
               </span>
-              <span className="hidden sm:inline text-sm text-emerald-900/25 dark:text-emerald-400/30" aria-hidden="true">
+              <span className="text-sm text-emerald-900/25 dark:text-emerald-400/30" aria-hidden="true">
                 /
               </span>
-              <h1 className="text-[15px] sm:text-sm font-bold sm:font-semibold text-slate-900 dark:text-slate-100 truncate">
+              <h1 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
                 {activeNavItem.label}
               </h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <div className="flex items-center justify-end gap-1.5 sm:gap-3 flex-1 sm:flex-none min-w-0">
             {/* Month Switcher */}
-            <div className="flex items-center gap-0.5 sm:gap-1 border border-emerald-900/15 dark:border-emerald-400/20 rounded-xl bg-[#F2F7F4] dark:bg-[#0F261B] p-0.5 shadow-[inset_0_1px_2px_rgba(11,59,36,0.04)]">
+            <div className="flex items-center justify-between gap-0.5 sm:gap-1 border border-emerald-900/15 dark:border-emerald-400/20 rounded-xl bg-[#F2F7F4] dark:bg-[#0F261B] p-0.5 shadow-[inset_0_1px_2px_rgba(11,59,36,0.04)] flex-1 sm:flex-none max-w-[172px] sm:max-w-none min-w-0">
               <button
                 type="button"
                 onClick={() => setSelectedMonth((m) => shiftMonthKey(m, -1))}
                 aria-label="Mes anterior"
-                className="p-1.5 text-emerald-950/80 dark:text-emerald-200/80 hover:text-[#0B3B24] dark:hover:text-white hover:bg-white dark:hover:bg-white/10 hover:shadow-xs rounded-lg transition-all"
+                className="p-1.5 text-emerald-950/80 dark:text-emerald-200/80 hover:text-[#0B3B24] dark:hover:text-white hover:bg-white dark:hover:bg-white/10 hover:shadow-xs rounded-lg transition-all shrink-0"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="px-1.5 sm:px-3 text-[13px] sm:text-sm font-bold sm:font-semibold text-slate-900 dark:text-slate-100 whitespace-nowrap min-w-[96px] sm:min-w-[136px] text-center">
-                {formatMonthLabel(selectedMonth)}
+              <span className="px-1 sm:px-3 text-[13px] sm:text-sm font-bold sm:font-semibold text-slate-900 dark:text-slate-100 whitespace-nowrap sm:min-w-[136px] text-center truncate">
+                <span className="sm:hidden">{formatShortMonthLabel(selectedMonth)}</span>
+                <span className="hidden sm:inline">{formatMonthLabel(selectedMonth)}</span>
               </span>
               <button
                 type="button"
                 onClick={() => setSelectedMonth((m) => shiftMonthKey(m, 1))}
                 aria-label="Mes siguiente"
-                className="p-1.5 text-emerald-950/80 dark:text-emerald-200/80 hover:text-[#0B3B24] dark:hover:text-white hover:bg-white dark:hover:bg-white/10 hover:shadow-xs rounded-lg transition-all"
+                className="p-1.5 text-emerald-950/80 dark:text-emerald-200/80 hover:text-[#0B3B24] dark:hover:text-white hover:bg-white dark:hover:bg-white/10 hover:shadow-xs rounded-lg transition-all shrink-0"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -344,7 +346,7 @@ export default function App() {
               onClick={toggleTheme}
               aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
               title={isDark ? 'Modo claro' : 'Modo oscuro'}
-              className="p-2 rounded-xl border border-emerald-900/15 dark:border-emerald-400/20 bg-[#F2F7F4] dark:bg-[#0F261B] text-[#0B3B24] dark:text-amber-300 hover:bg-emerald-50 dark:hover:bg-[#153425] transition-all shrink-0"
+              className="w-9 h-9 sm:w-auto sm:h-auto sm:p-2 flex items-center justify-center rounded-xl border border-emerald-900/15 dark:border-emerald-400/20 bg-[#F2F7F4] dark:bg-[#0F261B] text-[#0B3B24] dark:text-amber-300 hover:bg-emerald-50 dark:hover:bg-[#153425] transition-all shrink-0"
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
@@ -352,7 +354,7 @@ export default function App() {
             <button
               type="button"
               onClick={handleOpenNew}
-              className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-bold sm:font-semibold text-white bg-gradient-to-b from-[#157548] to-[#0F5A36] hover:from-[#12663F] hover:to-[#0B472A] dark:from-emerald-500 dark:to-emerald-600 dark:hover:from-emerald-400 dark:hover:to-emerald-500 dark:text-[#041A10] active:scale-[0.98] rounded-xl shadow-[0_1px_2px_rgba(11,59,36,0.22),0_4px_10px_rgba(18,102,63,0.18)] transition-all whitespace-nowrap shrink-0"
+              className="inline-flex items-center justify-center gap-1 sm:gap-2 px-2.5 sm:px-4 h-9 sm:h-auto sm:py-2 text-[13px] sm:text-sm font-bold sm:font-semibold text-white bg-gradient-to-b from-[#157548] to-[#0F5A36] hover:from-[#12663F] hover:to-[#0B472A] dark:from-emerald-500 dark:to-emerald-600 dark:hover:from-emerald-400 dark:hover:to-emerald-500 dark:text-[#041A10] active:scale-[0.98] rounded-xl shadow-[0_1px_2px_rgba(11,59,36,0.22),0_4px_10px_rgba(18,102,63,0.18)] transition-all whitespace-nowrap shrink-0"
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span className="hidden sm:inline">Nuevo movimiento</span>
@@ -363,6 +365,24 @@ export default function App() {
 
         {/* Main Content Viewport */}
         <main className="flex-1 w-full max-w-[1280px] mx-auto px-2.5 sm:px-6 lg:px-8 py-2.5 sm:py-5 lg:py-6">
+          {/* Compact Mobile Context Row */}
+          <div className="sm:hidden flex items-center justify-between gap-2 mb-2.5 px-0.5">
+            <div className="flex items-center gap-2 min-w-0">
+              <BrandLogo size="xs" tone={isDark ? 'light' : 'dark'} showWordmark={false} />
+              <h1 className="text-[15px] font-bold text-[#0B3B24] dark:text-emerald-100 font-display truncate">
+                {activeNavItem.label}
+              </h1>
+            </div>
+            {selectedMonth !== currentMonthKey && (
+              <button
+                type="button"
+                onClick={() => setSelectedMonth(currentMonthKey)}
+                className="text-xs font-bold text-[#12663F] dark:text-emerald-400 hover:underline whitespace-nowrap shrink-0"
+              >
+                Mes actual
+              </button>
+            )}
+          </div>
           <BudgetAlertBanner
             alerts={visibleBudgetAlerts}
             selectedMonth={selectedMonth}

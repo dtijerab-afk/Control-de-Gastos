@@ -138,11 +138,11 @@ export function TransactionsView({
       <div className="mf-card p-2.5 sm:p-4 space-y-2 sm:space-y-3">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
           {/* Quincena Segmented Filter */}
-          <div className="inline-flex items-center gap-0.5 sm:gap-1 p-1 bg-[#EFF5F1] dark:bg-[#0D2118] border border-emerald-950/[0.08] dark:border-emerald-400/15 rounded-xl w-full sm:w-fit overflow-x-auto max-w-full">
+          <div className="grid grid-cols-3 sm:inline-flex items-center gap-0.5 sm:gap-1 p-1 bg-[#EFF5F1] dark:bg-[#0D2118] border border-emerald-950/[0.08] dark:border-emerald-400/15 rounded-xl w-full sm:w-fit">
             <button
               type="button"
               onClick={() => onChangeQuincena('all')}
-              className={`flex-1 sm:flex-none px-2.5 sm:px-3 py-1 sm:py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
+              className={`px-1.5 sm:px-3 py-1.5 text-[12px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap text-center ${
                 selectedQuincena === 'all'
                   ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
                   : 'text-slate-700 sm:text-slate-600 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-white/60 dark:hover:bg-emerald-400/10'
@@ -153,24 +153,30 @@ export function TransactionsView({
             <button
               type="button"
               onClick={() => onChangeQuincena(1)}
-              className={`flex-1 sm:flex-none px-2.5 sm:px-3 py-1 sm:py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
+              className={`px-1.5 sm:px-3 py-1.5 text-[12px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap text-center ${
                 selectedQuincena === 1
                   ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
                   : 'text-slate-700 sm:text-slate-600 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-white/60 dark:hover:bg-emerald-400/10'
               }`}
             >
-              1ª Q ({getQuincenaRangeLabel(selectedMonth, 1)})
+              <span className="sm:hidden">1ª Q (15–16)</span>
+              <span className="hidden sm:inline">
+                1ª Q ({getQuincenaRangeLabel(selectedMonth, 1)})
+              </span>
             </button>
             <button
               type="button"
               onClick={() => onChangeQuincena(2)}
-              className={`flex-1 sm:flex-none px-2.5 sm:px-3 py-1 sm:py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
+              className={`px-1.5 sm:px-3 py-1.5 text-[12px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap text-center ${
                 selectedQuincena === 2
                   ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
                   : 'text-slate-700 sm:text-slate-600 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-white/60 dark:hover:bg-emerald-400/10'
               }`}
             >
-              2ª Q ({getQuincenaRangeLabel(selectedMonth, 2)})
+              <span className="sm:hidden">2ª Q (30–1)</span>
+              <span className="hidden sm:inline">
+                2ª Q ({getQuincenaRangeLabel(selectedMonth, 2)})
+              </span>
             </button>
           </div>
 

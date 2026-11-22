@@ -259,7 +259,7 @@ export function OverviewView({
     <div className="space-y-3.5 sm:space-y-5">
       {/* Period Selector Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
-        <div className="inline-flex items-center gap-1 p-1 bg-white/80 dark:bg-[#0D2118] border border-emerald-950/10 dark:border-emerald-400/15 shadow-xs rounded-xl w-full sm:w-fit overflow-x-auto">
+        <div className="grid grid-cols-3 sm:inline-flex items-center gap-1 p-1 bg-white/80 dark:bg-[#0D2118] border border-emerald-950/10 dark:border-emerald-400/15 shadow-xs rounded-xl w-full sm:w-fit">
           <button
             type="button"
             onClick={() => {
@@ -267,7 +267,7 @@ export function OverviewView({
               setConfirmingCopy(false);
               setCopyFeedback(null);
             }}
-            className={`flex-1 sm:flex-none px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
+            className={`px-1.5 sm:px-3 py-1.5 text-[12px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap text-center ${
               selectedQuincena === 'all'
                 ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
                 : 'text-slate-700 sm:text-slate-600 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-emerald-950/[0.04] dark:hover:bg-emerald-400/10'
@@ -282,13 +282,13 @@ export function OverviewView({
               setConfirmingCopy(false);
               setCopyFeedback(null);
             }}
-            className={`flex-1 sm:flex-none px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
+            className={`px-1.5 sm:px-3 py-1.5 text-[12px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap text-center ${
               selectedQuincena === 1
                 ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
                 : 'text-slate-700 sm:text-slate-600 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-emerald-950/[0.04] dark:hover:bg-emerald-400/10'
             }`}
           >
-            <span className="sm:hidden">1ª Q ({getQuincenaRangeLabel(selectedMonth, 1)})</span>
+            <span className="sm:hidden">1ª Q (15–16)</span>
             <span className="hidden sm:inline">
               1ª Quincena ({getQuincenaRangeLabel(selectedMonth, 1)})
             </span>
@@ -300,13 +300,13 @@ export function OverviewView({
               setConfirmingCopy(false);
               setCopyFeedback(null);
             }}
-            className={`flex-1 sm:flex-none px-3 py-1.5 text-[13px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 ${
+            className={`px-1.5 sm:px-3 py-1.5 text-[12px] sm:text-xs font-bold sm:font-semibold rounded-lg transition-all whitespace-nowrap text-center ${
               selectedQuincena === 2
                 ? 'bg-[#0B3B24] dark:bg-[#166E43] text-white shadow-xs'
                 : 'text-slate-700 sm:text-slate-600 dark:text-slate-300 hover:text-[#0B3B24] dark:hover:text-emerald-200 hover:bg-emerald-950/[0.04] dark:hover:bg-emerald-400/10'
             }`}
           >
-            <span className="sm:hidden">2ª Q ({getQuincenaRangeLabel(selectedMonth, 2)})</span>
+            <span className="sm:hidden">2ª Q (30–1)</span>
             <span className="hidden sm:inline">
               2ª Quincena ({getQuincenaRangeLabel(selectedMonth, 2)})
             </span>
@@ -380,7 +380,7 @@ export function OverviewView({
           {loadingData ? (
             <div className="h-6 sm:h-7 w-28 bg-slate-100 dark:bg-emerald-950/60 rounded mt-2 animate-pulse" />
           ) : (
-            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums mt-1 sm:mt-1.5 truncate">
+            <p className="text-[15px] min-[400px]:text-base sm:text-2xl font-mono font-bold sm:font-semibold tracking-tight text-emerald-700 dark:text-emerald-400 tabular-nums mt-1 sm:mt-1.5 truncate">
               +{formatCurrency(kpis.income, currency)}
             </p>
           )}
@@ -401,7 +401,7 @@ export function OverviewView({
           {loadingData ? (
             <div className="h-6 sm:h-7 w-28 bg-slate-100 dark:bg-emerald-950/60 rounded mt-2 animate-pulse" />
           ) : (
-            <p className="text-lg sm:text-2xl font-mono font-bold sm:font-semibold text-rose-700 dark:text-rose-400 tabular-nums mt-1 sm:mt-1.5 truncate">
+            <p className="text-[15px] min-[400px]:text-base sm:text-2xl font-mono font-bold sm:font-semibold tracking-tight text-rose-700 dark:text-rose-400 tabular-nums mt-1 sm:mt-1.5 truncate">
               −{formatCurrency(kpis.expense, currency)}
             </p>
           )}
@@ -423,7 +423,7 @@ export function OverviewView({
             <div className="h-6 sm:h-7 w-28 bg-slate-100 dark:bg-emerald-950/60 rounded mt-2 animate-pulse" />
           ) : (
             <p
-              className={`text-lg sm:text-2xl font-mono font-bold sm:font-semibold tabular-nums mt-1 sm:mt-1.5 truncate ${
+              className={`text-[15px] min-[400px]:text-base sm:text-2xl font-mono font-bold sm:font-semibold tracking-tight tabular-nums mt-1 sm:mt-1.5 truncate ${
                 kpis.net > 0
                   ? 'text-slate-900 dark:text-slate-100'
                   : kpis.net < 0
