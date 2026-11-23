@@ -51,7 +51,7 @@ const NAV_ITEMS: { id: NavSection; label: string; icon: typeof LayoutDashboard }
   { id: 'movimientos', label: 'Movimientos', icon: ListOrdered },
   { id: 'deudas', label: 'Deudas y extractos', icon: CreditCard },
   { id: 'ahorro', label: 'Plan de ahorro', icon: PiggyBank },
-  { id: 'ia', label: 'Análisis IA', icon: BrainCircuit },
+  { id: 'ia', label: 'Análisis', icon: BrainCircuit },
   { id: 'graficas', label: 'Gráficas', icon: BarChart3 },
   { id: 'categorias', label: 'Categorías', icon: FolderKanban },
 ];

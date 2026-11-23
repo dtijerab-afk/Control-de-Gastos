@@ -792,7 +792,7 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
       setAiError(
         err instanceof Error
           ? err.message
-          : 'No se pudo analizar el extracto con IA. Intenta de nuevo.'
+          : 'No se pudo analizar el extracto. Intenta de nuevo.'
       );
     } finally {
       setAnalyzingStmtId(null);
@@ -856,7 +856,7 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
           date: tx.date,
           quincena: getQuincenaFromDate(tx.date),
           paymentMethod: tx.paymentMethod,
-          notes: `Importado con IA desde ${aiTargetStmt?.title || 'extracto bancario'}`.slice(
+          notes: `Importado desde ${aiTargetStmt?.title || 'extracto bancario'}`.slice(
             0,
             VALIDATION_LIMITS.NOTES_MAX
           ),
@@ -2173,7 +2173,7 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
                           ) : (
                             <BrainCircuit className="w-3.5 h-3.5" />
                           )}
-                          Leer con IA
+                          Analizar
                         </button>
                         <button
                           type="button"
@@ -2256,7 +2256,7 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#0B3B24] dark:text-emerald-200 bg-[#EFF5F1] dark:bg-[#122D20] hover:bg-emerald-100 dark:hover:bg-[#193C2B] border border-emerald-900/15 dark:border-emerald-400/25 rounded-xl whitespace-nowrap"
                 >
                   <BrainCircuit className="w-3.5 h-3.5" />
-                  Leer con IA
+                  Analizar
                 </button>
                 <button
                   type="button"
@@ -2327,7 +2327,7 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
                 </span>
                 <div className="min-w-0">
                   <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 truncate">
-                    Lectura IA: {aiTargetStmt.title}
+                    Análisis: {aiTargetStmt.title}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                     {aiTargetStmt.bankName} · {aiTargetStmt.fileName}
@@ -2342,7 +2342,7 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
                   setAiResult(null);
                   setAiError(null);
                 }}
-                aria-label="Cerrar análisis IA"
+                aria-label="Cerrar análisis"
                 className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-40"
               >
                 <X className="w-5 h-5" />
@@ -2354,7 +2354,7 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
                 <div className="py-12 text-center space-y-3">
                   <Loader2 className="w-8 h-8 mx-auto text-[#157548] dark:text-emerald-400 animate-spin" />
                   <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
-                    Leyendo extracto con IA...
+                    Analizando extracto...
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                     Estamos extrayendo fechas, conceptos, montos y datos de pago de tu documento.

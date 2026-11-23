@@ -279,7 +279,7 @@ export function AiAdvisorView({ selectedMonth, onNavigate }: AiAdvisorViewProps)
             </span>
             <div className="min-w-0">
               <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 font-display leading-tight">
-                Diagnóstico financiero con IA
+                Análisis financiero
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Analiza tus quincenas (15–16 y 30–1), presupuestos, deudas y plan de ahorro de{' '}
@@ -426,7 +426,7 @@ export function AiAdvisorView({ selectedMonth, onNavigate }: AiAdvisorViewProps)
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Sube un extracto o toma una foto en Deudas y extractos para extraer movimientos y
-              fechas de pago con IA en un clic.
+              fechas de pago automáticamente en un clic.
             </p>
           </div>
         </div>

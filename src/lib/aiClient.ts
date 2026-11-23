@@ -99,7 +99,7 @@ async function postJson<T>(url: string, body: unknown): Promise<T> {
   if (!res.ok) {
     if (res.status === 405) {
       throw new Error(
-        'Esta URL está en un hosting estático (como GitHub Pages) que no ejecuta el backend /api de IA. Abre la app desplegada con servidor (Cloud Run / vista previa) o configura la variable VITE_API_BASE_URL en GitHub apuntando a tu servidor.'
+        'Esta URL está en un hosting estático (como GitHub Pages) que no ejecuta el backend /api de análisis. Abre la app desplegada con servidor (Cloud Run / vista previa) o configura la variable VITE_API_BASE_URL en GitHub apuntando a tu servidor.'
       );
     }
     throw new Error(data.error || `Error del servidor (${res.status}).`);
