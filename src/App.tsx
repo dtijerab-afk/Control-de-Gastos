@@ -3,6 +3,7 @@ import {
   AlertCircle,
   AlertTriangle,
   BarChart3,
+  BrainCircuit,
   ChevronLeft,
   ChevronRight,
   CreditCard,
@@ -17,6 +18,7 @@ import {
   Sun,
   X,
 } from 'lucide-react';
+import { AiAdvisorView } from './components/AiAdvisorView';
 import { AnalyticsView } from './components/AnalyticsView';
 import { AuthScreen } from './components/AuthScreen';
 import { BrandLogo } from './components/BrandLogo';
@@ -49,6 +51,7 @@ const NAV_ITEMS: { id: NavSection; label: string; icon: typeof LayoutDashboard }
   { id: 'movimientos', label: 'Movimientos', icon: ListOrdered },
   { id: 'deudas', label: 'Deudas y extractos', icon: CreditCard },
   { id: 'ahorro', label: 'Plan de ahorro', icon: PiggyBank },
+  { id: 'ia', label: 'Análisis IA', icon: BrainCircuit },
   { id: 'graficas', label: 'Gráficas', icon: BarChart3 },
   { id: 'categorias', label: 'Categorías', icon: FolderKanban },
 ];
@@ -437,6 +440,10 @@ export default function App() {
 
           {activeNav === 'ahorro' && (
             <SavingsPlanView selectedMonth={selectedMonth} />
+          )}
+
+          {activeNav === 'ia' && (
+            <AiAdvisorView selectedMonth={selectedMonth} onNavigate={setActiveNav} />
           )}
 
           {activeNav === 'graficas' && (

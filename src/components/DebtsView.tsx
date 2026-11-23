@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
   AlertTriangle,
+  BrainCircuit,
   Building2,
   CalendarClock,
   Camera,
@@ -12,6 +13,7 @@ import {
   FileImage,
   FileText,
   History,
+  Loader2,
   Paperclip,
   Pencil,
   Plus,
@@ -22,6 +24,10 @@ import {
   X,
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
+import {
+  analyzeStatementWithAi,
+  type ParsedStatementResult,
+} from '../lib/aiClient';
 import {
   addMonthsToDateStr,
 } from '../lib/savingsPlan';
@@ -145,6 +151,15 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
 
   // Statement Preview Modal
   const [previewStmt, setPreviewStmt] = useState<BankStatementRecord | null>(null);
+
+  // AI Statement Parser Modal state
+  const [analyzingStmtId, setAnalyzingStmtId] = useState<string | null>(null);
+  const [aiTargetStmt, setAiTargetStmt] = useState<BankStatementRecord | null>(null);
+  const [aiResult, setAiResult] = useState<ParsedStatementResult | null>(null);
+  const [aiSelectedIdx, setAiSelectedIdx] = useState<Record<number, boolean>>({});
+  const [aiCategoryIds, setAiCategoryIds] = useState<Record<number, string>>({});
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [importingAiTxs, setImportingAiTxs] = useState(false);
 
   // Sync month selector default for new statement uploads
   useEffect(() => {
@@ -729,6 +744,139 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
     if (debt.institution) setStmtBank(debt.institution);
     setStmtTitle(`Extracto ${debt.name} - ${formatShortMonthLabel(selectedMonth)}`);
     statementsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const matchCategoryForAiTx = (suggestedName: string, txType: 'ingreso' | 'gasto'): string => {
+    const byType = categories.filter((c) => c.type === txType);
+    if (byType.length === 0) return categories[0]?.id ?? '';
+    const norm = suggestedName.trim().toLowerCase();
+    if (norm) {
+      const exact = byType.find((c) => c.name.trim().toLowerCase() === norm);
+      if (exact) return exact.id;
+      const partial = byType.find(
+        (c) =>
+          c.name.trim().toLowerCase().includes(norm) ||
+          norm.includes(c.name.trim().toLowerCase())
+      );
+      if (partial) return partial.id;
+    }
+    return byType[0].id;
+  };
+
+  const handleAnalyzeStatementWithAi = async (stmt: BankStatementRecord) => {
+    setAnalyzingStmtId(stmt.id);
+    setAiTargetStmt(stmt);
+    setAiResult(null);
+    setAiError(null);
+    setPreviewStmt(null);
+
+    try {
+      const parsed = await analyzeStatementWithAi({
+        blob: stmt.blob,
+        mimeType: stmt.mimeType,
+        fileName: stmt.fileName,
+        currency,
+        defaultMonthKey: stmt.monthKey || selectedMonth,
+        categories,
+      });
+      const initialSelected: Record<number, boolean> = {};
+      const initialCats: Record<number, string> = {};
+      parsed.transactions.forEach((tx, idx) => {
+        initialSelected[idx] = true;
+        initialCats[idx] = matchCategoryForAiTx(tx.suggestedCategoryName, tx.type);
+      });
+      setAiSelectedIdx(initialSelected);
+      setAiCategoryIds(initialCats);
+      setAiResult(parsed);
+    } catch (err) {
+      setAiError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo analizar el extracto con IA. Intenta de nuevo.'
+      );
+    } finally {
+      setAnalyzingStmtId(null);
+    }
+  };
+
+  const handleApplyDetectedDebtFromAi = () => {
+    const d = aiResult?.detectedDebt;
+    if (!d) return;
+    setEditingDebtId(null);
+    setName(d.name || `Tarjeta ${d.institution || aiResult?.bankName || ''}`.trim());
+    setInstitution(d.institution || aiResult?.bankName || aiTargetStmt?.bankName || '');
+    setCategory('tarjeta_credito');
+    const bal = d.totalBalance > 0 ? String(Math.round(d.totalBalance * 100) / 100) : '';
+    setRemainingAmount(bal);
+    setTotalAmount(bal);
+    setMonthlyPayment(
+      d.minimumPayment > 0 ? String(Math.round(d.minimumPayment * 100) / 100) : ''
+    );
+    setInterestRate(d.interestRate > 0 ? String(d.interestRate) : '');
+    setCutoffDay(d.cutoffDay >= 1 && d.cutoffDay <= 31 ? String(d.cutoffDay) : '');
+    if (d.dueDate && VALIDATION_LIMITS.DATE_PATTERN.test(d.dueDate)) {
+      setNextDueDate(d.dueDate);
+      const dayNum = Number(d.dueDate.slice(8, 10)) || 16;
+      setDueDay(String(dayNum));
+      setPayQuincena(dayNum >= 15 && dayNum < 30 ? 1 : 2);
+    }
+    setNotes(
+      aiResult?.statementPeriod
+        ? `Detectado del extracto ${aiResult.statementPeriod}`
+        : 'Detectado automáticamente desde extracto bancario'
+    );
+    setFormError(null);
+    setAiTargetStmt(null);
+    setAiResult(null);
+    setFormOpen(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleImportAiTransactions = async () => {
+    if (!user || !aiResult) return;
+    const chosen = aiResult.transactions
+      .map((tx, idx) => ({ tx, idx }))
+      .filter(({ idx }) => aiSelectedIdx[idx]);
+    if (chosen.length === 0) return;
+
+    setImportingAiTxs(true);
+    setAiError(null);
+    try {
+      let importedCount = 0;
+      for (const { tx, idx } of chosen) {
+        const catId = aiCategoryIds[idx] || matchCategoryForAiTx(tx.suggestedCategoryName, tx.type);
+        const catObj = categories.find((c) => c.id === catId);
+        if (!catObj) continue;
+        await createTransaction(user.uid, {
+          type: tx.type,
+          amount: tx.amount,
+          description: tx.description,
+          categoryId: catObj.id,
+          categoryName: catObj.name,
+          date: tx.date,
+          quincena: getQuincenaFromDate(tx.date),
+          paymentMethod: tx.paymentMethod,
+          notes: `Importado con IA desde ${aiTargetStmt?.title || 'extracto bancario'}`.slice(
+            0,
+            VALIDATION_LIMITS.NOTES_MAX
+          ),
+        });
+        importedCount += 1;
+      }
+      setAiTargetStmt(null);
+      setAiResult(null);
+      setFeedback(
+        importedCount === 1
+          ? 'Se importó 1 movimiento a MoneyFlow desde el extracto.'
+          : `Se importaron ${importedCount} movimientos a MoneyFlow desde el extracto.`
+      );
+    } catch (err) {
+      setAiError(
+        err instanceof Error ? err.message : 'Ocurrió un error al importar los movimientos.'
+      );
+    } finally {
+      setImportingAiTxs(false);
+    }
   };
 
   return (
@@ -2013,7 +2161,20 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
                     </div>
 
                     <div className="flex items-center justify-between gap-2 pt-2 border-t border-emerald-950/[0.06] dark:border-emerald-400/10">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <button
+                          type="button"
+                          disabled={analyzingStmtId === stmt.id}
+                          onClick={() => void handleAnalyzeStatementWithAi(stmt)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-white bg-gradient-to-b from-[#157548] to-[#0F5A36] hover:from-[#12663F] hover:to-[#0B472A] dark:from-emerald-500 dark:to-emerald-600 dark:text-[#041A10] disabled:opacity-60 rounded-lg transition-all whitespace-nowrap"
+                        >
+                          {analyzingStmtId === stmt.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <BrainCircuit className="w-3.5 h-3.5" />
+                          )}
+                          Leer con IA
+                        </button>
                         <button
                           type="button"
                           onClick={() => setPreviewStmt(stmt)}
@@ -2025,10 +2186,11 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
                         <button
                           type="button"
                           onClick={() => handleDownloadStatement(stmt)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-[#0B1D15] hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
+                          aria-label={`Descargar ${stmt.title}`}
+                          title="Descargar"
+                          className="p-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-[#0B1D15] hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
                         >
                           <Download className="w-3.5 h-3.5" />
-                          Descargar
                         </button>
                       </div>
 
@@ -2090,6 +2252,14 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
+                  onClick={() => void handleAnalyzeStatementWithAi(previewStmt)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#0B3B24] dark:text-emerald-200 bg-[#EFF5F1] dark:bg-[#122D20] hover:bg-emerald-100 dark:hover:bg-[#193C2B] border border-emerald-900/15 dark:border-emerald-400/25 rounded-xl whitespace-nowrap"
+                >
+                  <BrainCircuit className="w-3.5 h-3.5" />
+                  Leer con IA
+                </button>
+                <button
+                  type="button"
                   onClick={() => handleDownloadStatement(previewStmt)}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-b from-[#157548] to-[#0F5A36] dark:from-emerald-500 dark:to-emerald-600 dark:text-[#041A10] rounded-xl whitespace-nowrap"
                 >
@@ -2133,6 +2303,272 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
                 </p>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Statement Extraction Review Modal */}
+      {aiTargetStmt && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !analyzingStmtId && !importingAiTxs) {
+              setAiTargetStmt(null);
+              setAiResult(null);
+              setAiError(null);
+            }
+          }}
+        >
+          <div className="w-full max-w-3xl max-h-[90vh] bg-white dark:bg-[#0B1D15] border border-emerald-950/15 dark:border-emerald-400/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            <div className="px-4 sm:px-5 py-3.5 border-b border-emerald-950/[0.08] dark:border-emerald-400/15 flex items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="w-8 h-8 rounded-xl bg-[#EEF6F1] dark:bg-emerald-500/15 text-[#0F5A36] dark:text-emerald-300 flex items-center justify-center shrink-0">
+                  <BrainCircuit className="w-4 h-4" />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 truncate">
+                    Lectura IA: {aiTargetStmt.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                    {aiTargetStmt.bankName} · {aiTargetStmt.fileName}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={Boolean(analyzingStmtId) || importingAiTxs}
+                onClick={() => {
+                  setAiTargetStmt(null);
+                  setAiResult(null);
+                  setAiError(null);
+                }}
+                aria-label="Cerrar análisis IA"
+                className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-40"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+              {analyzingStmtId && (
+                <div className="py-12 text-center space-y-3">
+                  <Loader2 className="w-8 h-8 mx-auto text-[#157548] dark:text-emerald-400 animate-spin" />
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                    Leyendo extracto con IA...
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                    Estamos extrayendo fechas, conceptos, montos y datos de pago de tu documento.
+                  </p>
+                </div>
+              )}
+
+              {aiError && !analyzingStmtId && (
+                <div className="px-4 py-3 text-xs font-semibold text-rose-800 dark:text-rose-200 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-500/30 rounded-xl flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{aiError}</span>
+                </div>
+              )}
+
+              {aiResult && !analyzingStmtId && (
+                <>
+                  {/* Extracted Summary */}
+                  <div className="p-3.5 rounded-xl bg-[#F4F9F5] dark:bg-[#0D2118] border border-emerald-900/12 dark:border-emerald-400/20 space-y-1">
+                    <p className="text-xs font-bold text-[#0B3B24] dark:text-emerald-200">
+                      {aiResult.bankName || aiTargetStmt.bankName}
+                      {aiResult.statementPeriod ? ` · ${aiResult.statementPeriod}` : ''}
+                    </p>
+                    {aiResult.summary && (
+                      <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                        {aiResult.summary}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Detected Debt Card */}
+                  {aiResult.detectedDebt?.hasDebtInfo && (
+                    <div className="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-300/70 dark:border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="space-y-1 min-w-0">
+                        <p className="text-xs font-bold text-amber-950 dark:text-amber-100">
+                          Datos de deuda detectados en el extracto
+                        </p>
+                        <p className="text-xs text-amber-900/85 dark:text-amber-200/85 font-mono tabular-nums flex flex-wrap gap-x-2 gap-y-0.5">
+                          {aiResult.detectedDebt.totalBalance > 0 && (
+                            <span>
+                              Saldo: {formatCurrency(aiResult.detectedDebt.totalBalance, currency)}
+                            </span>
+                          )}
+                          {aiResult.detectedDebt.minimumPayment > 0 && (
+                            <span>
+                              · Cuota/Mín:{' '}
+                              {formatCurrency(aiResult.detectedDebt.minimumPayment, currency)}
+                            </span>
+                          )}
+                          {aiResult.detectedDebt.dueDate && (
+                            <span>· Límite: {aiResult.detectedDebt.dueDate}</span>
+                          )}
+                          {aiResult.detectedDebt.cutoffDay > 0 && (
+                            <span>· Corte día {aiResult.detectedDebt.cutoffDay}</span>
+                          )}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleApplyDetectedDebtFromAi}
+                        className="px-3.5 py-2 text-xs font-bold text-amber-950 dark:text-amber-100 bg-white dark:bg-amber-900/50 border border-amber-300 dark:border-amber-500/40 rounded-xl hover:bg-amber-100/70 transition-colors whitespace-nowrap shrink-0"
+                      >
+                        Cargar en nueva deuda
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Extracted Transactions List */}
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                        Movimientos detectados ({aiResult.transactions.length})
+                      </p>
+                      {aiResult.transactions.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const allSelected = aiResult.transactions.every(
+                              (_, i) => aiSelectedIdx[i]
+                            );
+                            const next: Record<number, boolean> = {};
+                            aiResult.transactions.forEach((_, i) => {
+                              next[i] = !allSelected;
+                            });
+                            setAiSelectedIdx(next);
+                          }}
+                          className="text-xs font-bold text-[#12663F] dark:text-emerald-400 hover:underline"
+                        >
+                          {aiResult.transactions.every((_, i) => aiSelectedIdx[i])
+                            ? 'Deseleccionar todos'
+                            : 'Seleccionar todos'}
+                        </button>
+                      )}
+                    </div>
+
+                    {aiResult.transactions.length === 0 ? (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 py-4 text-center">
+                        No se detectaron movimientos individuales en este archivo.
+                      </p>
+                    ) : (
+                      <div className="divide-y divide-emerald-950/[0.07] dark:divide-emerald-400/10 border border-emerald-950/[0.08] dark:border-emerald-400/15 rounded-xl overflow-hidden">
+                        {aiResult.transactions.map((tx, idx) => {
+                          const checked = Boolean(aiSelectedIdx[idx]);
+                          const matchingCats = categories.filter((c) => c.type === tx.type);
+                          const catList = matchingCats.length > 0 ? matchingCats : categories;
+                          const q = getQuincenaFromDate(tx.date);
+
+                          return (
+                            <div
+                              key={`${tx.date}-${tx.description}-${idx}`}
+                              className={`p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-colors ${
+                                checked
+                                  ? 'bg-white dark:bg-[#0B1D15]'
+                                  : 'bg-slate-50/70 dark:bg-[#07140E] opacity-60'
+                              }`}
+                            >
+                              <label className="flex items-start gap-2.5 min-w-0 cursor-pointer flex-1">
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={(e) =>
+                                    setAiSelectedIdx((prev) => ({
+                                      ...prev,
+                                      [idx]: e.target.checked,
+                                    }))
+                                  }
+                                  className="mt-1 rounded border-emerald-900/30 text-[#0F5A36] focus:ring-emerald-600/40 shrink-0"
+                                />
+                                <div className="min-w-0">
+                                  <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                                    {tx.description}
+                                  </p>
+                                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono tabular-nums">
+                                    {formatShortDate(tx.date)} · {q === 1 ? '1ª Q' : '2ª Q'} ·{' '}
+                                    {tx.type === 'ingreso' ? 'Ingreso' : 'Gasto'}
+                                  </p>
+                                </div>
+                              </label>
+
+                              <div className="flex items-center justify-between sm:justify-end gap-2.5 pl-6 sm:pl-0 shrink-0">
+                                <select
+                                  value={aiCategoryIds[idx] ?? ''}
+                                  onChange={(e) =>
+                                    setAiCategoryIds((prev) => ({
+                                      ...prev,
+                                      [idx]: e.target.value,
+                                    }))
+                                  }
+                                  className="px-2 py-1 text-xs bg-[#F6FAF7] dark:bg-[#0D2118] border border-emerald-900/15 dark:border-emerald-400/20 rounded-lg text-slate-800 dark:text-slate-200 max-w-[165px]"
+                                >
+                                  {catList.map((c) => (
+                                    <option key={c.id} value={c.id}>
+                                      {c.name}
+                                    </option>
+                                  ))}
+                                </select>
+                                <span
+                                  className={`text-xs sm:text-sm font-mono font-bold tabular-nums whitespace-nowrap ${
+                                    tx.type === 'ingreso'
+                                      ? 'text-emerald-700 dark:text-emerald-400'
+                                      : 'text-rose-700 dark:text-rose-400'
+                                  }`}
+                                >
+                                  {tx.type === 'ingreso' ? '+' : '−'}
+                                  {formatCurrency(tx.amount, currency)}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {aiResult && !analyzingStmtId && aiResult.transactions.length > 0 && (
+              <div className="px-4 sm:px-5 py-3.5 border-t border-emerald-950/[0.08] dark:border-emerald-400/15 bg-[#F6FAF7] dark:bg-[#0D2118] flex items-center justify-between gap-3 shrink-0">
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  {Object.values(aiSelectedIdx).filter(Boolean).length} seleccionados para importar
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={importingAiTxs}
+                    onClick={() => {
+                      setAiTargetStmt(null);
+                      setAiResult(null);
+                    }}
+                    className="px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+                  >
+                    Cerrar
+                  </button>
+                  <button
+                    type="button"
+                    disabled={
+                      importingAiTxs ||
+                      Object.values(aiSelectedIdx).filter(Boolean).length === 0
+                    }
+                    onClick={() => void handleImportAiTransactions()}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-gradient-to-b from-[#157548] to-[#0F5A36] hover:from-[#12663F] hover:to-[#0B472A] dark:from-emerald-500 dark:to-emerald-600 dark:text-[#041A10] disabled:opacity-50 rounded-xl shadow-xs whitespace-nowrap"
+                  >
+                    {importingAiTxs ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    )}
+                    {importingAiTxs
+                      ? 'Importando...'
+                      : `Importar ${Object.values(aiSelectedIdx).filter(Boolean).length} movimientos`}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
