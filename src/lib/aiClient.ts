@@ -86,14 +86,22 @@ export function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
+
 async function postJson<T>(url: string, body: unknown): Promise<T> {
-  const res = await fetch(url, {
+  const targetUrl = API_BASE ? `${API_BASE}${url}` : url;
+  const res = await fetch(targetUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
   const data = (await res.json().catch(() => ({}))) as T & { error?: string };
   if (!res.ok) {
+    if (res.status === 405) {
+      throw new Error(
+        'Esta URL está en un hosting estático (como GitHub Pages) que no ejecuta el backend /api de IA. Abre la app desplegada con servidor (Cloud Run / vista previa) o configura la variable VITE_API_BASE_URL en GitHub apuntando a tu servidor.'
+      );
+    }
     throw new Error(data.error || `Error del servidor (${res.status}).`);
   }
   return data;
