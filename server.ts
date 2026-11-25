@@ -352,6 +352,8 @@ export function createApp() {
       const parsed = JSON.parse(rawText);
       res.json(parsed);
     } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      console.error('[MoneyFlow Gemini API error]', { message: detail, status: typeof err === 'object' && err !== null && 'status' in err ? (err as { status?: unknown }).status : undefined, code: typeof err === 'object' && err !== null && 'code' in err ? (err as { code?: unknown }).code : undefined });
       const { status, message } = formatApiError(err);
       res.status(status).json({ error: message });
     }
@@ -433,6 +435,8 @@ export function createApp() {
       const parsed = JSON.parse(rawText);
       res.json(parsed);
     } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      console.error('[MoneyFlow Gemini API error]', { message: detail, status: typeof err === 'object' && err !== null && 'status' in err ? (err as { status?: unknown }).status : undefined, code: typeof err === 'object' && err !== null && 'code' in err ? (err as { code?: unknown }).code : undefined });
       const { status, message } = formatApiError(err);
       res.status(status).json({ error: message });
     }
@@ -486,6 +490,8 @@ export function createApp() {
 
       res.json({ answer: (response.text ?? '').trim() });
     } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      console.error('[MoneyFlow Gemini API error]', { message: detail, status: typeof err === 'object' && err !== null && 'status' in err ? (err as { status?: unknown }).status : undefined, code: typeof err === 'object' && err !== null && 'code' in err ? (err as { code?: unknown }).code : undefined });
       const { status, message } = formatApiError(err);
       res.status(status).json({ error: message });
     }
