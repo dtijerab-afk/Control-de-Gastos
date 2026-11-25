@@ -65,6 +65,7 @@ import {
   type BankStatementRecord,
 } from '../lib/statementsDb';
 import { createTransaction } from '../services/financeService';
+import { loadDebtsFromCloud, migratePersonalDataToCloud, saveDebtsToCloud } from '../services/personalDataSync';
 import {
   CATEGORY_COLOR_SWATCHES,
   VALIDATION_LIMITS,
@@ -169,9 +170,18 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
   // Sync user data when user changes
   useEffect(() => {
     if (!user) return;
-    setDebtsState(loadDebtsState(user.uid));
     let cancelled = false;
     setLoadingStatements(true);
+    void (async () => {
+      try {
+        await migratePersonalDataToCloud(user.uid);
+        const cloudState = await loadDebtsFromCloud(user.uid);
+        if (!cancelled) setDebtsState(cloudState);
+      } catch (error) {
+        console.error('No se pudo sincronizar las deudas con Firebase:', error);
+        if (!cancelled) setFeedback('No se pudo sincronizar la información de deudas. Tus datos locales se conservaron.');
+      }
+    })();
     listBankStatements(user.uid)
       .then((rows) => {
         if (!cancelled) setStatements(rows);
@@ -211,7 +221,10 @@ export function DebtsView({ selectedMonth }: DebtsViewProps) {
         debts: updater(prev.debts),
         updatedAt: new Date().toISOString(),
       };
-      if (user) saveDebtsState(user.uid, next);
+      if (user) void saveDebtsToCloud(user.uid, next).catch((error) => {
+        console.error('No se pudieron guardar las deudas en Firebase:', error);
+        setFeedback('No se pudo guardar en la nube. La copia de este dispositivo se conservó.');
+      });
       return next;
     });
   };
