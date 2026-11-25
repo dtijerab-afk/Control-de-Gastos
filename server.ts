@@ -30,7 +30,7 @@ function verifyFirebaseToken() {
       let adminApp = getApps()[0];
       if (!adminApp) {
         const serviceAccount = JSON.parse(rawServiceAccount);
-        serviceAccount.private_key = String(serviceAccount.private_key || '').replace(/\\\\n/g, '\\n');
+        serviceAccount.private_key = String(serviceAccount.private_key || '').replace(/\\n/g, '\n');
         adminApp = initializeApp({ credential: cert(serviceAccount) });
       }
       const decoded = await getAdminAuth(adminApp).verifyIdToken(match[1]);
