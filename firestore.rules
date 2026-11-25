@@ -152,6 +152,41 @@ service cloud.firestore {
 
       allow delete: if false;
 
+      // Private user state: debt and savings snapshots (one document per data type).
+      match /privateData/{dataId} {
+        allow get: if isOwner(userId) &&
+          isValidId(userId) &&
+          dataId in ['debts', 'savings'] &&
+          hasValidParentUser(userId);
+
+        allow list: if false;
+
+        allow create: if isOwner(userId) &&
+          isValidId(userId) &&
+          dataId in ['debts', 'savings'] &&
+          incoming().keys().hasAll(['ownerId', 'payload', 'updatedAt', 'migrationVersion']) &&
+          incoming().keys().hasOnly(['ownerId', 'payload', 'updatedAt', 'migrationVersion']) &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().payload is map &&
+          incoming().updatedAt == request.time &&
+          incoming().migrationVersion == 1 &&
+          hasValidParentUser(userId);
+
+        allow update: if isOwner(userId) &&
+          isValidId(userId) &&
+          dataId in ['debts', 'savings'] &&
+          incoming().keys().hasAll(['ownerId', 'payload', 'updatedAt', 'migrationVersion']) &&
+          incoming().keys().hasOnly(['ownerId', 'payload', 'updatedAt', 'migrationVersion']) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().ownerId == request.auth.uid &&
+          incoming().payload is map &&
+          incoming().updatedAt == request.time &&
+          incoming().migrationVersion == 1 &&
+          hasValidParentUser(userId);
+
+        allow delete: if false;
+      }
+
       // Subcollection: /users/{userId}/categories/{categoryId}
       match /categories/{categoryId} {
         allow get: if isOwner(userId) &&
