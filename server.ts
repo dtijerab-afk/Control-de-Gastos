@@ -124,7 +124,7 @@ interface FinancialSnapshot {
   };
 }
 
-function createApp() {
+export function createApp() {
   const app = express();
   app.use(express.json({ limit: '25mb' }));
 
@@ -462,4 +462,7 @@ async function startServer() {
   });
 }
 
-void startServer();
+// Vercel importa createApp() desde api/[...path].ts. En local seguimos iniciando el servidor normalmente.
+if (process.env.VERCEL !== '1') {
+  void startServer();
+}
