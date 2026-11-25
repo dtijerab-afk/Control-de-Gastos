@@ -4,12 +4,43 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI, Type } from '@google/genai';
+import { cert, getApps, initializeApp } from 'firebase-admin/app';
+import { getAuth as getAdminAuth } from 'firebase-admin/auth';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const MODEL_NAME = 'gemini-4-hydrogen';
 const PORT = Number(process.env.PORT) || 3000;
+
+function verifyFirebaseToken() {
+  return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+      const authorization = req.headers.authorization || '';
+      const match = authorization.match(/^Bearer\s+(.+)$/i);
+      if (!match) {
+        res.status(401).json({ error: 'Tu sesión no está autorizada. Inicia sesión nuevamente.' });
+        return;
+      }
+      const rawServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+      if (!rawServiceAccount) {
+        res.status(503).json({ error: 'El servidor aún no tiene configurada la verificación segura de Firebase.' });
+        return;
+      }
+      let adminApp = getApps()[0];
+      if (!adminApp) {
+        const serviceAccount = JSON.parse(rawServiceAccount);
+        serviceAccount.private_key = String(serviceAccount.private_key || '').replace(/\\\\n/g, '\\n');
+        adminApp = initializeApp({ credential: cert(serviceAccount) });
+      }
+      const decoded = await getAdminAuth(adminApp).verifyIdToken(match[1]);
+      (req as express.Request & { firebaseUid?: string }).firebaseUid = decoded.uid;
+      next();
+    } catch {
+      res.status(401).json({ error: 'La sesión no es válida o ha vencido. Vuelve a iniciar sesión.' });
+    }
+  };
+}
 
 function getGeminiClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -128,17 +159,23 @@ export function createApp() {
   const app = express();
   app.use(express.json({ limit: '25mb' }));
 
-  // Allow cross-origin calls to /api/* (e.g. from GitHub Pages frontend to deployed backend)
+  // CORS cerrado: solo se permite el frontend oficial y el origen adicional configurado.
+  const allowedOrigins = new Set([
+    'https://dtijerab-afk.github.io',
+    ...(process.env.FRONTEND_ORIGIN ? [process.env.FRONTEND_ORIGIN] : []),
+  ]);
   app.use('/api', (req, res, next) => {
     const origin = req.headers.origin;
+    if (origin && !allowedOrigins.has(origin)) {
+      res.status(403).json({ error: 'Origen no autorizado.' });
+      return;
+    }
     if (origin) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Vary', 'Origin');
-    } else {
-      res.setHeader('Access-Control-Allow-Origin', '*');
     }
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') {
       res.status(204).end();
       return;
@@ -149,6 +186,25 @@ export function createApp() {
   // Health check
   app.get('/api/health', (_req, res) => {
     res.json({ ok: true });
+  });
+
+  // Las rutas de IA requieren token Firebase válido y límite básico por usuario.
+  const requestWindows = new Map<string, { count: number; resetAt: number }>();
+  app.use('/api/ai', verifyFirebaseToken(), (req, res, next) => {
+    const uid = (req as express.Request & { firebaseUid?: string }).firebaseUid || req.ip || 'unknown';
+    const now = Date.now();
+    const windowState = requestWindows.get(uid);
+    if (!windowState || now >= windowState.resetAt) {
+      requestWindows.set(uid, { count: 1, resetAt: now + 15 * 60 * 1000 });
+      next();
+      return;
+    }
+    if (windowState.count >= 20) {
+      res.status(429).json({ error: 'Alcanzaste el límite temporal de consultas de IA. Intenta más tarde.' });
+      return;
+    }
+    windowState.count += 1;
+    next();
   });
 
   // 1. Parse Bank Statement (PDF or Image) into structured transactions & optional debt details
