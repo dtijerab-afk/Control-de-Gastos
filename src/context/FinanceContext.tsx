@@ -3,6 +3,7 @@ import { onAuthStateChanged, signInWithPopup, signOut, type User } from 'firebas
 import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { auth, db, googleProvider, handleFirestoreError, OperationType } from '../lib/firebase';
 import { ensureUserProfileAndSeedDefaults } from '../services/financeService';
+import { loadDebtsFromCloud, loadSavingsFromCloud, migratePersonalDataToCloud } from '../services/personalDataSync';
 import type { Category, CurrencyCode, Transaction, UserProfile } from '../types/finance';
 
 interface FinanceContextValue {
@@ -63,6 +64,14 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         const ensuredProfile = await ensureUserProfileAndSeedDefaults(activeUser);
         if (cancelled) return;
         setProfile(ensuredProfile);
+
+        // Migrate legacy browser-only data once, then refresh the local cache from the user's cloud copy.
+        await migratePersonalDataToCloud(activeUser.uid);
+        await Promise.all([
+          loadDebtsFromCloud(activeUser.uid),
+          loadSavingsFromCloud(activeUser.uid),
+        ]);
+        if (cancelled) return;
 
         let gotCats = false;
         let gotTxs = false;
