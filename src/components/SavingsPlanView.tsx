@@ -49,6 +49,7 @@ import {
   type SavingsRuleMode,
 } from '../lib/savingsPlan';
 import { createTransaction } from '../services/financeService';
+import { loadSavingsFromCloud, migratePersonalDataToCloud, saveSavingsToCloud } from '../services/personalDataSync';
 import {
   CATEGORY_COLOR_SWATCHES,
   VALIDATION_LIMITS,
@@ -78,13 +79,27 @@ export function SavingsPlanView({ selectedMonth }: SavingsPlanViewProps) {
   // Sync plan when user changes
   useEffect(() => {
     if (!user) return;
-    setPlan(loadSavingsPlan(user.uid));
+    let cancelled = false;
+    void (async () => {
+      try {
+        await migratePersonalDataToCloud(user.uid);
+        const cloudPlan = await loadSavingsFromCloud(user.uid);
+        if (!cancelled) setPlan(cloudPlan);
+      } catch (error) {
+        console.error('No se pudo sincronizar el plan de ahorro con Firebase:', error);
+        if (!cancelled) setFeedback('No se pudo sincronizar el ahorro. La copia local se conservó.');
+      }
+    })();
+    return () => { cancelled = true; };
   }, [user]);
 
   const updatePlan = (updater: (prev: SavingsPlanState) => SavingsPlanState) => {
     setPlan((prev) => {
       const next = updater(prev);
-      if (user) saveSavingsPlan(user.uid, next);
+      if (user) void saveSavingsToCloud(user.uid, next).catch((error) => {
+        console.error('No se pudo guardar el plan de ahorro en Firebase:', error);
+        setFeedback('No se pudo guardar en la nube. La copia de este dispositivo se conservó.');
+      });
       return next;
     });
   };
