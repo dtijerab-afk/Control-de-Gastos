@@ -10,7 +10,7 @@ import { getAuth as getAdminAuth } from 'firebase-admin/auth';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const MODEL_NAME = 'gemini-4-hydrogen';
+const MODEL_NAME = 'gemini-3.8-flash';
 const PORT = Number(process.env.PORT) || 3000;
 
 function verifyFirebaseToken() {
