@@ -1,4 +1,5 @@
 import type { Category, CurrencyCode, PaymentMethod, TransactionType } from '../types/finance';
+import { auth } from './firebase';
 
 export interface ParsedStatementTransaction {
   date: string;
@@ -90,9 +91,12 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const targetUrl = API_BASE ? `${API_BASE}${url}` : url;
+  const user = auth.currentUser;
+  if (!user) throw new Error('Inicia sesión para utilizar el asesor de IA.');
+  const idToken = await user.getIdToken();
   const res = await fetch(targetUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
     body: JSON.stringify(body),
   });
   const data = (await res.json().catch(() => ({}))) as T & { error?: string };
